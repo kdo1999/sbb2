@@ -2,6 +2,9 @@ package com.sbb2.infrastructer.question.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,6 +14,10 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 import com.sbb2.common.config.JpaAudtingConfig;
@@ -44,6 +51,30 @@ public class QuestionRepositoryTest {
 			.build();
 
 		Member savedMember = memberRepository.save(member);
+
+		String subject = "testSubject";
+		String content = "testContent";
+		Member author = memberRepository.findById(1L).get();
+
+		for (int i = 0; i < 20; i++) {
+			Question question = Question.builder()
+			.subject(subject + i + 1)
+			.content(content + i + 1)
+			.author(author)
+			.build();
+
+			questionRepository.save(question);
+		}
+
+		for (int i = 0; i < 5; i++) {
+			Question question = Question.builder()
+			.subject("searchSubject" + i + 1)
+			.content("searchContent" + i + 1)
+			.author(author)
+			.build();
+
+			questionRepository.save(question);
+		}
 	}
 
 	@DisplayName("질문 저장 테스트")
@@ -67,5 +98,23 @@ public class QuestionRepositoryTest {
 		assertThat(savedQuestion).isEqualTo(question);
 		assertThat(savedQuestion.createdAt()).isNotNull();
 		assertThat(savedQuestion.modifiedAt()).isNotNull();
+	}
+
+	@DisplayName("질문 키워드 조회 테스트")
+	@Test
+	void find_keyword_question() {
+		//given
+		String keyword = "search";
+		int page = 0;
+
+		//when
+		List<Sort.Order> sorts = new ArrayList<>();
+        sorts.add(Sort.Order.desc("createdAt"));
+        Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
+		Page<Question> questionPage = questionRepository.findAll(keyword, pageable);
+
+		//then
+		assertThat(questionPage.getTotalPages()).isEqualTo(1);
+		assertThat(questionPage.getContent().size()).isEqualTo(5);
 	}
 }
