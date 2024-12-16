@@ -23,7 +23,7 @@ public class MemberEntity {
 	private Long id;
 
 	@Column
-	private String usernmae;
+	private String username;
 
 	@Column
 	private String email;
@@ -32,9 +32,9 @@ public class MemberEntity {
 	private String password;
 
 	@Builder(access = AccessLevel.PROTECTED)
-	private MemberEntity(Long id, String usernmae, String email, String password) {
+	private MemberEntity(Long id, String username, String email, String password) {
 		this.id = id;
-		this.usernmae = usernmae;
+		this.username = username;
 		this.email = email;
 		this.password = password;
 	}
@@ -42,7 +42,7 @@ public class MemberEntity {
 	public static MemberEntity from(Member member) {
 		return MemberEntity.builder()
 			.id(member.id())
-			.usernmae(member.username())
+			.username(member.username())
 			.email(member.email())
 			.password(member.password())
 			.build();
@@ -51,7 +51,7 @@ public class MemberEntity {
 	public Member toModel() {
 		return Member.builder()
 			.id(this.id)
-			.username(this.usernmae)
+			.username(this.username)
 			.email(this.email)
 			.password(this.password)
 			.build();
