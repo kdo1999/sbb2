@@ -41,6 +41,7 @@ public class MemberEntity {
 
 	public static MemberEntity from(Member member) {
 		return MemberEntity.builder()
+			.id(member.id())
 			.usernmae(member.username())
 			.email(member.email())
 			.password(member.password())
@@ -49,6 +50,7 @@ public class MemberEntity {
 
 	public Member toModel() {
 		return Member.builder()
+			.id(this.id)
 			.username(this.usernmae)
 			.email(this.email)
 			.password(this.password)

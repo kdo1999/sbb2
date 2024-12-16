@@ -46,8 +46,8 @@ public class MemberRepositoryTest {
 	}
 
 	@Test
-	@DisplayName("회원 조회 테스트")
-	void find_member() {
+	@DisplayName("회원 ID 조회 테스트")
+	void find_id_member() {
 		//given
 		String username = "testUsername";
 		String password = "testPassword";
@@ -62,7 +62,7 @@ public class MemberRepositoryTest {
 		Member savedMember = memberRepository.save(member);
 
 		//when
-		Member findMember = memberRepository.findById(savedMember.id());
+		Member findMember = memberRepository.findById(savedMember.id()).get();
 
 		//then
 		assertThat(findMember).isEqualTo(savedMember);
