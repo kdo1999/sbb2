@@ -4,6 +4,9 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
+import com.sbb2.infrastructer.member.entity.MemberEntity;
+import com.sbb2.member.domain.Member;
+
 import lombok.RequiredArgsConstructor;
 
 @Repository
@@ -12,7 +15,7 @@ public class MemberRepositoryImpl implements MemberRepository{
 	private final MemberJpaRepository memberJpaRepository;
 
 	@Override
-	public Optional<Member> save(Member member) {
-		return memberJpaRepository.save(member).toModel();
+	public Member save(Member member) {
+		return memberJpaRepository.save(MemberEntity.from(member)).toModel();
 	}
 }

@@ -2,6 +2,8 @@ package com.sbb2.infrastructer.member.repository;
 
 import java.util.Optional;
 
+import com.sbb2.member.domain.Member;
+
 public interface MemberRepository {
-	Optional<Member> save(Member member);
+	Member save(Member member);
 }
