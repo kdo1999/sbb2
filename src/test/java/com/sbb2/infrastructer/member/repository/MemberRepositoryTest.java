@@ -1,4 +1,4 @@
-package com.sbb2.repository;
+package com.sbb2.infrastructer.member.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
