@@ -21,12 +21,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 import com.sbb2.common.config.JpaAudtingConfig;
+import com.sbb2.common.config.QuerydslConfig;
 import com.sbb2.infrastructer.member.repository.MemberRepository;
 import com.sbb2.member.domain.Member;
+import com.sbb2.question.domain.QuestionPageResponse;
 import com.sbb2.question.domain.Question;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class))
-@Import(JpaAudtingConfig.class)
+@Import({JpaAudtingConfig.class, QuerydslConfig.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class QuestionRepositoryTest {
 	private final MemberRepository memberRepository;
@@ -111,7 +113,7 @@ public class QuestionRepositoryTest {
 		List<Sort.Order> sorts = new ArrayList<>();
         sorts.add(Sort.Order.desc("createdAt"));
         Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
-		Page<Question> questionPage = questionRepository.findAll(keyword, pageable);
+		Page<QuestionPageResponse> questionPage = questionRepository.findAll(keyword, pageable);
 
 		//then
 		assertThat(questionPage.getTotalPages()).isEqualTo(1);
