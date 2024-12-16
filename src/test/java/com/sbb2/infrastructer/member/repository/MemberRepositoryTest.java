@@ -2,9 +2,6 @@ package com.sbb2.infrastructer.member.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
-import java.util.Optional;
-
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +10,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.stereotype.Repository;
 
-import com.sbb2.infrastructer.member.repository.MemberRepository;
 import com.sbb2.member.domain.Member;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class))
@@ -71,7 +67,7 @@ public class MemberRepositoryTest {
 	@DisplayName("회원 Username 조회 테스트")
 	@Test
 	void find_username_member() {
-	    //given
+		//given
 		String username = "findUsername";
 		String password = "testPassword";
 		String email = "testEmail";
