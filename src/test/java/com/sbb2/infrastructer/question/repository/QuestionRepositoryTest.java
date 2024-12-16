@@ -97,7 +97,9 @@ public class QuestionRepositoryTest {
 		Question savedQuestion = questionRepository.save(question);
 
 		//then
-		assertThat(savedQuestion).isEqualTo(question);
+		assertThat(savedQuestion.subject()).isEqualTo(subject);
+		assertThat(savedQuestion.content()).isEqualTo(content);
+		assertThat(savedQuestion.author()).isEqualTo(author);
 		assertThat(savedQuestion.createdAt()).isNotNull();
 		assertThat(savedQuestion.modifiedAt()).isNotNull();
 	}
@@ -139,8 +141,8 @@ public class QuestionRepositoryTest {
 	    //when
 		Question findQuestion = questionRepository.findById(savedQuestion.id()).get();
 
-	    //then
-	    assertThat(findQuestion).isEqualTo(givenQuestion);
+		//then
+	    assertThat(findQuestion).isEqualTo(savedQuestion);
 
 	}
 }

@@ -45,6 +45,7 @@ public class QuestionEntity extends BaseEntity {
 
 	public static QuestionEntity from(Question question) {
 		return QuestionEntity.builder()
+			.id(question.id())
 			.subject(question.subject())
 			.content(question.content())
 			.author(MemberEntity.from(question.author()))
@@ -53,6 +54,7 @@ public class QuestionEntity extends BaseEntity {
 
 	public Question toModel() {
 		return Question.builder()
+			.id(this.id)
 			.subject(this.subject)
 			.content(this.content)
 			.author(this.author.toModel())

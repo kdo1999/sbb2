@@ -1,5 +1,6 @@
 package com.sbb2.infrastructer.question.repository;
 
+
 import static com.sbb2.infrastructer.question.entity.QQuestionEntity.*;
 
 import java.util.List;
@@ -13,8 +14,8 @@ import org.springframework.util.StringUtils;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sbb2.question.domain.QQuestionPageResponse;
 import com.sbb2.question.domain.QuestionPageResponse;
-import com.sbb2.question.domain.QPageResponseQuestion;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,7 +27,7 @@ public class QuestionQueryRepository {
 
 	public Page<QuestionPageResponse> findAll(String kw, Pageable pageable) {
 		List<QuestionPageResponse> content = queryFactory
-			.select(new QPageResponseQuestion(
+			.select(new QQuestionPageResponse(
 				questionEntity.id,
 				questionEntity.subject,
 				questionEntity.content,
