@@ -67,4 +67,27 @@ public class MemberRepositoryTest {
 		//then
 		assertThat(findMember).isEqualTo(savedMember);
 	}
+
+	@DisplayName("회원 Username 조회 테스트")
+	@Test
+	void find_username_member() {
+	    //given
+		String username = "findUsername";
+		String password = "testPassword";
+		String email = "testEmail";
+
+		Member member = Member.builder()
+			.username(username)
+			.password(password)
+			.email(email)
+			.build();
+
+		Member savedMember = memberRepository.save(member);
+
+		//when
+		Member findMember = memberRepository.findByUsername(savedMember.username()).get();
+
+		//then
+		assertThat(findMember).isEqualTo(savedMember);
+	}
 }
