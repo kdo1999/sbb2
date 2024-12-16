@@ -1,5 +1,7 @@
 package com.sbb2.repository;
 
+import static org.assertj.core.api.Assertions.*;
+
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
@@ -38,8 +40,31 @@ public class MemberRepositoryTest {
 
 		Member savedMember = memberRepository.save(member);
 
-		Assertions.assertThat(username).isEqualTo(member.username());
-		Assertions.assertThat(password).isEqualTo(member.password());
-		Assertions.assertThat(email).isEqualTo(member.email());
+		assertThat(username).isEqualTo(member.username());
+		assertThat(password).isEqualTo(member.password());
+		assertThat(email).isEqualTo(member.email());
+	}
+
+	@Test
+	@DisplayName("회원 조회 테스트")
+	void find_member() {
+		//given
+		String username = "testUsername";
+		String password = "testPassword";
+		String email = "testEmail";
+
+		Member member = Member.builder()
+			.username(username)
+			.password(password)
+			.email(email)
+			.build();
+
+		Member savedMember = memberRepository.save(member);
+
+		//when
+		Member findMember = memberRepository.findById(savedMember.id());
+
+		//then
+		assertThat(findMember).isEqualTo(savedMember);
 	}
 }
