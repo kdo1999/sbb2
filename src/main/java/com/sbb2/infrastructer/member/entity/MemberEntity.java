@@ -22,10 +22,10 @@ public class MemberEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column
+	@Column(unique = true)
 	private String username;
 
-	@Column
+	@Column(unique = true)
 	private String email;
 
 	@Column
