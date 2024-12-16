@@ -119,4 +119,28 @@ public class QuestionRepositoryTest {
 		assertThat(questionPage.getTotalPages()).isEqualTo(1);
 		assertThat(questionPage.getContent().size()).isEqualTo(5);
 	}
+
+	@DisplayName("질문 ID 조회 테스트")
+	@Test
+	void find_id_question() {
+	    //given
+		String subject = "testSubject1";
+		String content = "testContent1";
+		Member author = memberRepository.findById(1L).get();
+
+		Question givenQuestion = Question.builder()
+			.subject(subject)
+			.content(content)
+			.author(author)
+			.build();
+
+		Question savedQuestion = questionRepository.save(givenQuestion);
+
+	    //when
+		Question findQuestion = questionRepository.findById(savedQuestion.id()).get();
+
+	    //then
+	    assertThat(findQuestion).isEqualTo(givenQuestion);
+
+	}
 }
