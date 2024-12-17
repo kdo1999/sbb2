@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,5 +55,36 @@ public class QuestionServiceTest {
 		assertThat(savedQuestion.author()).isEqualTo(givenMember);
 		assertThat(savedQuestion.subject()).isEqualTo(questionSubject);
 		assertThat(savedQuestion.content()).isEqualTo(questionContent);
+	}
+
+	void find_id_question() {
+		//given
+		String questionSubject = "subject";
+		String questionContent = "content";
+		Member givenMember = Member.builder()
+			.id(1L)
+			.username("testMember")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
+
+		given(questionRepository.findById(any(Long.class)))
+			.willReturn(
+				Optional.of(Question.builder()
+					.id(1L)
+					.subject(questionSubject)
+					.content(questionContent)
+					.author(givenMember)
+					.build()
+				)
+			);
+
+		//when
+		Question findQuestion = questionService.findById(1L);
+
+		//then
+		assertThat(findQuestion.author()).isEqualTo(givenMember);
+		assertThat(findQuestion.subject()).isEqualTo(questionSubject);
+		assertThat(findQuestion.content()).isEqualTo(questionContent);
 	}
 }
