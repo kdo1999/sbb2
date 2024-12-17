@@ -21,6 +21,17 @@ public record Answer(Long id, String content, Member author, Question question, 
 		this.modifiedAt = modifiedAt;
 	}
 
+	public Answer fetch(Answer updateAnswer) {
+		return Answer.builder()
+			.id(this.id)
+			.content(updateAnswer.content())
+			.author(this.author)
+			.question(this.question)
+			.createdAt(this.createdAt)
+			.modifiedAt(this.modifiedAt)
+			.build();
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o)
@@ -37,5 +48,17 @@ public record Answer(Long id, String content, Member author, Question question, 
 	@Override
 	public int hashCode() {
 		return Objects.hash(id, content, author, question, createdAt, modifiedAt);
+	}
+
+	@Override
+	public String toString() {
+		return "Answer{" +
+			"id=" + id +
+			", content='" + content + '\'' +
+			", author=" + author +
+			", question=" + question +
+			", createdAt=" + createdAt +
+			", modifiedAt=" + modifiedAt +
+			'}';
 	}
 }

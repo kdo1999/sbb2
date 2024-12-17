@@ -8,10 +8,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Repository;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.sbb2.answer.domain.Answer;
 import com.sbb2.common.config.JpaAudtingConfig;
@@ -39,9 +43,9 @@ public class AnswerRepositoryTest {
 
 	@BeforeAll
 	void initMember() {
-		String username = "testUsername";
+		String username = "testUsername41241231";
 		String password = "testPassword";
-		String email = "testEmail";
+		String email = "testEmail3124124";
 
 		Member member = Member.builder()
 			.username(username)
@@ -114,26 +118,32 @@ public class AnswerRepositoryTest {
 	}
 
 	@DisplayName("답변 수정 테스트")
+	@Test
 	void update_answer() {
 		//given
 	    String content = "testAnswerContent";
 		Member member = memberRepository.findById(1L).get();
 		Question question = questionRepository.findById(1L).get();
-
 		Answer givenAnswer = Answer.builder()
 			.content(content)
 			.author(member)
 			.question(question)
 			.build();
+		Answer savedAnswer = answerRepository.save(givenAnswer);
 
 		//when
 		String updateContent = "updateTestContent";
-		Answer updateAnswer = Answer.builder().content(updateContent).build();
 
-		updateAnswer = givenAnswer.fetch(updateAnswer);
-		Answer savedAnswer = answerRepository.update(updateAnswer);
+		savedAnswer = savedAnswer.fetch(
+			Answer.builder()
+				.content(updateContent)
+				.build()
+		);
+		
+		Answer updatedAnswer = answerRepository.save(savedAnswer);
 
 		//then
-		assertThat(updateAnswer.content()).isEqualTo(updateContent);
+		assertThat(updatedAnswer.content()).isEqualTo(updateContent);
+		assertThat(updatedAnswer.id()).isEqualTo(savedAnswer.id());
 	}
 }
