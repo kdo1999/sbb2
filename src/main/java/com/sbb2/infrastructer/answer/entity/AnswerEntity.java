@@ -1,8 +1,6 @@
 package com.sbb2.infrastructer.answer.entity;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.stream.Collectors;
 
 import com.sbb2.answer.domain.Answer;
 import com.sbb2.common.util.BaseEntity;
