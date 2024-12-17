@@ -1,13 +1,18 @@
 package com.sbb2.infrastructer.answer.entity;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.sbb2.answer.domain.Answer;
 import com.sbb2.common.util.BaseEntity;
 import com.sbb2.infrastructer.member.entity.MemberEntity;
 import com.sbb2.infrastructer.question.entity.QuestionEntity;
+import com.sbb2.infrastructer.voter.entity.VoterEntity;
 import com.sbb2.question.domain.Question;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -16,6 +21,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -43,8 +49,12 @@ public class AnswerEntity extends BaseEntity {
 	@JoinColumn(name = "question_id")
 	private QuestionEntity questionEntity;
 
-	@Builder(access = AccessLevel.PROTECTED)
-	private AnswerEntity(Long id, String content, MemberEntity author, QuestionEntity questionEntity, LocalDateTime createdAt,
+	@OneToMany(cascade = CascadeType.ALL)
+	private Set<VoterEntity> voterEntitySet = new HashSet<>();
+
+	@Builder
+	private AnswerEntity(Long id, String content, MemberEntity author, QuestionEntity questionEntity,
+		LocalDateTime createdAt,
 		LocalDateTime modifiedAt) {
 		this.id = id;
 		this.content = content;
@@ -54,8 +64,13 @@ public class AnswerEntity extends BaseEntity {
 		this.modifiedAt = modifiedAt;
 	}
 
+	public void setVoterEntitySet(Set<VoterEntity> voterEntitySet) {
+		this.voterEntitySet = voterEntitySet;
+		voterEntitySet.forEach(v -> v.setAnswerEntity(this));
+	}
+
 	public static AnswerEntity from(Answer answer) {
-		return AnswerEntity.builder()
+		AnswerEntity buildAnswerEntity = AnswerEntity.builder()
 			.id(answer.id())
 			.content(answer.content())
 			.author(MemberEntity.from(answer.author()))
@@ -68,10 +83,13 @@ public class AnswerEntity extends BaseEntity {
 				.author(MemberEntity.from(answer.author()))
 				.build())
 			.build();
+		buildAnswerEntity.setVoterEntitySet(answer.voterSet().stream().map(voter -> VoterEntity.from(voter)).collect(
+			Collectors.toSet()));
+		return buildAnswerEntity;
 	}
 
 	public Answer toModel() {
-		return Answer.builder()
+		Answer buildAnswer = Answer.builder()
 			.id(id)
 			.content(content)
 			.author(author.toModel())
@@ -87,5 +105,12 @@ public class AnswerEntity extends BaseEntity {
 			.modifiedAt(modifiedAt)
 			.createdAt(createdAt)
 			.build();
+
+		if (voterEntitySet.size() > 0) {
+			this.voterEntitySet.stream()
+				.forEach(voter -> buildAnswer.addVoter(voter.toModel()));
+		}
+
+		return buildAnswer;
 	}
 }

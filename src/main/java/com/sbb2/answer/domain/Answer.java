@@ -1,24 +1,29 @@
 package com.sbb2.answer.domain;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
+import com.sbb2.voter.Voter;
 
 import lombok.Builder;
 
-public record Answer(Long id, String content, Member author, Question question, LocalDateTime createdAt, LocalDateTime modifiedAt) {
+public record Answer(Long id, String content, Member author, Question question, LocalDateTime createdAt,
+					 LocalDateTime modifiedAt, Set<Voter> voterSet) {
 
 	@Builder
 	public Answer(Long id, String content, Member author, Question question, LocalDateTime createdAt,
-		LocalDateTime modifiedAt) {
+		LocalDateTime modifiedAt, Set<Voter> voterSet) {
 		this.id = id;
 		this.content = content;
 		this.author = author;
 		this.question = question;
 		this.createdAt = createdAt;
 		this.modifiedAt = modifiedAt;
+		this.voterSet = voterSet == null ? new HashSet<>() : voterSet;
 	}
 
 	public Answer fetch(Answer updateAnswer) {
@@ -60,5 +65,9 @@ public record Answer(Long id, String content, Member author, Question question, 
 			", createdAt=" + createdAt +
 			", modifiedAt=" + modifiedAt +
 			'}';
+	}
+
+	public void addVoter(Voter voter) {
+		this.voterSet.add(voter);
 	}
 }

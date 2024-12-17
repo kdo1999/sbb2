@@ -2,6 +2,7 @@ package com.sbb2.infrastructer.voter.entity;
 
 import java.util.ArrayList;
 
+import com.sbb2.answer.domain.Answer;
 import com.sbb2.infrastructer.answer.entity.AnswerEntity;
 import com.sbb2.infrastructer.member.entity.MemberEntity;
 import com.sbb2.infrastructer.question.entity.QuestionEntity;
@@ -38,11 +39,16 @@ public class VoterEntity {
 	@JoinColumn(name = "member_id")
 	private MemberEntity memberEntity;
 
+	@ManyToOne
+	@JoinColumn(name = "answer_id")
+	private AnswerEntity answerEntity;
+
 	@Builder
-	private VoterEntity(Long id, QuestionEntity questionEntity, MemberEntity memberEntity) {
+	private VoterEntity(Long id, QuestionEntity questionEntity, MemberEntity memberEntity, AnswerEntity answerEntity) {
 		this.id = id;
 		this.questionEntity = questionEntity;
 		this.memberEntity = memberEntity;
+		this.answerEntity = answerEntity;
 	}
 
 	public static VoterEntity from(Voter voter) {
@@ -56,11 +62,15 @@ public class VoterEntity {
 		this.questionEntity = questionEntity;
 	}
 
+	public void setAnswerEntity(AnswerEntity answerEntity) {
+		this.answerEntity = answerEntity;
+	}
+
 	public Voter toModel() {
 		return Voter.builder()
 			.id(this.id)
 			.member(this.memberEntity.toModel())
-			.question(Question.builder()
+			.question(this.questionEntity == null ? null : Question.builder()
 				.id(this.questionEntity.getId())
 				.subject(this.questionEntity.getSubject())
 				.content(this.questionEntity.getContent())
@@ -72,6 +82,11 @@ public class VoterEntity {
 				)
 				.createdAt(this.questionEntity.getCreatedAt())
 				.modifiedAt(this.questionEntity.getModifiedAt())
+				.build())
+			.answer(this.answerEntity == null ? null : Answer.builder()
+				.id(this.answerEntity.getId())
+				.content(this.answerEntity.getContent())
+				.author(this.answerEntity.getAuthor().toModel())
 				.build())
 			.build();
 	}
