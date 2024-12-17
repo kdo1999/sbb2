@@ -5,4 +5,6 @@ import com.sbb2.question.domain.Question;
 
 public interface QuestionService {
 	Question save(String subject, String content, Member author);
+
+	Question findById(Long id);
 }

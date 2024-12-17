@@ -57,6 +57,8 @@ public class QuestionServiceTest {
 		assertThat(savedQuestion.content()).isEqualTo(questionContent);
 	}
 
+	@DisplayName("질문 ID로 조회 성공 테스트")
+	@Test
 	void find_id_question() {
 		//given
 		String questionSubject = "subject";

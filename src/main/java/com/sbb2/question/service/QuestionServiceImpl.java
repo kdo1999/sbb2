@@ -23,4 +23,12 @@ public class QuestionServiceImpl implements QuestionService {
 
 		return questionRepository.save(question);
 	}
+
+	@Override
+	public Question findById(Long id) {
+		Question question = questionRepository.findById(id)
+			.orElseThrow(() -> new RuntimeException("데이터가 존재하지 않습니다."));
+
+		return question;
+	}
 }
