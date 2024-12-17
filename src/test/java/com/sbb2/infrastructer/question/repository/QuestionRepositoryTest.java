@@ -42,9 +42,9 @@ public class QuestionRepositoryTest {
 
 	@BeforeAll
 	void initMember() {
-		String username = "testUsername";
-		String password = "testPassword";
-		String email = "testEmail";
+		String username = "testUsername123";
+		String password = "testPassword123";
+		String email = "testEmail123";
 
 		Member member = Member.builder()
 			.username(username)

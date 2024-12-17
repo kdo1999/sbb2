@@ -1,5 +1,7 @@
 package com.sbb2.infrastructer.answer.repository;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Repository;
 
 import com.sbb2.answer.domain.Answer;
@@ -15,5 +17,10 @@ public class AnswerRepositoryImpl implements AnswerRepository{
 	@Override
 	public Answer save(Answer answer) {
 		return answerJpaRepository.save(AnswerEntity.from(answer)).toModel();
+	}
+
+	@Override
+	public Optional<Answer> findById(Long id) {
+		return answerJpaRepository.findById(id).map(AnswerEntity::toModel);
 	}
 }
