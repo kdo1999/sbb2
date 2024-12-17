@@ -1,23 +1,27 @@
 package com.sbb2.question.service;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.awaitility.Awaitility.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
 
+@ExtendWith(MockitoExtension.class)
 public class QuestionServiceTest {
-	private final QuestionService questionService = new QuestionService();
 	@Mock
 	private QuestionRepository questionRepository;
+
+	@InjectMocks
+	private QuestionServiceImpl questionService;
 
 	@DisplayName("질문 저장 테스트")
 	@Test
@@ -49,6 +53,5 @@ public class QuestionServiceTest {
 		assertThat(savedQuestion.author()).isEqualTo(givenMember);
 		assertThat(savedQuestion.subject()).isEqualTo(questionSubject);
 		assertThat(savedQuestion.content()).isEqualTo(questionContent);
-
 	}
 }
