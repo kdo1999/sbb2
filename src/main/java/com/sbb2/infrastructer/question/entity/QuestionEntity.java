@@ -15,6 +15,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -30,15 +31,17 @@ import lombok.NoArgsConstructor;
 public class QuestionEntity extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "question_id")
 	private Long id;
 
 	@Column(nullable = false)
 	private String subject;
 
-	@Column(columnDefinition = "text")
+	@Column(nullable = false, columnDefinition = "text")
 	private String content;
 
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "member_id")
 	private MemberEntity author;
 
 	@OneToMany(mappedBy = "questionEntity")

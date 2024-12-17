@@ -14,6 +14,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -28,15 +29,18 @@ import lombok.NoArgsConstructor;
 public class AnswerEntity extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "answer_id")
 	private Long id;
 
 	@Column(nullable = false, columnDefinition = "text")
 	private String content;
 
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "member_id")
 	private MemberEntity author;
 
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "question_id")
 	private QuestionEntity questionEntity;
 
 	@Builder(access = AccessLevel.PROTECTED)

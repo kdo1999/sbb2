@@ -20,15 +20,16 @@ import lombok.NoArgsConstructor;
 public class MemberEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "member_id")
 	private Long id;
 
-	@Column(unique = true)
+	@Column(unique = true, nullable = false)
 	private String username;
 
-	@Column(unique = true)
+	@Column(unique = true, nullable = false)
 	private String email;
 
-	@Column
+	@Column(nullable = false)
 	private String password;
 
 	@Builder(access = AccessLevel.PROTECTED)
