@@ -149,7 +149,6 @@ public class QuestionRepositoryTest {
 	@Test
 	void update_question() {
 	    //given
-		//given
 		String subject = "testSubject1";
 		String content = "testContent1";
 		String updateSubject = "updateSubject";

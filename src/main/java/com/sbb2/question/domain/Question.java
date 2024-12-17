@@ -19,6 +19,17 @@ public record Question (Long id, String subject, String content, Member author, 
 		this.modifiedAt = modifiedAt;
 	}
 
+	public Question fetch(Question updateQuestion) {
+		return Question.builder()
+			.id(this.id)
+			.subject(updateQuestion.subject)
+			.content(updateQuestion.content())
+			.author(this.author)
+			.createdAt(this.createdAt)
+			.modifiedAt(this.modifiedAt)
+			.build();
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o)
