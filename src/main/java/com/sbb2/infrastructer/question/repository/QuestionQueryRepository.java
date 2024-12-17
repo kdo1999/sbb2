@@ -1,6 +1,5 @@
 package com.sbb2.infrastructer.question.repository;
 
-
 import static com.sbb2.infrastructer.question.entity.QQuestionEntity.*;
 
 import java.util.List;
@@ -14,6 +13,7 @@ import org.springframework.util.StringUtils;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sbb2.infrastructer.answer.entity.QAnswerEntity;
 import com.sbb2.question.domain.QQuestionPageResponse;
 import com.sbb2.question.domain.QuestionPageResponse;
 
@@ -33,7 +33,10 @@ public class QuestionQueryRepository {
 				questionEntity.content,
 				questionEntity.author.username,
 				questionEntity.createdAt,
-				questionEntity.modifiedAt))
+				questionEntity.modifiedAt,
+				queryFactory.select(QAnswerEntity.answerEntity.count())
+					.from(QAnswerEntity.answerEntity)
+					.where(QAnswerEntity.answerEntity.questionEntity.id.eq(questionEntity.id))))
 			.from(questionEntity)
 			.leftJoin(questionEntity.author)
 			.where(subjectAndContentContains(kw))
@@ -50,6 +53,7 @@ public class QuestionQueryRepository {
 	}
 
 	public BooleanExpression subjectAndContentContains(String kw) {
-		return StringUtils.hasText(kw) ? questionEntity.subject.contains(kw).or(questionEntity.content.contains(kw)) : null;
+		return StringUtils.hasText(kw) ? questionEntity.subject.contains(kw).or(questionEntity.content.contains(kw)) :
+			null;
 	}
 }

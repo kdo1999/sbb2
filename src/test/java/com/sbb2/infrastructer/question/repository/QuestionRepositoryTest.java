@@ -20,12 +20,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
+import com.sbb2.answer.domain.Answer;
 import com.sbb2.common.config.JpaAudtingConfig;
 import com.sbb2.common.config.QuerydslConfig;
+import com.sbb2.infrastructer.answer.repository.AnswerRepository;
 import com.sbb2.infrastructer.member.repository.MemberRepository;
 import com.sbb2.member.domain.Member;
-import com.sbb2.question.domain.QuestionPageResponse;
 import com.sbb2.question.domain.Question;
+import com.sbb2.question.domain.QuestionPageResponse;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class))
 @Import({JpaAudtingConfig.class, QuerydslConfig.class})
@@ -33,11 +35,14 @@ import com.sbb2.question.domain.Question;
 public class QuestionRepositoryTest {
 	private final MemberRepository memberRepository;
 	private final QuestionRepository questionRepository;
+	private final AnswerRepository answerRepository;
 
 	@Autowired
-	public QuestionRepositoryTest(QuestionRepository questionRepository, MemberRepository memberRepository) {
+	public QuestionRepositoryTest(QuestionRepository questionRepository, MemberRepository memberRepository,
+		AnswerRepository answerRepository) {
 		this.questionRepository = questionRepository;
 		this.memberRepository = memberRepository;
+		this.answerRepository = answerRepository;
 	}
 
 	@BeforeAll
@@ -60,22 +65,33 @@ public class QuestionRepositoryTest {
 
 		for (int i = 0; i < 20; i++) {
 			Question question = Question.builder()
-			.subject(subject + i + 1)
-			.content(content + i + 1)
-			.author(author)
-			.build();
+				.subject(subject + i + 1)
+				.content(content + i + 1)
+				.author(author)
+				.build();
 
 			questionRepository.save(question);
 		}
 
 		for (int i = 0; i < 5; i++) {
 			Question question = Question.builder()
-			.subject("searchSubject" + i + 1)
-			.content("searchContent" + i + 1)
-			.author(author)
-			.build();
+				.subject("searchSubject" + i + 1)
+				.content("searchContent" + i + 1)
+				.author(author)
+				.build();
 
 			questionRepository.save(question);
+		}
+
+		Question question = questionRepository.findById(21L).get();
+		String answerContent = "answerContent";
+
+		for (int i = 0; i < 5; i++) {
+			answerRepository.save(Answer.builder()
+				.content(answerContent)
+				.question(question)
+				.author(author)
+				.build());
 		}
 	}
 
@@ -113,10 +129,10 @@ public class QuestionRepositoryTest {
 
 		//when
 		List<Sort.Order> sorts = new ArrayList<>();
-        sorts.add(Sort.Order.desc("createdAt"));
-        Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
+		sorts.add(Sort.Order.desc("createdAt"));
+		Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
 		Page<QuestionPageResponse> questionPage = questionRepository.findAll(keyword, pageable);
-
+		questionPage.getContent().iterator().forEachRemaining(System.out::println);
 		//then
 		assertThat(questionPage.getTotalPages()).isEqualTo(1);
 		assertThat(questionPage.getContent().size()).isEqualTo(5);
@@ -125,7 +141,7 @@ public class QuestionRepositoryTest {
 	@DisplayName("질문 ID 조회 테스트")
 	@Test
 	void find_id_question() {
-	    //given
+		//given
 		String subject = "testSubject1";
 		String content = "testContent1";
 		Member author = memberRepository.findById(1L).get();
@@ -138,17 +154,17 @@ public class QuestionRepositoryTest {
 
 		Question savedQuestion = questionRepository.save(givenQuestion);
 
-	    //when
+		//when
 		Question findQuestion = questionRepository.findById(savedQuestion.id()).get();
 
 		//then
-	    assertThat(findQuestion).isEqualTo(savedQuestion);
+		assertThat(findQuestion).isEqualTo(savedQuestion);
 	}
 
 	@DisplayName("질문 수정 테스트")
 	@Test
 	void update_question() {
-	    //given
+		//given
 		String subject = "testSubject1";
 		String content = "testContent1";
 		String updateSubject = "updateSubject";
@@ -162,7 +178,7 @@ public class QuestionRepositoryTest {
 			.build();
 
 		Question savedQuestion = questionRepository.save(givenQuestion);
-	    //when
+		//when
 		savedQuestion = savedQuestion.fetch(
 			Question.builder()
 				.subject(updateSubject)
@@ -172,9 +188,9 @@ public class QuestionRepositoryTest {
 
 		Question updateQuestion = questionRepository.save(savedQuestion);
 
-	    //then
-	    assertThat(updateQuestion.subject()).isEqualTo(updateSubject);
-	    assertThat(updateQuestion.content()).isEqualTo(updateContent);
+		//then
+		assertThat(updateQuestion.subject()).isEqualTo(updateSubject);
+		assertThat(updateQuestion.content()).isEqualTo(updateContent);
 		assertThat(updateQuestion.id()).isEqualTo(savedQuestion.id());
 	}
 }
