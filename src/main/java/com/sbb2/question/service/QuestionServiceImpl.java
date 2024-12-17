@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
+import com.sbb2.question.exception.QuestionBusinessLogicException;
+import com.sbb2.question.exception.QuestionErrorCode;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,7 +29,7 @@ public class QuestionServiceImpl implements QuestionService {
 	@Override
 	public Question findById(Long id) {
 		Question question = questionRepository.findById(id)
-			.orElseThrow(() -> new RuntimeException("데이터가 존재하지 않습니다."));
+			.orElseThrow(() -> new QuestionBusinessLogicException(QuestionErrorCode.NOT_FOUND));
 
 		return question;
 	}
