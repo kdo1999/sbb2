@@ -89,4 +89,24 @@ public class QuestionServiceTest {
 		assertThat(findQuestion.subject()).isEqualTo(questionSubject);
 		assertThat(findQuestion.content()).isEqualTo(questionContent);
 	}
+
+	@DisplayName("질문 ID로 조회 실패 테스트")
+	@Test
+	void find_id_question_fail() {
+		//given
+		String questionSubject = "subject";
+		String questionContent = "content";
+		Member givenMember = Member.builder()
+			.id(1L)
+			.username("testMember")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
+
+		given(questionRepository.findById(any(Long.class)))
+			.willThrow(new QuestionBusinessLogicException(QuestionErrorCode.NOT_FOUND));
+
+		//then
+		assertThatThrownBy(() -> questionService.findById(2L)).isInstanceOf(QuestionBusinessLogicException.class);
+	}
 }
