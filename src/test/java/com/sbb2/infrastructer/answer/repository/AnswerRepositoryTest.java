@@ -8,14 +8,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Repository;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.annotation.DirtiesContext;
 
 import com.sbb2.answer.domain.Answer;
 import com.sbb2.common.config.JpaAudtingConfig;
@@ -28,6 +25,7 @@ import com.sbb2.question.domain.Question;
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class))
 @Import({JpaAudtingConfig.class, QuerydslConfig.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@DirtiesContext
 public class AnswerRepositoryTest {
 	private final AnswerRepository answerRepository;
 	private final QuestionRepository questionRepository;

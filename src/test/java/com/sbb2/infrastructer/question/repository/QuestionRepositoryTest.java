@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
+import org.springframework.test.annotation.DirtiesContext;
 
 import com.sbb2.answer.domain.Answer;
 import com.sbb2.common.config.JpaAudtingConfig;
@@ -32,6 +33,7 @@ import com.sbb2.question.domain.QuestionPageResponse;
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class))
 @Import({JpaAudtingConfig.class, QuerydslConfig.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@DirtiesContext
 public class QuestionRepositoryTest {
 	private final MemberRepository memberRepository;
 	private final QuestionRepository questionRepository;
