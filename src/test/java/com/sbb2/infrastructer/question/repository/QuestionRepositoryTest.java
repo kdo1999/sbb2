@@ -143,6 +143,39 @@ public class QuestionRepositoryTest {
 
 		//then
 	    assertThat(findQuestion).isEqualTo(savedQuestion);
+	}
 
+	@DisplayName("질문 수정 테스트")
+	@Test
+	void update_question() {
+	    //given
+		//given
+		String subject = "testSubject1";
+		String content = "testContent1";
+		String updateSubject = "updateSubject";
+		String updateContent = "updateContent";
+		Member author = memberRepository.findById(1L).get();
+
+		Question givenQuestion = Question.builder()
+			.subject(subject)
+			.content(content)
+			.author(author)
+			.build();
+
+		Question savedQuestion = questionRepository.save(givenQuestion);
+	    //when
+		savedQuestion = savedQuestion.fetch(
+			Question.builder()
+				.subject(updateSubject)
+				.content(updateContent)
+				.build()
+		);
+
+		Question updateQuestion = questionRepository.save(savedQuestion);
+
+	    //then
+	    assertThat(updateQuestion.subject()).isEqualTo(updateSubject);
+	    assertThat(updateQuestion.content()).isEqualTo(updateContent);
+		assertThat(updateQuestion.id()).isEqualTo(savedQuestion.id());
 	}
 }
