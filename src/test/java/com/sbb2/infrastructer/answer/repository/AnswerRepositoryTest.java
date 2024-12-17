@@ -112,4 +112,28 @@ public class AnswerRepositoryTest {
 	    //then
 		assertThat(findAnswer).isEqualTo(savedAnswer);
 	}
+
+	@DisplayName("답변 수정 테스트")
+	void update_answer() {
+		//given
+	    String content = "testAnswerContent";
+		Member member = memberRepository.findById(1L).get();
+		Question question = questionRepository.findById(1L).get();
+
+		Answer givenAnswer = Answer.builder()
+			.content(content)
+			.author(member)
+			.question(question)
+			.build();
+
+		//when
+		String updateContent = "updateTestContent";
+		Answer updateAnswer = Answer.builder().content(updateContent).build();
+
+		updateAnswer = givenAnswer.fetch(updateAnswer);
+		Answer savedAnswer = answerRepository.update(updateAnswer);
+
+		//then
+		assertThat(updateAnswer.content()).isEqualTo(updateContent);
+	}
 }
