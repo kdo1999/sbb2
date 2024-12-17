@@ -26,9 +26,11 @@ import com.sbb2.common.config.JpaAudtingConfig;
 import com.sbb2.common.config.QuerydslConfig;
 import com.sbb2.infrastructer.answer.repository.AnswerRepository;
 import com.sbb2.infrastructer.member.repository.MemberRepository;
+import com.sbb2.infrastructer.voter.repository.VoterRepository;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
 import com.sbb2.question.domain.QuestionPageResponse;
+import com.sbb2.voter.Voter;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class))
 @Import({JpaAudtingConfig.class, QuerydslConfig.class})
@@ -38,13 +40,15 @@ public class QuestionRepositoryTest {
 	private final MemberRepository memberRepository;
 	private final QuestionRepository questionRepository;
 	private final AnswerRepository answerRepository;
+	private final VoterRepository voterRepository;
 
 	@Autowired
 	public QuestionRepositoryTest(QuestionRepository questionRepository, MemberRepository memberRepository,
-		AnswerRepository answerRepository) {
+		AnswerRepository answerRepository, VoterRepository voterRepository) {
 		this.questionRepository = questionRepository;
 		this.memberRepository = memberRepository;
 		this.answerRepository = answerRepository;
+		this.voterRepository = voterRepository;
 	}
 
 	@BeforeAll
@@ -194,5 +198,26 @@ public class QuestionRepositoryTest {
 		assertThat(updateQuestion.subject()).isEqualTo(updateSubject);
 		assertThat(updateQuestion.content()).isEqualTo(updateContent);
 		assertThat(updateQuestion.id()).isEqualTo(savedQuestion.id());
+	}
+
+	@DisplayName("질문 추천 조회")
+	@Test
+	void find_voter_question() {
+		//given
+		Member member = memberRepository.findById(1L).get();
+		Question question = questionRepository.findById(1L).get();
+		Voter voter = Voter.builder()
+			.member(member)
+			.build();
+
+		//when
+		question.addVoter(voter);
+		Question savedQuestion = questionRepository.save(question);
+
+		//then
+		Voter savedVoter = savedQuestion.voterSet().iterator().next();
+		assertThat(savedVoter.id()).isNotNull();
+		assertThat(savedVoter.member()).isEqualTo(member);
+		assertThat(savedVoter.question()).isEqualTo(question);
 	}
 }

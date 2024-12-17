@@ -2,13 +2,18 @@ package com.sbb2.infrastructer.question.entity;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.sbb2.common.util.BaseEntity;
 import com.sbb2.infrastructer.answer.entity.AnswerEntity;
 import com.sbb2.infrastructer.member.entity.MemberEntity;
+import com.sbb2.infrastructer.voter.entity.VoterEntity;
 import com.sbb2.question.domain.Question;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -47,6 +52,9 @@ public class QuestionEntity extends BaseEntity {
 	@OneToMany(mappedBy = "questionEntity")
 	private List<AnswerEntity> answerEntityList = new ArrayList<>();
 
+	@OneToMany(mappedBy = "questionEntity", cascade = CascadeType.ALL)
+	private Set<VoterEntity> voterEntitySet = new HashSet<>();
+
 	@Builder
 	public QuestionEntity(Long id, String subject, String content, MemberEntity author, LocalDateTime createdAt,
 		LocalDateTime modifiedAt, List<AnswerEntity> answerEntityList) {
@@ -59,8 +67,13 @@ public class QuestionEntity extends BaseEntity {
 		this.answerEntityList = answerEntityList;
 	}
 
+	public void setVoterEntitySet(Set<VoterEntity> voterEntitySet) {
+		this.voterEntitySet = voterEntitySet;
+		voterEntitySet.forEach(v -> v.setQuestionEntity(this));
+	}
+
 	public static QuestionEntity from(Question question) {
-		return QuestionEntity.builder()
+		QuestionEntity buildQuestion = QuestionEntity.builder()
 			.id(question.id())
 			.subject(question.subject())
 			.content(question.content())
@@ -68,10 +81,13 @@ public class QuestionEntity extends BaseEntity {
 			.answerEntityList(question.answerList().isEmpty() ? new ArrayList<>() :
 				question.answerList().stream().map(AnswerEntity::from).toList())
 			.build();
+		buildQuestion.setVoterEntitySet(question.voterSet().stream().map(voter -> VoterEntity.from(voter)).collect(
+			Collectors.toSet()));
+		return buildQuestion;
 	}
 
 	public Question toModel() {
-		return Question.builder()
+		Question buildQuestion = Question.builder()
 			.id(this.id)
 			.subject(this.subject)
 			.content(this.content)
@@ -83,5 +99,10 @@ public class QuestionEntity extends BaseEntity {
 			.createdAt(this.createdAt)
 			.modifiedAt(this.modifiedAt)
 			.build();
+
+		this.voterEntitySet.stream()
+			.forEach(voter -> buildQuestion.addVoter(voter.toModel()));
+
+		return buildQuestion;
 	}
 }
