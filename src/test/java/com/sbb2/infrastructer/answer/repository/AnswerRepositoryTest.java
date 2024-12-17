@@ -90,4 +90,26 @@ public class AnswerRepositoryTest {
 		assertThat(savedAnswer.createdAt()).isNotNull();
 		assertThat(savedAnswer.modifiedAt()).isNotNull();
 	}
+
+	@DisplayName("답변 조회 테스트")
+	@Test
+	void find_id_answer() {
+	    //given
+	    String content = "testAnswerContent";
+		Member member = memberRepository.findById(1L).get();
+		Question question = questionRepository.findById(1L).get();
+
+		Answer givenAnswer = Answer.builder()
+			.content(content)
+			.author(member)
+			.question(question)
+			.build();
+
+		Answer savedAnswer = answerRepository.save(givenAnswer);
+	    //when
+		Answer findAnswer = answerRepository.findById(savedAnswer.id()).get();
+
+	    //then
+		assertThat(findAnswer).isEqualTo(savedAnswer);
+	}
 }
