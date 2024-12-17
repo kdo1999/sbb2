@@ -1,5 +1,9 @@
 package com.sbb2.infrastructer.question.entity;
 
+import java.time.LocalDateTime;
+
+import org.springframework.cglib.core.Local;
+
 import com.sbb2.common.util.BaseEntity;
 import com.sbb2.infrastructer.member.entity.MemberEntity;
 import com.sbb2.question.domain.Question;
@@ -35,12 +39,14 @@ public class QuestionEntity extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private MemberEntity author;
 
-	@Builder(access = AccessLevel.PROTECTED)
-	private QuestionEntity(Long id, String subject, String content, MemberEntity author) {
+	@Builder
+	public QuestionEntity(Long id, String subject, String content, MemberEntity author, LocalDateTime createdAt, LocalDateTime modifiedAt) {
 		this.id = id;
 		this.subject = subject;
 		this.content = content;
 		this.author = author;
+		this.createdAt = createdAt;
+		this.modifiedAt = modifiedAt;
 	}
 
 	public static QuestionEntity from(Question question) {
