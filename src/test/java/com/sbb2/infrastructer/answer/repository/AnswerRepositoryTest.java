@@ -159,7 +159,6 @@ public class AnswerRepositoryTest {
 		assertThat(updatedAnswer.id()).isEqualTo(savedAnswer.id());
 	}
 
-	//TODO 답변 추천 기능 만들기
 	@DisplayName("답변 추천 테스트")
 	@Test
 	void save_voter_answer() {
