@@ -2,6 +2,9 @@ package com.sbb2.infrastructer.answer.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +22,7 @@ import com.sbb2.common.config.JpaAudtingConfig;
 import com.sbb2.common.config.QuerydslConfig;
 import com.sbb2.infrastructer.member.repository.MemberRepository;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
+import com.sbb2.infrastructer.voter.repository.VoterRepository;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
 import com.sbb2.voter.Voter;
@@ -31,13 +35,15 @@ public class AnswerRepositoryTest {
 	private final AnswerRepository answerRepository;
 	private final QuestionRepository questionRepository;
 	private final MemberRepository memberRepository;
+	private final VoterRepository voterRepository;
 
 	@Autowired
 	public AnswerRepositoryTest(AnswerRepository answerRepository, QuestionRepository questionRepository,
-		MemberRepository memberRepository) {
+		MemberRepository memberRepository, VoterRepository voterRepository) {
 		this.answerRepository = answerRepository;
 		this.questionRepository = questionRepository;
 		this.memberRepository = memberRepository;
+		this.voterRepository = voterRepository;
 	}
 
 	@BeforeAll
@@ -73,10 +79,10 @@ public class AnswerRepositoryTest {
 
 		for (int i = 0; i < 4; i++) {
 			Answer givenAnswer = Answer.builder()
-			.content(answerContent + (i + 1))
-			.author(author)
-			.question(question)
-			.build();
+				.content(answerContent + (i + 1))
+				.author(author)
+				.question(question)
+				.build();
 
 			answerRepository.save(givenAnswer);
 		}
@@ -110,8 +116,8 @@ public class AnswerRepositoryTest {
 	@DisplayName("답변 조회 테스트")
 	@Test
 	void find_id_answer() {
-	    //given
-	    String content = "testAnswerContent";
+		//given
+		String content = "testAnswerContent";
 		Member member = memberRepository.findById(1L).get();
 		Question question = questionRepository.findById(1L).get();
 
@@ -122,10 +128,10 @@ public class AnswerRepositoryTest {
 			.build();
 
 		Answer savedAnswer = answerRepository.save(givenAnswer);
-	    //when
+		//when
 		Answer findAnswer = answerRepository.findById(savedAnswer.id()).get();
 
-	    //then
+		//then
 		assertThat(findAnswer).isEqualTo(savedAnswer);
 	}
 
@@ -133,7 +139,7 @@ public class AnswerRepositoryTest {
 	@Test
 	void update_answer() {
 		//given
-	    String content = "testAnswerContent";
+		String content = "testAnswerContent";
 		Member member = memberRepository.findById(1L).get();
 		Question question = questionRepository.findById(1L).get();
 		Answer givenAnswer = Answer.builder()
@@ -151,7 +157,7 @@ public class AnswerRepositoryTest {
 				.content(updateContent)
 				.build()
 		);
-		
+
 		Answer updatedAnswer = answerRepository.save(savedAnswer);
 
 		//then
@@ -162,7 +168,7 @@ public class AnswerRepositoryTest {
 	@DisplayName("답변 추천 테스트")
 	@Test
 	void save_voter_answer() {
-	    //given
+		//given
 		Member member = memberRepository.findById(1L).get();
 		Answer answer = answerRepository.findById(1L).get();
 		Voter voter = Voter.builder()
@@ -179,5 +185,37 @@ public class AnswerRepositoryTest {
 		assertThat(savedVoter.member()).isEqualTo(member);
 		assertThat(savedVoter.answer()).isNotNull();
 		assertThat(savedVoter.question()).isNull();
+	}
+
+	@DisplayName("답변 삭제시 추천 삭제 성공 테스트")
+	@Test
+	void delete_answer_voter_success() {
+		//given
+		Member member = memberRepository.findById(1L).get();
+		Question question = questionRepository.findById(1L).get();
+		Answer givenAnswer = Answer.builder()
+			.content("givenAnswer")
+			.author(member)
+			.question(question)
+			.build();
+
+		Answer savedAnswer = answerRepository.save(givenAnswer);
+
+		Voter voter = Voter.builder()
+			.member(member)
+			.build();
+		savedAnswer.addVoter(voter);
+
+		savedAnswer = answerRepository.save(savedAnswer);
+
+		//when
+		answerRepository.deleteById(savedAnswer.id());
+
+		//then
+		Optional<Answer> findAnswerOptional = answerRepository.findById(savedAnswer.id());
+		List<Answer> findAnswerList = voterRepository.findByAnswerId(savedAnswer.id());
+
+		assertThat(findAnswerOptional.isEmpty()).isTrue();
+		assertThat(findAnswerList.isEmpty()).isTrue();
 	}
 }
