@@ -74,7 +74,7 @@ public class AnswerServiceTest {
 		assertThat(savedAnswer.question()).isEqualTo(question);
 	}
 
-	@DisplayName("save_answer_find_fail")
+	@DisplayName("답변 저장 질문 조회 실패 테스트")
 	@Test
 	void save_answer_find_fail() {
 	    //given
