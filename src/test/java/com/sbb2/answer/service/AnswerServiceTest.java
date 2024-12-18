@@ -4,17 +4,18 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 
-import org.assertj.core.api.Assertions;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.BDDMockito;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.sbb2.answer.domain.Answer;
 import com.sbb2.infrastructer.answer.repository.AnswerRepository;
+import com.sbb2.infrastructer.question.repository.QuestionRepository;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
 
@@ -22,11 +23,13 @@ import com.sbb2.question.domain.Question;
 public class AnswerServiceTest {
 	@Mock
 	private AnswerRepository answerRepository;
+	@Mock
+	private QuestionRepository questionRepository;
 	private AnswerService answerService;
 
 	@BeforeEach
 	void setUp() {
-		answerService = new AnswerServiceImpl(answerRepository);
+		answerService = new AnswerServiceImpl(questionRepository, answerRepository);
 	}
 
 	@DisplayName("답변 저장 성공 테스트")
@@ -48,6 +51,8 @@ public class AnswerServiceTest {
 
 		String content = "saveAnswer";
 		Long questionId = question.id();
+
+		given(questionRepository.findById(any(Long.class))).willReturn(Optional.of(question));
 
 		given(answerRepository.save(any(Answer.class)))
 			.willReturn(Answer.builder()

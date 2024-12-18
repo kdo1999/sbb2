@@ -3,6 +3,7 @@ package com.sbb2.question.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
 import com.sbb2.member.domain.Member;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class QuestionServiceImpl implements QuestionService {
 	private final QuestionRepository questionRepository;
 	private static final int PAGE_SIZE = 10;
@@ -30,6 +32,7 @@ public class QuestionServiceImpl implements QuestionService {
 		return questionRepository.save(question);
 	}
 
+	@Transactional(readOnly = true)
 	@Override
 	public Question findById(Long id) {
 		Question question = questionRepository.findById(id)
@@ -61,6 +64,7 @@ public class QuestionServiceImpl implements QuestionService {
 		questionRepository.deleteById(target.id());
 	}
 
+	@Transactional(readOnly = true)
 	@Override
 	public Page<QuestionPageResponse> findAll(int pageNum, String keyword) {
 		PageRequest pageRequest = PageRequest.of(pageNum, PAGE_SIZE);
