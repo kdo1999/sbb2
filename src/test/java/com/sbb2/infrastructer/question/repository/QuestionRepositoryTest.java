@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -219,5 +220,19 @@ public class QuestionRepositoryTest {
 		assertThat(savedVoter.id()).isNotNull();
 		assertThat(savedVoter.member()).isEqualTo(member);
 		assertThat(savedVoter.question()).isEqualTo(question);
+	}
+
+	@DisplayName("질문 삭제 테스트")
+	@Test
+	void delete_question() {
+	    //given
+		Question question = questionRepository.findById(1L).get();
+
+		//when
+	    questionRepository.deleteById(question.id());
+
+	    //then
+		Optional<Question> findQuestion = questionRepository.findById(question.id());
+		assertThat(findQuestion.isEmpty()).isTrue();
 	}
 }
