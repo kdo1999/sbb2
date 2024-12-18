@@ -100,4 +100,41 @@ public class AnswerServiceTest {
 	    //then
 		assertThatThrownBy(() -> answerService.save(questionId, content, member));
 	}
+
+	@DisplayName("답변 조회 성공 테스트")
+	@Test
+	void find_answer_success() {
+	    //given
+		Member member = Member.builder()
+			.username("testUsername")
+			.password("testPassword")
+			.email("testEmail@naver.com")
+			.build();
+
+		Question question = Question.builder()
+			.id(1L)
+			.subject("testSubject")
+			.content("testContent")
+			.author(member)
+			.build();
+
+		String content = "saveAnswer";
+
+		Answer answer = Answer.builder()
+			.id(1L)
+			.content(content)
+			.author(member)
+			.question(question)
+			.build();
+
+		Long answerId = answer.id();
+
+		given(answerRepository.findById(any(Long.class))).willReturn(Optional.of(answer));
+
+		//when
+	    Answer findAnswer = answerService.findById(answerId);
+
+	    //then
+	    assertThat(findAnswer).isEqualTo(answer);
+	}
 }
