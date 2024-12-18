@@ -152,4 +152,29 @@ public class QuestionServiceTest {
 		assertThat(updateQuestion.subject()).isEqualTo(questionForm.subject());
 		assertThat(updateQuestion.content()).isEqualTo(questionForm.content());
 	}
+
+	@DisplayName("질문 수정시 조회 실패 테스트")
+	@Test
+	void update_find_question_fail() {
+	    //given
+		QuestionForm questionForm = QuestionForm.builder()
+			.subject("updateSubject")
+			.content("updateContent")
+			.build();
+
+		Member givenMember = Member.builder()
+			.id(1L)
+			.username("testMember")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
+
+		given(questionRepository.findById(any(Long.class)))
+			.willReturn(Optional.empty());
+
+		//then
+		assertThatThrownBy(() -> questionService.update(1L, questionForm.subject(), questionForm.content(), givenMember))
+			.isInstanceOf(QuestionBusinessLogicException.class)
+			.hasMessage(QuestionErrorCode.NOT_FOUND.getMessage());
+	}
 }
