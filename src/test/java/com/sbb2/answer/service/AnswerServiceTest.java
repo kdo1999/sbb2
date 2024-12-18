@@ -137,4 +137,16 @@ public class AnswerServiceTest {
 	    //then
 	    assertThat(findAnswer).isEqualTo(answer);
 	}
+
+	@DisplayName("답변 조회 실패 테스트")
+	@Test
+	void find_answer_fail() {
+	    //given
+		Long answerId = 1L;
+
+		given(answerRepository.findById(any(Long.class))).willReturn(Optional.empty());
+
+	    //then
+		assertThatThrownBy(() -> answerService.findById(answerId));
+	}
 }
