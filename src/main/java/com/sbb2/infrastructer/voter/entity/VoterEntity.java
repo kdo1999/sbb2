@@ -35,11 +35,11 @@ public class VoterEntity {
 	@JoinColumn(name = "qustion_id")
 	private QuestionEntity questionEntity;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
 	private MemberEntity memberEntity;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "answer_id")
 	private AnswerEntity answerEntity;
 
