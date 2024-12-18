@@ -273,4 +273,38 @@ public class QuestionRepositoryTest {
 		assertThat(findQuestionOptional.isEmpty()).isTrue();
 		assertThat(findAnswerList.isEmpty()).isTrue();
 	}
+
+	@DisplayName("질문 삭제시 추천 삭제 성공 테스트")
+	@Test
+	void delete_question_voter_success() {
+		//given
+		Member member = memberRepository.findById(1L).get();
+		Question question = Question.builder()
+				.subject("givenSubject")
+				.content("givenContent")
+				.author(member)
+				.build();
+
+		Question savedQuestion = questionRepository.save(question);
+		String answerContent = "answerContent";
+
+		Voter voter = Voter.builder()
+			.member(member)
+			.question(savedQuestion)
+			.build();
+		Voter savedVoter = voterRepository.save(voter);
+
+		em.flush();
+		em.clear();
+
+		//when
+		questionRepository.deleteById(savedQuestion.id());
+
+		//then
+		List<Voter> findVoterList = voterRepository.findById(voter);
+		Optional<Question> findQuestion = questionRepository.findById(savedQuestion.id());
+
+		assertThat(findVoterList.isEmpty()).isTrue();
+		assertThat(findQuestion.isEmpty()).isTrue();
+	}
 }
