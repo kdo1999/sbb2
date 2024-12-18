@@ -18,6 +18,8 @@ import com.sbb2.infrastructer.answer.repository.AnswerRepository;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
+import com.sbb2.question.exception.QuestionBusinessLogicException;
+import com.sbb2.question.exception.QuestionErrorCode;
 
 @ExtendWith(MockitoExtension.class)
 public class AnswerServiceTest {
@@ -70,5 +72,32 @@ public class AnswerServiceTest {
 		assertThat(savedAnswer.content()).isEqualTo(content);
 		assertThat(savedAnswer.author()).isEqualTo(member);
 		assertThat(savedAnswer.question()).isEqualTo(question);
+	}
+
+	@DisplayName("save_answer_find_fail")
+	@Test
+	void save_answer_find_fail() {
+	    //given
+		Member member = Member.builder()
+			.username("testUsername")
+			.password("testPassword")
+			.email("testEmail@naver.com")
+			.build();
+
+		Question question = Question.builder()
+			.id(1L)
+			.subject("testSubject")
+			.content("testContent")
+			.author(member)
+			.build();
+
+		String content = "saveAnswer";
+		Long questionId = question.id();
+
+		given(questionRepository.findById(any(Long.class)))
+			.willThrow(new QuestionBusinessLogicException(QuestionErrorCode.NOT_FOUND));
+
+	    //then
+		assertThatThrownBy(() -> answerService.save(questionId, content, member));
 	}
 }
