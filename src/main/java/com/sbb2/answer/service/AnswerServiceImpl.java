@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sbb2.answer.domain.Answer;
+import com.sbb2.answer.exception.AnswerBusinessLogicException;
+import com.sbb2.answer.exception.AnswerErrorCode;
 import com.sbb2.infrastructer.answer.repository.AnswerRepository;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
 import com.sbb2.member.domain.Member;
@@ -32,5 +34,11 @@ public class AnswerServiceImpl implements AnswerService {
 			.build();
 
 		return answerRepository.save(answer);
+	}
+
+	@Override
+	public Answer findById(Long answerId) {
+		return answerRepository.findById(answerId)
+			.orElseThrow(() -> new AnswerBusinessLogicException(AnswerErrorCode.NOT_FOUND));
 	}
 }

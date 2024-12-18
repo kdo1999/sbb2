@@ -6,4 +6,6 @@ import com.sbb2.member.domain.Member;
 public interface AnswerService {
 
 	Answer save(Long questionId, String content, Member author);
+
+	Answer findById(Long answerId);
 }
