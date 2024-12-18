@@ -9,4 +9,6 @@ public interface QuestionService {
 	Question findById(Long id);
 
 	Question update(Long id, String subject, String content, Member author);
+
+	void deleteById(Long id);
 }

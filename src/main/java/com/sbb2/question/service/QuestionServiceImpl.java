@@ -48,4 +48,12 @@ public class QuestionServiceImpl implements QuestionService {
 
 		return questionRepository.save(target);
 	}
+
+	@Override
+	public void deleteById(Long id) {
+		Question target = questionRepository.findById(id)
+			.orElseThrow(() -> new QuestionBusinessLogicException(QuestionErrorCode.NOT_FOUND));
+
+		questionRepository.deleteById(target.id());
+	}
 }
