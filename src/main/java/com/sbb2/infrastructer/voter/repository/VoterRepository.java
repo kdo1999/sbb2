@@ -8,4 +8,6 @@ public interface VoterRepository {
 	Voter save(Voter voter);
 
 	List<Voter> findByQuestionId(Long questionId);
+
+	List<Voter> findByAnswerId(Long answerId);
 }

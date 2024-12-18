@@ -213,9 +213,9 @@ public class AnswerRepositoryTest {
 
 		//then
 		Optional<Answer> findAnswerOptional = answerRepository.findById(savedAnswer.id());
-		List<Answer> findAnswerList = voterRepository.findByAnswerId(savedAnswer.id());
+		List<Voter> findVoterList = voterRepository.findByAnswerId(savedAnswer.id());
 
 		assertThat(findAnswerOptional.isEmpty()).isTrue();
-		assertThat(findAnswerList.isEmpty()).isTrue();
+		assertThat(findVoterList.isEmpty()).isTrue();
 	}
 }

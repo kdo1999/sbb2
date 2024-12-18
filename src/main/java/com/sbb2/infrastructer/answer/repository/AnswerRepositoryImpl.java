@@ -32,4 +32,9 @@ public class AnswerRepositoryImpl implements AnswerRepository{
 			.map(AnswerEntity::toModel)
 			.toList();
 	}
+
+	@Override
+	public void deleteById(Long id) {
+		answerJpaRepository.deleteById(id);
+	}
 }

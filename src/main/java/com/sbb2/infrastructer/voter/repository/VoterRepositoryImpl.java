@@ -23,4 +23,9 @@ public class VoterRepositoryImpl implements VoterRepository {
 	public List<Voter> findByQuestionId(Long questionId) {
 		return voterJpaRepository.findByQuestionId(questionId).stream().map(VoterEntity::toModel).toList();
 	}
+
+	@Override
+	public List<Voter> findByAnswerId(Long answerId) {
+		return voterJpaRepository.findByAnswerId(answerId).stream().map(VoterEntity::toModel).toList();
+	}
 }

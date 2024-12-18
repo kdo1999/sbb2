@@ -11,4 +11,7 @@ import com.sbb2.infrastructer.voter.entity.VoterEntity;
 public interface VoterJpaRepository extends JpaRepository<VoterEntity, Long> {
 	@Query("select v from VoterEntity v left join fetch v.questionEntity left join fetch v.memberEntity where v.questionEntity.id = :questionId")
 	List<VoterEntity> findByQuestionId(@Param("questionId") Long questionId);
+
+	@Query("select v from VoterEntity v left join fetch v.answerEntity left join fetch v.memberEntity where v.answerEntity.id = :answerId")
+	List<VoterEntity> findByAnswerId(@Param("answerId") Long answerId);
 }
