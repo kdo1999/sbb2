@@ -13,4 +13,6 @@ public interface QuestionRepository {
 	Question save(Question question);
 	Optional<Question> findById(@Param("id") Long id);
 	Page<QuestionPageResponse> findAll(String keyword, Pageable pageable);
+
+	void deleteById(Long targetId);
 }

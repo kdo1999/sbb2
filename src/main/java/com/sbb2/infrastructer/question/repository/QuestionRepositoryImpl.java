@@ -32,4 +32,9 @@ public class QuestionRepositoryImpl implements QuestionRepository {
 	public Page<QuestionPageResponse> findAll(String keyword, Pageable pageable) {
 		return questionQueryRepository.findAll(keyword, pageable);
 	}
+
+	@Override
+	public void deleteById(Long targetId) {
+		questionJpaRepository.deleteById(targetId);
+	}
 }
