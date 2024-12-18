@@ -149,4 +149,41 @@ public class AnswerServiceTest {
 	    //then
 		assertThatThrownBy(() -> answerService.findById(answerId));
 	}
+
+	@DisplayName("답변 수정 성공 테스트")
+	@Test
+	void update_answer_success() {
+	    //given
+		Member member = Member.builder()
+			.username("testUsername")
+			.password("testPassword")
+			.email("testEmail@naver.com")
+			.build();
+
+		Question question = Question.builder()
+			.id(1L)
+			.subject("testSubject")
+			.content("testContent")
+			.author(member)
+			.build();
+
+		String updateContent = "updateAnswer";
+
+		Answer answer = Answer.builder()
+			.id(1L)
+			.content(updateContent)
+			.author(member)
+			.question(question)
+			.build();
+
+		Long answerId = answer.id();
+
+		given(answerRepository.save(any(Answer.class))).willReturn(answer);
+
+	    //when
+		Answer updateAnswer = answerService.update(id, updateContent);
+
+	    //then
+	    assertThat(updateAnswer).isEqualTo(answer);
+	}
 }
