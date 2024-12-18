@@ -177,4 +177,32 @@ public class QuestionServiceTest {
 			.isInstanceOf(QuestionBusinessLogicException.class)
 			.hasMessage(QuestionErrorCode.NOT_FOUND.getMessage());
 	}
+
+	@DisplayName("질문 삭제 성공 테스트")
+	@Test
+	void delete_question_success() {
+	    //given
+		Member givenMember = Member.builder()
+			.id(1L)
+			.username("testMember")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
+
+	    given(questionRepository.findById(any(Long.class)))
+			.willReturn(Optional.of(Question.builder()
+				.id(1L)
+				.subject("subject")
+				.content("content")
+				.author(givenMember)
+				.build()));
+
+		doNothing().when(questionRepository).deleteById(any(Long.class));
+
+	    //when
+		questionService.deleteById(1L);
+
+		//then
+		verify(questionRepository, times(1)).deleteById(any(Long.class));
+	}
 }
