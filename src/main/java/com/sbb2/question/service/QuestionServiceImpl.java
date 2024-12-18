@@ -33,4 +33,19 @@ public class QuestionServiceImpl implements QuestionService {
 
 		return question;
 	}
+
+	@Override
+	public Question update(Long id, String subject, String content, Member author) {
+		Question target = questionRepository.findById(id)
+			.orElseThrow(() -> new QuestionBusinessLogicException(QuestionErrorCode.NOT_FOUND));
+
+		Question updateQuestion = Question.builder()
+			.subject(subject)
+			.content(content)
+			.build();
+
+		target = target.fetch(updateQuestion);
+
+		return questionRepository.save(target);
+	}
 }

@@ -8,7 +8,6 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -16,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
 import com.sbb2.member.domain.Member;
+import com.sbb2.question.controller.request.QuestionForm;
 import com.sbb2.question.domain.Question;
 import com.sbb2.question.exception.QuestionBusinessLogicException;
 import com.sbb2.question.exception.QuestionErrorCode;
@@ -129,6 +129,14 @@ public class QuestionServiceTest {
 			.email("testEmail")
 			.build();
 
+		given(questionRepository.findById(any(Long.class)))
+			.willReturn(Optional.of(Question.builder()
+				.id(1L)
+				.subject("subject")
+				.content("content")
+				.author(givenMember)
+				.build()));
+
 		given(questionRepository.save(any(Question.class)))
 			.willReturn(Question.builder()
 				.id(1L)
@@ -137,7 +145,7 @@ public class QuestionServiceTest {
 				.author(givenMember)
 				.build());
 	    //when
-		Question updateQuestion = questionService.update(questionForm.subject(), questionForm.content());
+		Question updateQuestion = questionService.update(1L, questionForm.subject(), questionForm.content(), givenMember);
 
 	    //then
 		assertThat(updateQuestion.author()).isEqualTo(givenMember);

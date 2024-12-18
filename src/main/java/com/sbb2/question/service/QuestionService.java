@@ -7,4 +7,6 @@ public interface QuestionService {
 	Question save(String subject, String content, Member author);
 
 	Question findById(Long id);
+
+	Question update(Long id, String subject, String content, Member author);
 }
