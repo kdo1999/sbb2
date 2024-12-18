@@ -49,7 +49,7 @@ public class QuestionEntity extends BaseEntity {
 	@JoinColumn(name = "member_id")
 	private MemberEntity author;
 
-	@OneToMany(mappedBy = "questionEntity")
+	@OneToMany(mappedBy = "questionEntity", cascade = CascadeType.ALL)
 	private List<AnswerEntity> answerEntityList = new ArrayList<>();
 
 	@OneToMany(mappedBy = "questionEntity", cascade = CascadeType.ALL)

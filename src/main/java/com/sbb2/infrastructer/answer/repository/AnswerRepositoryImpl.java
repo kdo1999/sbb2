@@ -1,5 +1,6 @@
 package com.sbb2.infrastructer.answer.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
@@ -22,5 +23,13 @@ public class AnswerRepositoryImpl implements AnswerRepository{
 	@Override
 	public Optional<Answer> findById(Long id) {
 		return answerJpaRepository.findById(id).map(AnswerEntity::toModel);
+	}
+
+	@Override
+	public List<Answer> findByQuestionId(Long questionId) {
+
+		return answerJpaRepository.findByQuestionId(questionId).stream()
+			.map(AnswerEntity::toModel)
+			.toList();
 	}
 }
