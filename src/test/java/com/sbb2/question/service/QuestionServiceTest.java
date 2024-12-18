@@ -270,7 +270,7 @@ public class QuestionServiceTest {
 		}
 
 		given(questionRepository.findAll(any(String.class), any(Pageable.class))).willReturn(new PageImpl<>(
-			questionPageResponseList,
+			questionPageResponseList.subList(0, Math.min(10, questionPageResponseList.size())),
 			PageRequest.of(0, 10),
 			questionPageResponseList.size()
 			)
@@ -282,6 +282,6 @@ public class QuestionServiceTest {
 		//then
 		assertThat(findAll.getContent().size()).isEqualTo(10);
 		assertThat(findAll.getTotalElements()).isEqualTo(15);
-		assertThat(findAll.getTotalPages()).isEqualTo(1);
+		assertThat(findAll.getTotalPages()).isEqualTo(2);
 	}
 }
