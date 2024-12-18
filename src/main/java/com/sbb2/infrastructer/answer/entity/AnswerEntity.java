@@ -49,7 +49,7 @@ public class AnswerEntity extends BaseEntity {
 	@JoinColumn(name = "question_id")
 	private QuestionEntity questionEntity;
 
-	@OneToMany(cascade = CascadeType.ALL)
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "answerEntity")
 	private Set<VoterEntity> voterEntitySet = new HashSet<>();
 
 	@Builder
