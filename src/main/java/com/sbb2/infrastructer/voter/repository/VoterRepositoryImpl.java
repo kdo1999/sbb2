@@ -1,5 +1,7 @@
 package com.sbb2.infrastructer.voter.repository;
 
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
 import com.sbb2.infrastructer.voter.entity.VoterEntity;
@@ -15,5 +17,10 @@ public class VoterRepositoryImpl implements VoterRepository {
 	@Override
 	public Voter save(Voter voter) {
 		return voterJpaRepository.save(VoterEntity.from(voter)).toModel();
+	}
+
+	@Override
+	public List<Voter> findByQuestionId(Long questionId) {
+		return voterJpaRepository.findByQuestionId(questionId).stream().map(VoterEntity::toModel).toList();
 	}
 }

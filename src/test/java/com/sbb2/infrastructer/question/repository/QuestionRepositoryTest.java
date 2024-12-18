@@ -301,7 +301,7 @@ public class QuestionRepositoryTest {
 		questionRepository.deleteById(savedQuestion.id());
 
 		//then
-		List<Voter> findVoterList = voterRepository.findById(voter);
+		List<Voter> findVoterList = voterRepository.findByQuestionId(savedQuestion.id());
 		Optional<Question> findQuestion = questionRepository.findById(savedQuestion.id());
 
 		assertThat(findVoterList.isEmpty()).isTrue();
