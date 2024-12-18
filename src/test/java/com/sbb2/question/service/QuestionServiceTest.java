@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -110,5 +111,37 @@ public class QuestionServiceTest {
 
 		//then
 		assertThatThrownBy(() -> questionService.findById(2L)).isInstanceOf(QuestionBusinessLogicException.class);
+	}
+
+	@DisplayName("질문 수정 성공 테스트")
+	@Test
+	void update_question_succes() {
+	    //given
+		QuestionForm questionForm = QuestionForm.builder()
+			.subject("updateSubject")
+			.content("updateContent")
+			.build();
+
+		Member givenMember = Member.builder()
+			.id(1L)
+			.username("testMember")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
+
+		given(questionRepository.save(any(Question.class)))
+			.willReturn(Question.builder()
+				.id(1L)
+				.subject(questionForm.subject())
+				.content(questionForm.content())
+				.author(givenMember)
+				.build());
+	    //when
+		Question updateQuestion = questionService.update(questionForm.subject(), questionForm.content());
+
+	    //then
+		assertThat(updateQuestion.author()).isEqualTo(givenMember);
+		assertThat(updateQuestion.subject()).isEqualTo(questionForm.subject());
+		assertThat(updateQuestion.content()).isEqualTo(questionForm.content());
 	}
 }
