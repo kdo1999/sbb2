@@ -8,4 +8,6 @@ public interface AnswerService {
 	Answer save(Long questionId, String content, Member author);
 
 	Answer findById(Long answerId);
+
+	//TODO 답변 수정 기능 구현 예정
 }
