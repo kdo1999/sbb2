@@ -33,6 +33,8 @@ import com.sbb2.question.domain.Question;
 import com.sbb2.question.domain.QuestionPageResponse;
 import com.sbb2.voter.Voter;
 
+import jakarta.persistence.EntityManager;
+
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class))
 @Import({JpaAudtingConfig.class, QuerydslConfig.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -42,14 +44,16 @@ public class QuestionRepositoryTest {
 	private final QuestionRepository questionRepository;
 	private final AnswerRepository answerRepository;
 	private final VoterRepository voterRepository;
+	private final EntityManager em;
 
 	@Autowired
 	public QuestionRepositoryTest(QuestionRepository questionRepository, MemberRepository memberRepository,
-		AnswerRepository answerRepository, VoterRepository voterRepository) {
+		AnswerRepository answerRepository, VoterRepository voterRepository, EntityManager em) {
 		this.questionRepository = questionRepository;
 		this.memberRepository = memberRepository;
 		this.answerRepository = answerRepository;
 		this.voterRepository = voterRepository;
+		this.em = em;
 	}
 
 	@BeforeAll
@@ -234,5 +238,39 @@ public class QuestionRepositoryTest {
 	    //then
 		Optional<Question> findQuestion = questionRepository.findById(question.id());
 		assertThat(findQuestion.isEmpty()).isTrue();
+	}
+
+	@DisplayName("질문 삭제시 댓글 삭제 성공 테스트")
+	@Test
+	void delete_question_answer_success() {
+	    //given
+		Member member = memberRepository.findById(1L).get();
+		Question question = Question.builder()
+				.subject("givenSubject")
+				.content("givenContent")
+				.author(member)
+				.build();
+
+		Question savedQuestion = questionRepository.save(question);
+		String answerContent = "answerContent";
+
+		for (int i = 0; i < 5; i++) {
+			answerRepository.save(Answer.builder()
+				.content(answerContent)
+				.question(savedQuestion)
+				.author(member)
+				.build());
+		}
+
+		em.flush();
+		em.clear();
+		//when
+		questionRepository.deleteById(savedQuestion.id());
+
+		//then
+		Optional<Question> findQuestionOptional = questionRepository.findById(savedQuestion.id());
+		List<Answer> findAnswerList = answerRepository.findByQuestionId(savedQuestion.id());
+		assertThat(findQuestionOptional.isEmpty()).isTrue();
+		assertThat(findAnswerList.isEmpty()).isTrue();
 	}
 }
