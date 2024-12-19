@@ -52,8 +52,9 @@ public class VoterServiceImpl implements VoterService {
 	}
 
 	@Override
-	public void deleteQuestionVoter(Long questionId, Long memberId) {
-		Voter findVoter = voterRepository.findByQuestionIdAndMemberId(questionId, memberId)
+	public void delete(Question question, Member member) {
+		Voter findVoter = question.voterSet().stream()
+			.filter(voter -> member.id().equals(voter.member().id())).findFirst()
 			.orElseThrow(() -> new VoterBusinessLogicException(VoterErrorCode.NOT_FOUND));
 
 		voterRepository.deleteById(findVoter.id());
@@ -62,7 +63,7 @@ public class VoterServiceImpl implements VoterService {
 	@Override
 	public void delete(Answer answer, Member member) {
 		Voter findVoter = answer.voterSet().stream()
-			.filter(voter -> voter.member().id().equals(member.id()))
+			.filter(voter -> member.id().equals(voter.member().id()))
 			.findFirst()
 			.orElseThrow(() -> new VoterBusinessLogicException(VoterErrorCode.NOT_FOUND));
 

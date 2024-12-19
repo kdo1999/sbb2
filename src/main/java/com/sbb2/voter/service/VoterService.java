@@ -10,7 +10,7 @@ public interface VoterService {
 
 	Voter save(Answer answer, Member member);
 
-	void deleteQuestionVoter(Long questionId, Long memberId);
+	void delete(Question question, Member member);
 
 	void delete(Answer answer, Member member);
 }
