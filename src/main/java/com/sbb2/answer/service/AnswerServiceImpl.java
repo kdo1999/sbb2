@@ -48,13 +48,27 @@ public class AnswerServiceImpl implements AnswerService {
 		Answer findAnswer = answerRepository.findById(answerId)
 			.orElseThrow(() -> new AnswerBusinessLogicException(AnswerErrorCode.NOT_FOUND));
 
-		if (!findAnswer.author().equals(author)) {
-			throw new AnswerBusinessLogicException(AnswerErrorCode.UNAUTHORIZED);
-		}
+		loginMemberEqualsAuthor(author, findAnswer);
 
 		Answer updateAnswer = findAnswer.fetch(content);
 		Answer savedAnswer = answerRepository.save(updateAnswer);
 
 		return savedAnswer;
+	}
+
+	@Override
+	public void deleteById(Long answerId, Member author) {
+		Answer findAnswer = answerRepository.findById(answerId)
+			.orElseThrow(() -> new AnswerBusinessLogicException(AnswerErrorCode.NOT_FOUND));
+
+		loginMemberEqualsAuthor(author, findAnswer);
+
+		answerRepository.deleteById(findAnswer.id());
+	}
+
+	private void loginMemberEqualsAuthor(Member author, Answer findAnswer) {
+		if (!findAnswer.author().equals(author)) {
+			throw new AnswerBusinessLogicException(AnswerErrorCode.UNAUTHORIZED);
+		}
 	}
 }

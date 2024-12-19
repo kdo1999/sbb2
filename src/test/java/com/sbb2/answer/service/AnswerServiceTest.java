@@ -274,6 +274,7 @@ public class AnswerServiceTest {
 
 		Long targetId = answer.id();
 
+		given(answerRepository.findById(any(Long.class))).willReturn(Optional.of(answer));
 		doNothing().when(answerRepository).deleteById(any(Long.class));
 
 	    //when
