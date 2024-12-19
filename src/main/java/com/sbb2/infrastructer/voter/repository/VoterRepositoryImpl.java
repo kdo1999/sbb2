@@ -1,6 +1,7 @@
 package com.sbb2.infrastructer.voter.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
@@ -37,5 +38,10 @@ public class VoterRepositoryImpl implements VoterRepository {
 	@Override
 	public void deleteById(Long voterId) {
 		voterJpaRepository.deleteById(voterId);
+	}
+
+	@Override
+	public Optional<Voter> findById(Long voterId) {
+		return voterJpaRepository.findById(voterId).map(VoterEntity::toModel);
 	}
 }
