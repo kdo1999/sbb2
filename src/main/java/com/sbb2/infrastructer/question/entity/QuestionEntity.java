@@ -67,7 +67,7 @@ public class QuestionEntity extends BaseEntity {
 		this.answerEntityList = answerEntityList;
 	}
 
-	public void setVoterEntitySet(Set<VoterEntity> voterEntitySet) {
+	private void setVoterEntitySet(Set<VoterEntity> voterEntitySet) {
 		this.voterEntitySet = voterEntitySet;
 		voterEntitySet.forEach(v -> v.setQuestionEntity(this));
 	}
