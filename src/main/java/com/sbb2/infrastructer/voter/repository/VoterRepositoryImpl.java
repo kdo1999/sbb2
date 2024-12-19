@@ -17,7 +17,9 @@ public class VoterRepositoryImpl implements VoterRepository {
 
 	@Override
 	public Voter save(Voter voter) {
-		return voterJpaRepository.save(VoterEntity.from(voter)).toModel();
+
+		VoterEntity saved = voterJpaRepository.save(VoterEntity.from(voter));
+		return saved.toModel();
 	}
 
 	@Override
