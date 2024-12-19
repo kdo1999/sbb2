@@ -58,4 +58,14 @@ public class VoterServiceImpl implements VoterService {
 
 		voterRepository.deleteById(findVoter.id());
 	}
+
+	@Override
+	public void delete(Answer answer, Member member) {
+		Voter findVoter = answer.voterSet().stream()
+			.filter(voter -> voter.member().id().equals(member.id()))
+			.findFirst()
+			.orElseThrow(() -> new VoterBusinessLogicException(VoterErrorCode.NOT_FOUND));
+
+		voterRepository.deleteById(findVoter.id());
+	}
 }

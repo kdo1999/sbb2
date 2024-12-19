@@ -195,11 +195,12 @@ public class VoterServiceTest {
 			.member(member)
 			.build();
 
-		given(voterRepository.findByQuestionIdAndMemberId(answer.id(), member.id())).willReturn(Optional.of(voter));
+		answer.voterSet().add(voter);
+
 		doNothing().when(voterRepository).deleteById(voter.id());
 
 		//when
-		voterService.deleteAnswerVoter(question.id(), member.id());
+		voterService.delete(answer, member);
 
 		//then
 		verify(voterRepository, times(1)).deleteById(voter.id());
