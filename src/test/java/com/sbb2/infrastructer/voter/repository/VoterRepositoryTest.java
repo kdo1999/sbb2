@@ -2,6 +2,8 @@ package com.sbb2.infrastructer.voter.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -81,5 +83,27 @@ public class VoterRepositoryTest {
 		assertThat(savedVoter.id()).isNotNull();
 		assertThat(savedVoter.question().id()).isEqualTo(findQuestion.id());
 		assertThat(savedVoter.member()).isEqualTo(member);
+	}
+
+	@DisplayName("질문 추천 삭제 테스트")
+	@Test
+	void delete_question_voter_success() {
+		//given
+		Member member = memberRepository.findById(1L).get();
+		Question findQuestion = questionRepository.findById(1L).get();
+
+		Voter voter = Voter.builder()
+			.question(findQuestion)
+			.member(member)
+			.build();
+
+		Voter savedVoter = voterRepository.save(voter);
+
+		//when
+		voterRepository.deleteById(savedVoter.id());
+
+		//then
+		Optional<Voter> findVoter = voterRepository.findById(savedVoter.id());
+		assertThat(findVoter.isEmpty()).isTrue();
 	}
 }
