@@ -1,5 +1,7 @@
 package com.sbb2.answer.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,6 +66,12 @@ public class AnswerServiceImpl implements AnswerService {
 		loginMemberEqualsAuthor(author, findAnswer);
 
 		answerRepository.deleteById(findAnswer.id());
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<Answer> findByQuestionId(Long questionId) {
+		return answerRepository.findByQuestionId(questionId);
 	}
 
 	private void loginMemberEqualsAuthor(Member author, Answer findAnswer) {

@@ -362,5 +362,6 @@ public class AnswerServiceTest {
 
 		//then
 		assertThat(findAnswerList).isEqualTo(answerList);
+		assertThat(findAnswerList.size()).isEqualTo(4);
 	}
 }
