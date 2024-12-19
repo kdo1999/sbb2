@@ -247,4 +247,39 @@ public class AnswerServiceTest {
 			.isInstanceOf(AnswerBusinessLogicException.class)
 			.hasMessage(AnswerErrorCode.UNAUTHORIZED.getMessage());
 	}
+
+	@DisplayName("답변 삭제 성공 테스트")
+	@Test
+	void delete_answer_success() {
+	    //given
+		Member author = Member.builder()
+			.username("testUsername")
+			.password("testPassword")
+			.email("testEmail@naver.com")
+			.build();
+
+		Question question = Question.builder()
+			.id(1L)
+			.subject("testSubject")
+			.content("testContent")
+			.author(author)
+			.build();
+
+		Answer answer = Answer.builder()
+			.id(1L)
+			.content("content")
+			.author(author)
+			.question(question)
+			.build();
+
+		Long targetId = answer.id();
+
+		doNothing().when(answerRepository).deleteById(any(Long.class));
+
+	    //when
+		answerService.deleteById(targetId, author);
+
+	    //then
+		verify(answerRepository, times(1)).deleteById(any(Long.class));
+	}
 }
