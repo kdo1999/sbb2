@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.sbb2.answer.domain.Answer;
 import com.sbb2.infrastructer.voter.repository.VoterRepository;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
@@ -126,9 +127,43 @@ public class VoterServiceTest {
 			.hasMessage(VoterErrorCode.DUPLICATE_VOTER.getMessage());
 	}
 
-	//TODO 질문 추천 조회 테스트
+	@DisplayName("댓글 추천 성공 테스트")
+	@Test
+	void save_answer_voter_success() {
+	    //given
+	    Member member = Member.builder()
+			.id(1L)
+			.username("testUsername")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
 
-	//TODO 댓글 추천 성공 테스트
+		Question question = Question.builder()
+			.id(1L)
+			.subject("testSubject")
+			.content("testContent")
+			.author(member)
+			.build();
+
+		Answer answer = Answer.builder()
+			.id(1L)
+			.content("testContent")
+			.author(member)
+			.build();
+
+		Voter voter = Voter.builder()
+			.answer(answer)
+			.member(member)
+			.build();
+
+		given(voterRepository.save(voter)).willReturn(voter);
+
+	    //when
+		Voter savedVoter = voterService.save(voter, member);
+
+	    //then
+	    assertThat(savedVoter).isEqualTo(voter);
+	}
 	//TODO 댓글 추천 삭제 테스트
 	//TODO 댓글 중복 추천 방지 테스트
 	//TODO 질문 추천 삭제 테스트
