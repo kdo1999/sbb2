@@ -9,5 +9,5 @@ public interface AnswerService {
 
 	Answer findById(Long answerId);
 
-	//TODO 답변 수정 기능 구현 예정
+	Answer update(Long answerId, String content, Member author);
 }

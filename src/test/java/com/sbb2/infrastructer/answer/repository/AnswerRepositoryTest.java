@@ -153,9 +153,7 @@ public class AnswerRepositoryTest {
 		String updateContent = "updateTestContent";
 
 		savedAnswer = savedAnswer.fetch(
-			Answer.builder()
-				.content(updateContent)
-				.build()
+			updateContent
 		);
 
 		Answer updatedAnswer = answerRepository.save(savedAnswer);
@@ -171,6 +169,7 @@ public class AnswerRepositoryTest {
 		//given
 		Member member = memberRepository.findById(1L).get();
 		Answer answer = answerRepository.findById(1L).get();
+
 		Voter voter = Voter.builder()
 			.member(member)
 			.build();

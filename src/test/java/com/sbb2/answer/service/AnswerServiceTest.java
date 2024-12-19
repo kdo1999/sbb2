@@ -171,19 +171,21 @@ public class AnswerServiceTest {
 
 		Answer answer = Answer.builder()
 			.id(1L)
-			.content(updateContent)
+			.content("content")
 			.author(member)
 			.question(question)
 			.build();
 
+		Answer updateAnswer = answer.fetch(updateContent);
 		Long answerId = answer.id();
 
-		given(answerRepository.save(any(Answer.class))).willReturn(answer);
+		given(answerRepository.findById(any(Long.class))).willReturn(Optional.of(answer));
+		given(answerRepository.save(any(Answer.class))).willReturn(updateAnswer);
 
 	    //when
-		Answer updateAnswer = answerService.update(id, updateContent);
+		Answer result = answerService.update(answerId, updateContent, member);
 
 	    //then
-	    assertThat(updateAnswer).isEqualTo(answer);
+	    assertThat(result).isEqualTo(updateAnswer);
 	}
 }

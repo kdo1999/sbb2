@@ -26,10 +26,10 @@ public record Answer(Long id, String content, Member author, Question question, 
 		this.voterSet = voterSet == null ? new HashSet<>() : voterSet;
 	}
 
-	public Answer fetch(Answer updateAnswer) {
+	public Answer fetch(String contennt) {
 		return Answer.builder()
 			.id(this.id)
-			.content(updateAnswer.content())
+			.content(content)
 			.author(this.author)
 			.question(this.question)
 			.createdAt(this.createdAt)

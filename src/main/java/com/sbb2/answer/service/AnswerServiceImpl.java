@@ -37,8 +37,24 @@ public class AnswerServiceImpl implements AnswerService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public Answer findById(Long answerId) {
 		return answerRepository.findById(answerId)
 			.orElseThrow(() -> new AnswerBusinessLogicException(AnswerErrorCode.NOT_FOUND));
+	}
+
+	@Override
+	public Answer update(Long answerId, String content, Member author) {
+		Answer findAnswer = answerRepository.findById(answerId)
+			.orElseThrow(() -> new AnswerBusinessLogicException(AnswerErrorCode.NOT_FOUND));
+
+		if (!findAnswer.author().equals(author)) {
+			throw new AnswerBusinessLogicException(AnswerErrorCode.UNAUTHORIZED);
+		}
+
+		Answer updateAnswer = findAnswer.fetch(content);
+		Answer savedAnswer = answerRepository.save(updateAnswer);
+
+		return savedAnswer;
 	}
 }

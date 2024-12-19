@@ -6,7 +6,8 @@ import lombok.Getter;
 
 @Getter
 public enum AnswerErrorCode {
-	NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 답변이 존재하지 않습니다.");
+	NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 답변이 존재하지 않습니다."),
+	UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "질문 작성자만 사용할 수 있습니다.");
 
 	HttpStatus httpstatus;
 	String message;
