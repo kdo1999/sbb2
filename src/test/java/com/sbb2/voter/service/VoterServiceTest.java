@@ -16,6 +16,8 @@ import com.sbb2.infrastructer.voter.repository.VoterRepository;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
 import com.sbb2.voter.domain.Voter;
+import com.sbb2.voter.exception.VoterBusinessLogicException;
+import com.sbb2.voter.exception.VoterErrorCode;
 
 @ExtendWith(MockitoExtension.class)
 public class VoterServiceTest {
@@ -93,8 +95,37 @@ public class VoterServiceTest {
 		//then
 		verify(voterRepository, times(1)).deleteById(voter.id());
 	}
+	@DisplayName("질문 중복 추천 방지 성공 테스트")
+	@Test
+	void prevent_duplicate_voter_success() {
+	    //given
+		Member member = Member.builder()
+			.id(1L)
+			.username("testUsername")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
 
-	//TODO 질문 중복 추천 방지 테스트
+		Question question = Question.builder()
+			.id(1L)
+			.subject("testSubject")
+			.content("testContent")
+			.author(member)
+			.build();
+
+		Voter voter = Voter.builder()
+			.question(question)
+			.member(member)
+			.build();
+
+		given(voterRepository.existsByQuestionIdAndMemberId(question.id(), member.id())).willReturn(true);
+
+	    //then
+		assertThatThrownBy(() -> voterService.save(question, member))
+			.isInstanceOf(VoterBusinessLogicException.class)
+			.hasMessage(VoterErrorCode.DUPLICATE_VOTER.getMessage());
+	}
+
 	//TODO 질문 추천 조회 테스트
 
 	//TODO 댓글 추천 성공 테스트

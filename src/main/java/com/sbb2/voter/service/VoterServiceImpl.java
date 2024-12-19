@@ -20,6 +20,12 @@ public class VoterServiceImpl implements VoterService {
 
 	@Override
 	public Voter save(Question question, Member member) {
+		Boolean exists = voterRepository.existsByQuestionIdAndMemberId(question.id(), member.id());
+
+		if (exists) {
+			throw new VoterBusinessLogicException(VoterErrorCode.DUPLICATE_VOTER);
+		}
+
 		Voter voter = Voter.builder()
 			.question(question)
 			.member(member)
