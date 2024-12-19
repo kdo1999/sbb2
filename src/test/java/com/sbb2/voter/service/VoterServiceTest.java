@@ -204,6 +204,4 @@ public class VoterServiceTest {
 		//then
 		verify(voterRepository, times(1)).deleteById(voter.id());
 	}
-	//TODO 댓글 중복 추천 방지 테스트
-	//TODO 질문 추천 삭제 테스트
 }
