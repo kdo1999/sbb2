@@ -2,6 +2,7 @@ package com.sbb2.infrastructer.voter.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -56,12 +57,19 @@ public class VoterRepositoryTest {
 			.build();
 		Member savedMember = memberRepository.save(member);
 
-		Question question = Question.builder()
+		Question question1 = Question.builder()
 			.subject("testSubject")
 			.content("testContent")
 			.author(savedMember)
 			.build();
-		questionRepository.save(question);
+		questionRepository.save(question1);
+
+		Question question2 = Question.builder()
+			.subject("testSubject")
+			.content("testContent")
+			.author(savedMember)
+			.build();
+		questionRepository.save(question2);
 	}
 
 	@DisplayName("질문 추천 성공 테스트")
@@ -105,5 +113,35 @@ public class VoterRepositoryTest {
 		//then
 		Optional<Voter> findVoter = voterRepository.findById(savedVoter.id());
 		assertThat(findVoter.isEmpty()).isTrue();
+	}
+
+	@DisplayName("질문ID로 추천 조회 테스트")
+	@Test
+	void find_questionId_voter_success() {
+	    //given
+	    Member member = memberRepository.findById(1L).get();
+		Question findQuestion1 = questionRepository.findById(1L).get();
+		Question findQuestion2 = questionRepository.findById(2L).get();
+
+		Voter voter1 = Voter.builder()
+			.question(findQuestion1)
+			.member(member)
+			.build();
+
+		Voter voter2 = Voter.builder()
+			.question(findQuestion2)
+			.member(member)
+			.build();
+
+		Voter savedVoter1 = voterRepository.save(voter1);
+		Voter savedVoter2 = voterRepository.save(voter2);
+
+	    //when
+		List<Voter> findVoterList = voterRepository.findByQuestionId(findQuestion1.id());
+
+		//then
+	    assertThat(findVoterList.size()).isEqualTo(1);
+		assertThat(findVoterList.get(0)).isEqualTo(savedVoter1);
+		assertThat(findVoterList.get(0)).isNotEqualTo(savedVoter2);
 	}
 }
