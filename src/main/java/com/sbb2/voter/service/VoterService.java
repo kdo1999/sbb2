@@ -6,4 +6,6 @@ import com.sbb2.voter.domain.Voter;
 
 public interface VoterService {
 	Voter save(Question question, Member member);
+
+	void deleteQuestionVoter(Long questionId, Long memberId);
 }

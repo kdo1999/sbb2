@@ -3,7 +3,8 @@ package com.sbb2.voter.service;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
-import org.assertj.core.api.Assertions;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -83,11 +84,11 @@ public class VoterServiceTest {
 			.member(member)
 			.build();
 
-		given(voterRepository.findByQuestionIdAndMemberId(question.id(), member.id())).willReturn(voter);
+		given(voterRepository.findByQuestionIdAndMemberId(question.id(), member.id())).willReturn(Optional.of(voter));
 		doNothing().when(voterRepository).deleteById(voter.id());
 
 		//when
-		voterService.delete(question.id(), member.id());
+		voterService.deleteQuestionVoter(question.id(), member.id());
 
 		//then
 		verify(voterRepository, times(1)).deleteById(voter.id());

@@ -7,6 +7,8 @@ import com.sbb2.infrastructer.voter.repository.VoterRepository;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
 import com.sbb2.voter.domain.Voter;
+import com.sbb2.voter.exception.VoterBusinessLogicException;
+import com.sbb2.voter.exception.VoterErrorCode;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,5 +26,13 @@ public class VoterServiceImpl implements VoterService {
 			.build();
 
 		return voterRepository.save(voter);
+	}
+
+	@Override
+	public void deleteQuestionVoter(Long questionId, Long memberId) {
+		Voter findVoter = voterRepository.findByQuestionIdAndMemberId(questionId, memberId)
+			.orElseThrow(() -> new VoterBusinessLogicException(VoterErrorCode.NOT_FOUND));
+
+		voterRepository.deleteById(findVoter.id());
 	}
 }
