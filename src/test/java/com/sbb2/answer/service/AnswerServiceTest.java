@@ -210,7 +210,7 @@ public class AnswerServiceTest {
 			.hasMessage(AnswerErrorCode.NOT_FOUND.getMessage());
 	}
 
-	@DisplayName("작성자가 아닌 회원이 질문 수정 시도시 실패")
+	@DisplayName("작성자가 아닌 회원이 답변 수정 시도시 실패")
 	@Test
 	void update_answer_unauthorized_fail() {
 	    //given
@@ -282,5 +282,45 @@ public class AnswerServiceTest {
 
 	    //then
 		verify(answerRepository, times(1)).deleteById(any(Long.class));
+	}
+
+	@DisplayName("작성자가 아닌 회원이 답변 삭제 시도시 실패")
+	@Test
+	void delete_answer_unauthorized_fail() {
+	    //given
+		Member author = Member.builder()
+			.username("testUsername")
+			.password("testPassword")
+			.email("testEmail@naver.com")
+			.build();
+		Member loginMember = Member.builder()
+			.username("testUsername2")
+			.password("testPassword2")
+			.email("testEmail@naver.com")
+			.build();
+
+		Question question = Question.builder()
+			.id(1L)
+			.subject("testSubject")
+			.content("testContent")
+			.author(author)
+			.build();
+
+		Answer answer = Answer.builder()
+			.id(1L)
+			.content("content")
+			.author(author)
+			.question(question)
+			.build();
+
+		Long targetId = answer.id();
+
+		given(answerRepository.findById(any(Long.class))).willReturn(Optional.of(answer));
+
+		//then
+		assertThatThrownBy(() -> answerService.deleteById(targetId, loginMember))
+			.isInstanceOf(AnswerBusinessLogicException.class)
+			.hasMessage(AnswerErrorCode.UNAUTHORIZED.getMessage());
+
 	}
 }
