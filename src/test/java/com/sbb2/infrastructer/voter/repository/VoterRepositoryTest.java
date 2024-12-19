@@ -324,4 +324,34 @@ public class VoterRepositoryTest {
 		//then
 	    assertThat(result).isTrue();
 	}
+
+	@DisplayName("질문 ID와 멤버 ID가 일치하는 추천이 없을 때 테스트")
+	@Test
+	void exists_questionId_memberId_voter_false_success() {
+	    //given
+		Member member1 = memberRepository.findById(1L).get();
+		Member member2 = memberRepository.findById(2L).get();
+		Question findQuestion1 = questionRepository.findById(1L).get();
+		Question findQuestion2 = questionRepository.findById(2L).get();
+
+		Voter voter1 = Voter.builder()
+			.question(findQuestion1)
+			.member(member1)
+			.build();
+
+		Voter voter2 = Voter.builder()
+			.question(findQuestion1)
+			.member(member2)
+			.build();
+
+		Voter savedVoter1 = voterRepository.save(voter1);
+		Voter savedVoter2 = voterRepository.save(voter2);
+
+
+		//when
+		Boolean result = voterRepository.existsByQuestionIdAndMemberId(findQuestion2.id(), member1.id());
+
+		//then
+	    assertThat(result).isFalse();
+	}
 }
