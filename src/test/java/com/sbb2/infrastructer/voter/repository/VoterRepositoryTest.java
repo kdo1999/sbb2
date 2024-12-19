@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Repository;
 import org.springframework.test.annotation.DirtiesContext;
 
+import com.sbb2.answer.domain.Answer;
 import com.sbb2.common.config.JpaAudtingConfig;
 import com.sbb2.common.config.QuerydslConfig;
 import com.sbb2.infrastructer.answer.repository.AnswerRepository;
@@ -62,14 +63,28 @@ public class VoterRepositoryTest {
 			.content("testContent")
 			.author(savedMember)
 			.build();
-		questionRepository.save(question1);
+		Question savedQuestion1 = questionRepository.save(question1);
 
 		Question question2 = Question.builder()
 			.subject("testSubject")
 			.content("testContent")
 			.author(savedMember)
 			.build();
-		questionRepository.save(question2);
+		Question savedQuestion2 = questionRepository.save(question2);
+
+		Answer answer1 = Answer.builder()
+			.content("testAnswer")
+			.question(savedQuestion1)
+			.author(savedMember)
+			.build();
+		answerRepository.save(answer1);
+
+		Answer answer2 = Answer.builder()
+			.content("testAnswer")
+			.question(savedQuestion2)
+			.author(savedMember)
+			.build();
+		answerRepository.save(answer2);
 	}
 
 	@DisplayName("질문 추천 성공 테스트")
@@ -164,5 +179,25 @@ public class VoterRepositoryTest {
 
 		//then
 	    assertThat(findVoter).isEqualTo(savedVoter);
+	}
+
+	@DisplayName("댓글 추천 성공 테스트")
+	@Test
+	void save_answer_voter_success() {
+	    //given
+		Answer findAnswer = answerRepository.findById(1L).get();
+		Member findMember = memberRepository.findById(1L).get();
+
+		Voter voter = Voter.builder()
+			.answer(findAnswer)
+			.member(findMember)
+			.build();
+
+		//when
+		Voter savedVoter = voterRepository.save(voter);
+
+		//then
+		assertThat(savedVoter.answer().id()).isEqualTo(voter.answer().id());
+		assertThat(savedVoter.member()).isEqualTo(findMember);
 	}
 }
