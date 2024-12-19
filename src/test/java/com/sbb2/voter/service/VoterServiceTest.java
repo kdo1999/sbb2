@@ -159,7 +159,7 @@ public class VoterServiceTest {
 		given(voterRepository.save(voter)).willReturn(voter);
 
 	    //when
-		Voter savedVoter = voterService.save(voter, member);
+		Voter savedVoter = voterService.save(answer, member);
 
 	    //then
 	    assertThat(savedVoter).isEqualTo(voter);
