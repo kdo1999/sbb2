@@ -33,4 +33,9 @@ public class VoterRepositoryImpl implements VoterRepository {
 	public Voter findByQuestionIdAndMemberId(Long questionId, Long memberId) {
 		return voterJpaRepository.findByQuestionIdAndMemberId(questionId, memberId).toModel();
 	}
+
+	@Override
+	public void deleteById(Long voterId) {
+		voterJpaRepository.deleteById(voterId);
+	}
 }

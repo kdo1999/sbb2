@@ -12,4 +12,6 @@ public interface VoterRepository {
 	List<Voter> findByAnswerId(Long answerId);
 
 	Voter findByQuestionIdAndMemberId(Long questionId, Long memberId);
+
+	void deleteById(Long voterId);
 }
