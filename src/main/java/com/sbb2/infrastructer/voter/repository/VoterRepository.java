@@ -10,4 +10,6 @@ public interface VoterRepository {
 	List<Voter> findByQuestionId(Long questionId);
 
 	List<Voter> findByAnswerId(Long answerId);
+
+	Voter findByQuestionIdAndMemberId(Long questionId, Long memberId);
 }

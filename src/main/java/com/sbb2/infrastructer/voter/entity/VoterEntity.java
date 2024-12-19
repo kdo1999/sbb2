@@ -1,7 +1,5 @@
 package com.sbb2.infrastructer.voter.entity;
 
-import java.util.ArrayList;
-
 import com.sbb2.answer.domain.Answer;
 import com.sbb2.infrastructer.answer.entity.AnswerEntity;
 import com.sbb2.infrastructer.member.entity.MemberEntity;
@@ -54,6 +52,9 @@ public class VoterEntity {
 	public static VoterEntity from(Voter voter) {
 		return VoterEntity.builder()
 			.id(voter.id())
+			.questionEntity(voter.question() == null ? null : QuestionEntity.builder()
+				.id(voter.question().id())
+				.build())
 			.memberEntity(MemberEntity.from(voter.member()))
 			.build();
 	}
@@ -72,21 +73,15 @@ public class VoterEntity {
 			.member(this.memberEntity.toModel())
 			.question(this.questionEntity == null ? null : Question.builder()
 				.id(this.questionEntity.getId())
-				.subject(this.questionEntity.getSubject())
-				.content(this.questionEntity.getContent())
-				.author(this.questionEntity.getAuthor().toModel())
-				.answerList(questionEntity.getAnswerEntityList().isEmpty() ? new ArrayList<>() :
-					this.questionEntity.getAnswerEntityList().stream()
-						.map(AnswerEntity::toModel)
-						.toList()
-				)
+				.author(this.memberEntity.toModel())
 				.createdAt(this.questionEntity.getCreatedAt())
 				.modifiedAt(this.questionEntity.getModifiedAt())
 				.build())
 			.answer(this.answerEntity == null ? null : Answer.builder()
 				.id(this.answerEntity.getId())
-				.content(this.answerEntity.getContent())
 				.author(this.answerEntity.getAuthor().toModel())
+				.createdAt(this.answerEntity.getCreatedAt())
+				.modifiedAt(this.answerEntity.getModifiedAt())
 				.build())
 			.build();
 	}

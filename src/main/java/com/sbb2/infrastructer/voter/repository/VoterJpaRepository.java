@@ -14,4 +14,7 @@ public interface VoterJpaRepository extends JpaRepository<VoterEntity, Long> {
 
 	@Query("select v from VoterEntity v left join fetch v.answerEntity left join fetch v.memberEntity where v.answerEntity.id = :answerId")
 	List<VoterEntity> findByAnswerId(@Param("answerId") Long answerId);
+
+	@Query("select v from VoterEntity v where v.questionEntity.id = :questionId and v.memberEntity.id = :memberId")
+	VoterEntity findByQuestionIdAndMemberId(@Param("questionId") Long questionId, @Param("memberId") Long memberId);
 }
