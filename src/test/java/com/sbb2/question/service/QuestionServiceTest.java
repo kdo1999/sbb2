@@ -214,7 +214,7 @@ public class QuestionServiceTest {
 		doNothing().when(questionRepository).deleteById(any(Long.class));
 
 		//when
-		questionService.deleteById(1L);
+		questionService.deleteById(1L, givenMember);
 
 		//then
 		verify(questionRepository, times(1)).deleteById(any(Long.class));
@@ -242,7 +242,7 @@ public class QuestionServiceTest {
 		given(questionRepository.findById(any(Long.class))).willReturn(Optional.empty());
 
 		//then
-		assertThatThrownBy(() -> questionService.deleteById(1L))
+		assertThatThrownBy(() -> questionService.deleteById(1L, givenMember))
 			.isInstanceOf(QuestionBusinessLogicException.class)
 			.hasMessage(QuestionErrorCode.NOT_FOUND.getMessage());
 	}

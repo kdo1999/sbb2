@@ -13,7 +13,7 @@ public interface QuestionService {
 
 	Question update(Long id, String subject, String content, Member author);
 
-	void deleteById(Long id);
+	void deleteById(Long id, Member author);
 
 	Page<QuestionPageResponse> findAll(int pageNum, String keyword);
 }

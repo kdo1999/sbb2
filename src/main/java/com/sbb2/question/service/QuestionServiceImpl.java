@@ -56,9 +56,13 @@ public class QuestionServiceImpl implements QuestionService {
 	}
 
 	@Override
-	public void deleteById(Long id) {
+	public void deleteById(Long id, Member author) {
 		Question target = questionRepository.findById(id)
 			.orElseThrow(() -> new QuestionBusinessLogicException(QuestionErrorCode.NOT_FOUND));
+
+		if (!target.author().equals(author)) {
+			throw new QuestionBusinessLogicException(QuestionErrorCode.UNAUTHORIZED);
+		}
 
 		questionRepository.deleteById(target.id());
 	}
