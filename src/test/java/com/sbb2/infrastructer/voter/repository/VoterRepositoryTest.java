@@ -51,38 +51,46 @@ public class VoterRepositoryTest {
 	}
 	@BeforeAll
 	void dataInit() {
-		Member member = Member.builder()
+		Member member1 = Member.builder()
 			.email("testEmail")
 			.username("testUsername")
 			.password("testPassword")
 			.build();
-		Member savedMember = memberRepository.save(member);
+		Member savedMember1 = memberRepository.save(member1);
+
+		Member member2 = Member.builder()
+			.email("testEmail2")
+			.username("testUsername2")
+			.password("testPassword2")
+			.build();
+		Member savedMember2 = memberRepository.save(member2);
+
 
 		Question question1 = Question.builder()
 			.subject("testSubject")
 			.content("testContent")
-			.author(savedMember)
+			.author(savedMember1)
 			.build();
 		Question savedQuestion1 = questionRepository.save(question1);
 
 		Question question2 = Question.builder()
 			.subject("testSubject")
 			.content("testContent")
-			.author(savedMember)
+			.author(savedMember1)
 			.build();
 		Question savedQuestion2 = questionRepository.save(question2);
 
 		Answer answer1 = Answer.builder()
 			.content("testAnswer")
 			.question(savedQuestion1)
-			.author(savedMember)
+			.author(savedMember1)
 			.build();
 		answerRepository.save(answer1);
 
 		Answer answer2 = Answer.builder()
 			.content("testAnswer")
 			.question(savedQuestion2)
-			.author(savedMember)
+			.author(savedMember1)
 			.build();
 		answerRepository.save(answer2);
 	}
@@ -229,5 +237,33 @@ public class VoterRepositoryTest {
 	    assertThat(findVoterList.size()).isEqualTo(1);
 		assertThat(findVoterList.get(0)).isEqualTo(savedVoter1);
 		assertThat(findVoterList.get(0)).isNotEqualTo(savedVoter2);
+	}
+
+	@DisplayName("댓글 ID와 멤버 ID가 일치하는 추천 조회가 됐을 때 테스트")
+	@Test
+	void exists_answerId_memberId_voter_success() {
+	    //given
+		Answer findAnswer1 = answerRepository.findById(1L).get();
+		Answer findAnswer2 = answerRepository.findById(2L).get();
+		Member findMember = memberRepository.findById(1L).get();
+
+		Voter voter1 = Voter.builder()
+			.answer(findAnswer1)
+			.member(findMember)
+			.build();
+
+		Voter voter2 = Voter.builder()
+			.answer(findAnswer2)
+			.member(findMember)
+			.build();
+
+		Voter savedVoter1 = voterRepository.save(voter1);
+		Voter savedVoter2 = voterRepository.save(voter2);
+
+		//when
+		Boolean result = voterRepository.existsByAnswerIdAndMemberId(findAnswer1.id(), findMember.id());
+
+		//then
+	    assertThat(result).isTrue();
 	}
 }
