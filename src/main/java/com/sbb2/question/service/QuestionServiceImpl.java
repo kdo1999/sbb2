@@ -46,14 +46,13 @@ public class QuestionServiceImpl implements QuestionService {
 		Question target = questionRepository.findById(id)
 			.orElseThrow(() -> new QuestionBusinessLogicException(QuestionErrorCode.NOT_FOUND));
 
-		Question updateQuestion = Question.builder()
-			.subject(subject)
-			.content(content)
-			.build();
+		if (!target.author().equals(author)) {
+			throw new QuestionBusinessLogicException(QuestionErrorCode.UNAUTHORIZED);
+		}
 
-		target = target.fetch(updateQuestion);
+		Question updateQuestion = target.fetch(subject, content);
 
-		return questionRepository.save(target);
+		return questionRepository.save(updateQuestion);
 	}
 
 	@Override

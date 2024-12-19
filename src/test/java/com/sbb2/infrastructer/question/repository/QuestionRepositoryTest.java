@@ -190,12 +190,7 @@ public class QuestionRepositoryTest {
 
 		Question savedQuestion = questionRepository.save(givenQuestion);
 		//when
-		savedQuestion = savedQuestion.fetch(
-			Question.builder()
-				.subject(updateSubject)
-				.content(updateContent)
-				.build()
-		);
+		savedQuestion = savedQuestion.fetch(updateSubject, updateContent);
 
 		Question updateQuestion = questionRepository.save(savedQuestion);
 

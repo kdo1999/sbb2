@@ -29,11 +29,11 @@ public record Question(Long id, String subject, String content, Member author, L
 		this.voterSet = voterSet == null ? new HashSet<>() : voterSet;
 	}
 
-	public Question fetch(Question updateQuestion) {
+	public Question fetch(String updateSubject, String updateContent) {
 		return Question.builder()
 			.id(this.id)
-			.subject(updateQuestion.subject)
-			.content(updateQuestion.content())
+			.subject(updateSubject)
+			.content(updateContent)
 			.author(this.author)
 			.createdAt(this.createdAt)
 			.modifiedAt(this.modifiedAt)
