@@ -26,14 +26,10 @@ public class VoterServiceTest {
 		voterService = new VoterServiceImpl(voterRepository);
 	}
 
-	//TODO 질문 추천 성공 테스트
 	@DisplayName("질문 추천 성공 테스트")
 	@Test
 	void save_question_voter_success() {
 	    //given
-		// 컨트롤러에서 id, member -> 질문 서비스로
-		// 질문 서비스로 해당 id 질문 조회 후 추천 서비스로 질문, 멤버 전달
-		// 추천 서비스에서 질문과 멤버로 voter 만든 후 저장
 		Member member = Member.builder()
 			.id(1L)
 			.username("testUsername")
