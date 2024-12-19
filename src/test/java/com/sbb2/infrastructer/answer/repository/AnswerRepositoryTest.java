@@ -152,9 +152,7 @@ public class AnswerRepositoryTest {
 		//when
 		String updateContent = "updateTestContent";
 
-		savedAnswer = savedAnswer.fetch(
-			updateContent
-		);
+		savedAnswer = savedAnswer.fetch(updateContent);
 
 		Answer updatedAnswer = answerRepository.save(savedAnswer);
 
