@@ -19,4 +19,6 @@ public interface VoterRepository {
 	Optional<Voter> findById(Long voterId);
 
 	Boolean existsByAnswerIdAndMemberId(Long answerId, Long memberId);
+
+	Boolean existsByQuestionIdAndMemberId(Long questionId, Long memberId);
 }

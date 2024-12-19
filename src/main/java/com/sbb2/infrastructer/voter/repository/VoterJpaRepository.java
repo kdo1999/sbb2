@@ -20,4 +20,7 @@ public interface VoterJpaRepository extends JpaRepository<VoterEntity, Long> {
 
 	@Query("select count(v) > 0 from VoterEntity v where v.answerEntity.id = :answerId and v.memberEntity.id = :memberId")
 	Boolean existsByAnswerIdAndMemberId(@Param("answerId") Long answerId, @Param("memberId") Long memberId);
+
+	@Query("select count(v) > 0 from VoterEntity v where v.questionEntity.id = :questionId and v.memberEntity.id = :memberId")
+	Boolean existsByQuestionIdAndMemberId(@Param("questionId") Long questionId, @Param("memberId") Long memberId);
 }

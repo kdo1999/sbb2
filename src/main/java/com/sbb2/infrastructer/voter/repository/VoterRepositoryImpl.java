@@ -51,4 +51,9 @@ public class VoterRepositoryImpl implements VoterRepository {
 	public Boolean existsByAnswerIdAndMemberId(Long answerId, Long memberId) {
 		return voterJpaRepository.existsByAnswerIdAndMemberId(answerId, memberId);
 	}
+
+	@Override
+	public Boolean existsByQuestionIdAndMemberId(Long questionId, Long memberId) {
+		return voterJpaRepository.existsByQuestionIdAndMemberId(questionId, memberId);
+	}
 }
