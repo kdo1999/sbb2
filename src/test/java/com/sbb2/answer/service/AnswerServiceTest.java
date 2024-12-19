@@ -4,7 +4,9 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,7 +41,7 @@ public class AnswerServiceTest {
 	@DisplayName("답변 저장 성공 테스트")
 	@Test
 	void save_answer_success() {
-	    //given
+		//given
 		Member member = Member.builder()
 			.username("testUsername")
 			.password("testPassword")
@@ -66,10 +68,10 @@ public class AnswerServiceTest {
 				.question(question)
 				.build());
 
-	    //when
+		//when
 		Answer savedAnswer = answerService.save(questionId, content, member);
 
-	    //then
+		//then
 		assertThat(savedAnswer.id()).isEqualTo(questionId);
 		assertThat(savedAnswer.content()).isEqualTo(content);
 		assertThat(savedAnswer.author()).isEqualTo(member);
@@ -79,7 +81,7 @@ public class AnswerServiceTest {
 	@DisplayName("답변 저장 질문 조회 실패 테스트")
 	@Test
 	void save_answer_find_fail() {
-	    //given
+		//given
 		Member member = Member.builder()
 			.username("testUsername")
 			.password("testPassword")
@@ -99,14 +101,14 @@ public class AnswerServiceTest {
 		given(questionRepository.findById(any(Long.class)))
 			.willThrow(new QuestionBusinessLogicException(QuestionErrorCode.NOT_FOUND));
 
-	    //then
+		//then
 		assertThatThrownBy(() -> answerService.save(questionId, content, member));
 	}
 
 	@DisplayName("답변 조회 성공 테스트")
 	@Test
 	void find_answer_success() {
-	    //given
+		//given
 		Member member = Member.builder()
 			.username("testUsername")
 			.password("testPassword")
@@ -134,28 +136,28 @@ public class AnswerServiceTest {
 		given(answerRepository.findById(any(Long.class))).willReturn(Optional.of(answer));
 
 		//when
-	    Answer findAnswer = answerService.findById(answerId);
+		Answer findAnswer = answerService.findById(answerId);
 
-	    //then
-	    assertThat(findAnswer).isEqualTo(answer);
+		//then
+		assertThat(findAnswer).isEqualTo(answer);
 	}
 
 	@DisplayName("답변 조회 실패 테스트")
 	@Test
 	void find_answer_fail() {
-	    //given
+		//given
 		Long answerId = 1L;
 
 		given(answerRepository.findById(any(Long.class))).willReturn(Optional.empty());
 
-	    //then
+		//then
 		assertThatThrownBy(() -> answerService.findById(answerId));
 	}
 
 	@DisplayName("답변 수정 성공 테스트")
 	@Test
 	void update_answer_success() {
-	    //given
+		//given
 		Member member = Member.builder()
 			.username("testUsername")
 			.password("testPassword")
@@ -184,17 +186,17 @@ public class AnswerServiceTest {
 		given(answerRepository.findById(any(Long.class))).willReturn(Optional.of(answer));
 		given(answerRepository.save(any(Answer.class))).willReturn(updateAnswer);
 
-	    //when
+		//when
 		Answer result = answerService.update(answerId, updateContent, member);
 
-	    //then
-	    assertThat(result).isEqualTo(updateAnswer);
+		//then
+		assertThat(result).isEqualTo(updateAnswer);
 	}
 
 	@DisplayName("답변 수정시 답변 조회 실패 테스트")
 	@Test
 	void update_answer_find_fail() {
-	    //given
+		//given
 		Long answerId = 1L;
 		Member member = Member.builder()
 			.username("testUsername")
@@ -204,7 +206,7 @@ public class AnswerServiceTest {
 
 		given(answerRepository.findById(any(Long.class))).willReturn(Optional.empty());
 
-	    //then
+		//then
 		assertThatThrownBy(() -> answerService.update(answerId, "updateContent", member))
 			.isInstanceOf(AnswerBusinessLogicException.class)
 			.hasMessage(AnswerErrorCode.NOT_FOUND.getMessage());
@@ -213,7 +215,7 @@ public class AnswerServiceTest {
 	@DisplayName("작성자가 아닌 회원이 답변 수정 시도시 실패")
 	@Test
 	void update_answer_unauthorized_fail() {
-	    //given
+		//given
 		Member author = Member.builder()
 			.username("testUsername")
 			.password("testPassword")
@@ -242,7 +244,7 @@ public class AnswerServiceTest {
 
 		given(answerRepository.findById(any(Long.class))).willReturn(Optional.of(answer));
 
-	    //then
+		//then
 		assertThatThrownBy(() -> answerService.update(answer.id(), "updateContent", loginMember))
 			.isInstanceOf(AnswerBusinessLogicException.class)
 			.hasMessage(AnswerErrorCode.UNAUTHORIZED.getMessage());
@@ -251,7 +253,7 @@ public class AnswerServiceTest {
 	@DisplayName("답변 삭제 성공 테스트")
 	@Test
 	void delete_answer_success() {
-	    //given
+		//given
 		Member author = Member.builder()
 			.username("testUsername")
 			.password("testPassword")
@@ -277,17 +279,17 @@ public class AnswerServiceTest {
 		given(answerRepository.findById(any(Long.class))).willReturn(Optional.of(answer));
 		doNothing().when(answerRepository).deleteById(any(Long.class));
 
-	    //when
+		//when
 		answerService.deleteById(targetId, author);
 
-	    //then
+		//then
 		verify(answerRepository, times(1)).deleteById(any(Long.class));
 	}
 
 	@DisplayName("작성자가 아닌 회원이 답변 삭제 시도시 실패")
 	@Test
 	void delete_answer_unauthorized_fail() {
-	    //given
+		//given
 		Member author = Member.builder()
 			.username("testUsername")
 			.password("testPassword")
@@ -322,5 +324,43 @@ public class AnswerServiceTest {
 			.isInstanceOf(AnswerBusinessLogicException.class)
 			.hasMessage(AnswerErrorCode.UNAUTHORIZED.getMessage());
 
+	}
+
+	@DisplayName("질문 ID로 답변 조회 성공 테스트")
+	@Test
+	void find_answer_questionId_success() {
+		//given
+		Member member = Member.builder()
+			.username("testUsername")
+			.password("testPassword")
+			.email("testEmail@naver.com")
+			.build();
+
+		Question question = Question.builder()
+			.id(1L)
+			.subject("testSubject")
+			.content("testContent")
+			.author(member)
+			.build();
+
+		String content = "saveAnswer";
+		List<Answer> answerList =
+			IntStream.range(1, 5)
+				.mapToObj(index -> Answer.builder()
+					.id((long)index)
+					.content(content)
+					.author(member)
+					.question(question)
+					.build())
+				.toList();
+
+
+		given(answerRepository.findByQuestionId(any(Long.class))).willReturn(answerList);
+
+		//when
+		List<Answer> findAnswerList = answerService.findByQuestionId(question.id());
+
+		//then
+		assertThat(findAnswerList).isEqualTo(answerList);
 	}
 }
