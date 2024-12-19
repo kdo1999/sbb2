@@ -25,7 +25,7 @@ import com.sbb2.infrastructer.question.repository.QuestionRepository;
 import com.sbb2.infrastructer.voter.repository.VoterRepository;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
-import com.sbb2.voter.Voter;
+import com.sbb2.voter.domain.Voter;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class))
 @Import({JpaAudtingConfig.class, QuerydslConfig.class})

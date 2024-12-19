@@ -7,7 +7,7 @@ import com.sbb2.infrastructer.answer.entity.AnswerEntity;
 import com.sbb2.infrastructer.member.entity.MemberEntity;
 import com.sbb2.infrastructer.question.entity.QuestionEntity;
 import com.sbb2.question.domain.Question;
-import com.sbb2.voter.Voter;
+import com.sbb2.voter.domain.Voter;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

@@ -5,15 +5,15 @@ import static org.mockito.BDDMockito.*;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.BDDMockito;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.sbb2.infrastructer.voter.repository.VoterRepository;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
-import com.sbb2.voter.Voter;
+import com.sbb2.voter.domain.Voter;
 
 @ExtendWith(MockitoExtension.class)
 public class VoterServiceTest {
@@ -49,7 +49,6 @@ public class VoterServiceTest {
 			.build();
 
 		Voter voter = Voter.builder()
-			.id(1L)
 			.question(question)
 			.member(member)
 			.build();

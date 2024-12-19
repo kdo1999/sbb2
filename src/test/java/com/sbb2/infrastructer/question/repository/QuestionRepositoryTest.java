@@ -31,7 +31,7 @@ import com.sbb2.infrastructer.voter.repository.VoterRepository;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
 import com.sbb2.question.domain.QuestionPageResponse;
-import com.sbb2.voter.Voter;
+import com.sbb2.voter.domain.Voter;
 
 import jakarta.persistence.EntityManager;
 

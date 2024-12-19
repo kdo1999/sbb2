@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 
 import com.sbb2.infrastructer.voter.entity.VoterEntity;
-import com.sbb2.voter.Voter;
+import com.sbb2.voter.domain.Voter;
 
 import lombok.RequiredArgsConstructor;
 

@@ -7,7 +7,7 @@ import java.util.Set;
 
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
-import com.sbb2.voter.Voter;
+import com.sbb2.voter.domain.Voter;
 
 import lombok.Builder;
 
