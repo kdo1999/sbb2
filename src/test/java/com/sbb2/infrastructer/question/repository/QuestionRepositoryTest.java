@@ -207,18 +207,20 @@ public class QuestionRepositoryTest {
 		Member member = memberRepository.findById(1L).get();
 		Question question = questionRepository.findById(1L).get();
 		Voter voter = Voter.builder()
+			.question(question)
 			.member(member)
 			.build();
 
 		//when
-		question.addVoter(voter);
-		Question savedQuestion = questionRepository.save(question);
+		Voter savedVoter = voterRepository.save(voter);
+		em.flush();
+		em.clear();
+
+		Question savedQuestion = questionRepository.findById(question.id()).get();
 
 		//then
-		Voter savedVoter = savedQuestion.voterSet().iterator().next();
-		assertThat(savedVoter.id()).isNotNull();
-		assertThat(savedVoter.member()).isEqualTo(member);
-		assertThat(savedVoter.question()).isEqualTo(question);
+		Voter findVoter = savedQuestion.voterSet().iterator().next();
+		assertThat(findVoter).isEqualTo(savedVoter);
 	}
 
 	@DisplayName("질문 삭제 테스트")
