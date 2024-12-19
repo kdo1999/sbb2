@@ -14,6 +14,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.sbb2.answer.domain.Answer;
+import com.sbb2.answer.exception.AnswerBusinessLogicException;
+import com.sbb2.answer.exception.AnswerErrorCode;
 import com.sbb2.infrastructer.answer.repository.AnswerRepository;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
 import com.sbb2.member.domain.Member;
@@ -187,5 +189,24 @@ public class AnswerServiceTest {
 
 	    //then
 	    assertThat(result).isEqualTo(updateAnswer);
+	}
+
+	@DisplayName("답변 수정시 답변 조회 실패 테스트")
+	@Test
+	void update_answer_find_fail() {
+	    //given
+		Long answerId = 1L;
+		Member member = Member.builder()
+			.username("testUsername")
+			.password("testPassword")
+			.email("testEmail@naver.com")
+			.build();
+
+		given(answerRepository.findById(any(Long.class))).willReturn(Optional.empty());
+
+	    //then
+		assertThatThrownBy(() -> answerService.update(answerId, "updateContent", member))
+			.isInstanceOf(AnswerBusinessLogicException.class)
+			.hasMessage(AnswerErrorCode.NOT_FOUND.getMessage());
 	}
 }
