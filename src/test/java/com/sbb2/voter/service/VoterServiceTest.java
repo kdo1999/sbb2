@@ -1,5 +1,6 @@
 package com.sbb2.voter.service;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import org.assertj.core.api.Assertions;
@@ -29,7 +30,7 @@ public class VoterServiceTest {
 	@DisplayName("질문 추천 성공 테스트")
 	@Test
 	void save_question_voter_success() {
-	    //given
+		//given
 		Member member = Member.builder()
 			.id(1L)
 			.username("testUsername")
@@ -54,10 +55,44 @@ public class VoterServiceTest {
 		//when
 		Voter savedVoter = voterService.save(question, member);
 
-	    //then
-		Assertions.assertThat(savedVoter).isEqualTo(voter);
+		//then
+		assertThat(savedVoter).isEqualTo(voter);
 	}
-	//TODO 질문 추천 삭제 테스트
+
+	@DisplayName("질문 추천 삭제 성공 테스트")
+	@Test
+	void delete_question_voter_success() {
+		//given
+		Member member = Member.builder()
+			.id(1L)
+			.username("testUsername")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
+
+		Question question = Question.builder()
+			.id(1L)
+			.subject("testSubject")
+			.content("testContent")
+			.author(member)
+			.build();
+
+		Voter voter = Voter.builder()
+			.id(1L)
+			.question(question)
+			.member(member)
+			.build();
+
+		given(voterRepository.findByQuestionIdAndMemberId(question.id(), member.id())).willReturn(voter);
+		doNothing().when(voterRepository).deleteById(voter.id());
+
+		//when
+		voterService.delete(question.id(), member.id());
+
+		//then
+		verify(voterRepository, times(1)).deleteById(voter.id());
+	}
+
 	//TODO 질문 중복 추천 방지 테스트
 	//TODO 질문 추천 조회 테스트
 
