@@ -200,4 +200,34 @@ public class VoterRepositoryTest {
 		assertThat(savedVoter.answer().id()).isEqualTo(voter.answer().id());
 		assertThat(savedVoter.member()).isEqualTo(findMember);
 	}
+
+	@DisplayName("댓글 ID로 조회 성공 테스트")
+	@Test
+	void find_answerId_voter_success() {
+	    //given
+		Answer findAnswer1 = answerRepository.findById(1L).get();
+		Answer findAnswer2 = answerRepository.findById(2L).get();
+		Member findMember = memberRepository.findById(1L).get();
+
+		Voter voter1 = Voter.builder()
+			.answer(findAnswer1)
+			.member(findMember)
+			.build();
+
+		Voter voter2 = Voter.builder()
+			.answer(findAnswer2)
+			.member(findMember)
+			.build();
+
+		Voter savedVoter1 = voterRepository.save(voter1);
+		Voter savedVoter2 = voterRepository.save(voter2);
+
+		//when
+		List<Voter> findVoterList = voterRepository.findByAnswerId(findAnswer1.id());
+
+		//then
+	    assertThat(findVoterList.size()).isEqualTo(1);
+		assertThat(findVoterList.get(0)).isEqualTo(savedVoter1);
+		assertThat(findVoterList.get(0)).isNotEqualTo(savedVoter2);
+	}
 }
