@@ -17,4 +17,6 @@ public interface VoterRepository {
 	void deleteById(Long voterId);
 
 	Optional<Voter> findById(Long voterId);
+
+	Boolean existsByAnswerIdAndMemberId(Long answerId, Long memberId);
 }

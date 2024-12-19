@@ -46,4 +46,9 @@ public class VoterRepositoryImpl implements VoterRepository {
 	public Optional<Voter> findById(Long voterId) {
 		return voterJpaRepository.findById(voterId).map(VoterEntity::toModel);
 	}
+
+	@Override
+	public Boolean existsByAnswerIdAndMemberId(Long answerId, Long memberId) {
+		return voterJpaRepository.existsByAnswerIdAndMemberId(answerId, memberId);
+	}
 }
