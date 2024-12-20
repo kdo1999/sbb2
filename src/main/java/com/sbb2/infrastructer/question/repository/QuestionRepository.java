@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
 
+import com.sbb2.question.domain.QuestionDetailResponse;
 import com.sbb2.question.domain.QuestionPageResponse;
 import com.sbb2.question.domain.Question;
 
@@ -15,4 +16,5 @@ public interface QuestionRepository {
 	Page<QuestionPageResponse> findAll(String keyword, Pageable pageable);
 
 	void deleteById(Long targetId);
+	QuestionDetailResponse findDetailById(Long questionId, Long memberId);
 }

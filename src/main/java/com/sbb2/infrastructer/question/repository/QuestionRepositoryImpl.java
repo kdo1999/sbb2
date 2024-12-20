@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.sbb2.infrastructer.question.entity.QuestionEntity;
+import com.sbb2.question.domain.QuestionDetailResponse;
 import com.sbb2.question.domain.QuestionPageResponse;
 import com.sbb2.question.domain.Question;
 
@@ -36,5 +37,10 @@ public class QuestionRepositoryImpl implements QuestionRepository {
 	@Override
 	public void deleteById(Long targetId) {
 		questionJpaRepository.deleteById(targetId);
+	}
+
+	@Override
+	public QuestionDetailResponse findDetailById(Long questionId, Long memberId) {
+		return questionQueryRepository.findById(questionId, memberId);
 	}
 }

@@ -30,6 +30,7 @@ import com.sbb2.infrastructer.member.repository.MemberRepository;
 import com.sbb2.infrastructer.voter.repository.VoterRepository;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
+import com.sbb2.question.domain.QuestionDetailResponse;
 import com.sbb2.question.domain.QuestionPageResponse;
 import com.sbb2.voter.domain.Voter;
 
@@ -62,13 +63,24 @@ public class QuestionRepositoryTest {
 		String password = "testPassword123";
 		String email = "testEmail123";
 
+		String username2 = "testUsername1234";
+		String password2 = "testPassword1234";
+		String email2 = "testEmail1234";
+
 		Member member = Member.builder()
 			.username(username)
 			.password(password)
 			.email(email)
 			.build();
 
+		Member member2 = Member.builder()
+			.username(username2)
+			.password(password2)
+			.email(email2)
+			.build();
+
 		Member savedMember = memberRepository.save(member);
+		Member savedMember2 = memberRepository.save(member2);
 
 		String subject = "testSubject";
 		String content = "testContent";
@@ -104,6 +116,13 @@ public class QuestionRepositoryTest {
 				.author(author)
 				.build());
 		}
+
+		Voter voter = Voter.builder()
+			.question(question)
+			.member(savedMember2)
+			.build();
+
+		voterRepository.save(voter);
 	}
 
 	@DisplayName("질문 저장 테스트")
@@ -226,13 +245,13 @@ public class QuestionRepositoryTest {
 	@DisplayName("질문 삭제 테스트")
 	@Test
 	void delete_question() {
-	    //given
+		//given
 		Question question = questionRepository.findById(1L).get();
 
 		//when
-	    questionRepository.deleteById(question.id());
+		questionRepository.deleteById(question.id());
 
-	    //then
+		//then
 		Optional<Question> findQuestion = questionRepository.findById(question.id());
 		assertThat(findQuestion.isEmpty()).isTrue();
 	}
@@ -240,13 +259,13 @@ public class QuestionRepositoryTest {
 	@DisplayName("질문 삭제시 댓글 삭제 성공 테스트")
 	@Test
 	void delete_question_answer_success() {
-	    //given
+		//given
 		Member member = memberRepository.findById(1L).get();
 		Question question = Question.builder()
-				.subject("givenSubject")
-				.content("givenContent")
-				.author(member)
-				.build();
+			.subject("givenSubject")
+			.content("givenContent")
+			.author(member)
+			.build();
 
 		Question savedQuestion = questionRepository.save(question);
 		String answerContent = "answerContent";
@@ -277,10 +296,10 @@ public class QuestionRepositoryTest {
 		//given
 		Member member = memberRepository.findById(1L).get();
 		Question question = Question.builder()
-				.subject("givenSubject")
-				.content("givenContent")
-				.author(member)
-				.build();
+			.subject("givenSubject")
+			.content("givenContent")
+			.author(member)
+			.build();
 
 		Question savedQuestion = questionRepository.save(question);
 		String answerContent = "answerContent";
@@ -303,5 +322,19 @@ public class QuestionRepositoryTest {
 
 		assertThat(findVoterList.isEmpty()).isTrue();
 		assertThat(findQuestion.isEmpty()).isTrue();
+	}
+
+	@DisplayName("추천한 사용자가 질문을 조회하면 isVoter가 true인 테스트")
+	@Test
+	void find_detail_success() {
+		//given
+		Member member = memberRepository.findById(2L).get();
+		Question question = questionRepository.findById(21L).get();
+
+		//when
+		QuestionDetailResponse detailById = questionRepository.findDetailById(question.id(), member.id());
+
+		//then
+		assertThat(detailById.isVoter()).isTrue();
 	}
 }
