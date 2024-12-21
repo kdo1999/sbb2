@@ -5,10 +5,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.sbb2.member.domain.Member;
+import com.sbb2.question.controller.request.QuestionForm;
 import com.sbb2.question.domain.QuestionDetailResponse;
 import com.sbb2.question.domain.QuestionPageResponse;
 import com.sbb2.question.service.QuestionService;
@@ -38,5 +40,12 @@ public class QuestionController {
 		model.addAttribute("questionDetailResponse", questionDetailResponse);
 
 		return "question_detail";
+	}
+
+	@PostMapping("/create")
+	public String save(QuestionForm questionForm, Member loginMember) {
+		questionService.save(questionForm.subject(), questionForm.content(), loginMember);
+
+		return "redirect:/question";
 	}
 }
