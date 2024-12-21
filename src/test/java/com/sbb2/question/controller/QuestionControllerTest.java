@@ -19,6 +19,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
 
 import com.sbb2.answer.domain.Answer;
 import com.sbb2.answer.domain.AnswerDetailResponse;
@@ -154,6 +156,7 @@ public class QuestionControllerTest {
 		assertThat(getQuestionDetailResponse).isEqualTo(questionDetailResponse);
 		assertThat(getQuestionDetailResponse.isVoter()).isTrue();
 	}
+
 	@DisplayName("질문 저장 성공 테스트")
 	@Test
 	void save_success() {
@@ -183,6 +186,33 @@ public class QuestionControllerTest {
 
 	    //then
 		assertThat(viewName).isEqualTo("redirect:/question");
+	}
+
+	@DisplayName("질문 저장시 제목 빈 값 들어갔을 때 실패 테스트")
+	@Test
+	void save_emptySubject_fail() {
+	    //given
+		QuestionForm questionForm = QuestionForm.builder()
+			.subject("")
+			.content("testContent")
+			.build();
+
+		Member givenMember = Member.builder()
+			.id(1L)
+			.username("testMember")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
+
+		BindingResult bindingResult = new BeanPropertyBindingResult(questionForm, "questionForm");
+
+		//when
+		String viewName = questionController.save(questionForm, givenMember);
+
+	    //then
+		assertThat(bindingResult.hasErrors()).isTrue();
+		assertThat(bindingResult.getErrorCount()).isEqualTo(1);
+		assertThat(viewName).isEqualTo("question_form");
 	}
 	//TODO 질문 삭제
 
