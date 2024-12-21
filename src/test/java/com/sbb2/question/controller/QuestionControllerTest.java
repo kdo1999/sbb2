@@ -23,6 +23,7 @@ import org.springframework.ui.Model;
 import com.sbb2.answer.domain.Answer;
 import com.sbb2.answer.domain.AnswerDetailResponse;
 import com.sbb2.member.domain.Member;
+import com.sbb2.question.controller.request.QuestionForm;
 import com.sbb2.question.domain.Question;
 import com.sbb2.question.domain.QuestionDetailResponse;
 import com.sbb2.question.domain.QuestionPageResponse;
@@ -153,7 +154,36 @@ public class QuestionControllerTest {
 		assertThat(getQuestionDetailResponse).isEqualTo(questionDetailResponse);
 		assertThat(getQuestionDetailResponse.isVoter()).isTrue();
 	}
+	@DisplayName("질문 저장 성공 테스트")
+	@Test
+	void save_success() {
+	    //given
+		QuestionForm questionForm = QuestionForm.builder()
+			.subject("testSubject")
+			.content("testContent")
+			.build();
 
+		Member givenMember = Member.builder()
+			.id(1L)
+			.username("testMember")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
+
+		given(questionService.save(questionForm.subject(), questionForm.content(), givenMember))
+			.willReturn(Question.builder()
+				.id(1L)
+				.subject(questionForm.subject())
+				.content(questionForm.content())
+				.author(givenMember)
+				.build());
+
+		//when
+		String viewName = questionController.save(questionForm, givenMember);
+
+	    //then
+		assertThat(viewName).isEqualTo("redirect:/question");
+	}
 	//TODO 질문 삭제
 
 	//TODO 질문 추천
