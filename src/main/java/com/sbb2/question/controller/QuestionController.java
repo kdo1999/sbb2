@@ -4,9 +4,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.sbb2.member.domain.Member;
+import com.sbb2.question.domain.QuestionDetailResponse;
 import com.sbb2.question.domain.QuestionPageResponse;
 import com.sbb2.question.service.QuestionService;
 
@@ -26,5 +29,14 @@ public class QuestionController {
 		model.addAttribute("kw", kw);
 
 		return "question_list";
+	}
+
+	@GetMapping("/detail/{questionId}")
+	public String findDetailById(Model model, @PathVariable(value = "questionId") Long questionId, Member loginMember) {
+		QuestionDetailResponse questionDetailResponse = questionService.findDetailById(questionId, loginMember);
+
+		model.addAttribute("questionDetailResponse", questionDetailResponse);
+
+		return "question_detail";
 	}
 }
