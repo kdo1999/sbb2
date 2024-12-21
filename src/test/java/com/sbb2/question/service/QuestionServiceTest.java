@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,13 +21,17 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import com.sbb2.answer.domain.Answer;
+import com.sbb2.answer.domain.AnswerDetailResponse;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.controller.request.QuestionForm;
 import com.sbb2.question.domain.Question;
+import com.sbb2.question.domain.QuestionDetailResponse;
 import com.sbb2.question.domain.QuestionPageResponse;
 import com.sbb2.question.exception.QuestionBusinessLogicException;
 import com.sbb2.question.exception.QuestionErrorCode;
+import com.sbb2.voter.domain.Voter;
 
 @ExtendWith(MockitoExtension.class)
 public class QuestionServiceTest {
@@ -287,5 +292,70 @@ public class QuestionServiceTest {
 		assertThat(findAll.getContent().size()).isEqualTo(10);
 		assertThat(findAll.getTotalElements()).isEqualTo(15);
 		assertThat(findAll.getTotalPages()).isEqualTo(2);
+	}
+
+	@DisplayName("추천한 사용자가 질문을 조회하면 isVoter가 true인 테스트")
+	@Test
+	void find_QuestionDetail_isVoter_true() {
+	    //given
+		Member givenMember = Member.builder()
+			.id(1L)
+			.username("testMember")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
+
+		Answer answer = Answer.builder()
+			.id(1L)
+			.content("testContent")
+			.author(givenMember)
+			.build();
+
+		Voter voter = Voter.builder()
+			.member(givenMember)
+			.question(Question.builder().id(1L).build())
+			.build();
+
+		Question question = Question.builder()
+			.id(1L)
+			.subject("subject")
+			.content("content")
+			.author(givenMember)
+			.answerList(List.of(answer))
+			.voterSet(Set.of(voter))
+			.build();
+
+		AnswerDetailResponse answerDetailResponse = AnswerDetailResponse.builder()
+			.id(1L)
+			.questionId(question.id())
+			.voterCount((long)question.answerList().get(0).voterSet().size())
+			.content(question.answerList().get(0).content())
+			.username(givenMember.username())
+			.isVoter(false)
+			.createdAt(LocalDateTime.now())
+			.modifiedAt(LocalDateTime.now())
+			.build();
+
+		QuestionDetailResponse questionDetailResponse = QuestionDetailResponse.builder()
+			.id(question.id())
+			.subject(question.subject())
+			.content(question.content())
+			.voterCount((long)question.voterSet().size())
+			.isVoter(question.voterSet().stream()
+				.anyMatch(v -> v.member().id().equals(givenMember.id())))
+			.answerList(List.of(answerDetailResponse))
+			.createdAt(LocalDateTime.now())
+			.modifiedAt(LocalDateTime.now())
+			.build();
+
+		given(questionRepository.findDetailById(question.id(), givenMember.id()))
+			.willReturn(questionDetailResponse);
+
+		//when
+		QuestionDetailResponse findDetailResponse = questionService.findDetailById(question.id(), givenMember);
+
+		//then
+	    assertThat(findDetailResponse).isEqualTo(questionDetailResponse);
+		assertThat(findDetailResponse.isVoter()).isTrue();
 	}
 }

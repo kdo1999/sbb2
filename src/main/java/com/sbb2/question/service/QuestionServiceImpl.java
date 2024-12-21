@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
+import com.sbb2.question.domain.QuestionDetailResponse;
 import com.sbb2.question.domain.QuestionPageResponse;
 import com.sbb2.question.exception.QuestionBusinessLogicException;
 import com.sbb2.question.exception.QuestionErrorCode;
@@ -73,5 +74,12 @@ public class QuestionServiceImpl implements QuestionService {
 		//TODO 정렬 기능 추가할 것 (Sort.Order 사용하면 메모리에서 정렬하기 때문에 Enum으로 정렬 값 받고 QuestionQueeryRepository에 넘겨줄 것)
 		PageRequest pageRequest = PageRequest.of(pageNum, PAGE_SIZE);
 		return questionRepository.findAll(keyword, pageRequest);
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public QuestionDetailResponse findDetailById(Long id, Member loginMember) {
+
+		return questionRepository.findDetailById(id, loginMember.id());
 	}
 }
