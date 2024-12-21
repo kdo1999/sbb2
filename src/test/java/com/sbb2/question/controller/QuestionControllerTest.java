@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.validator.HibernateValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,17 +33,26 @@ import com.sbb2.question.domain.QuestionPageResponse;
 import com.sbb2.question.service.QuestionService;
 import com.sbb2.voter.domain.Voter;
 
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
+
 @ExtendWith(MockitoExtension.class)
 public class QuestionControllerTest {
 	@Mock
 	private QuestionService questionService;
 	private QuestionController questionController;
 	private Model model;
+	private Validator validator;
 
 	@BeforeEach
 	void setUp() {
 		questionController = new QuestionController(questionService);
 		model = new ConcurrentModel();
+		ValidatorFactory factory = Validation.byProvider(HibernateValidator.class)
+			.configure()
+			.buildValidatorFactory();
+		validator = factory.getValidator();
 	}
 
 	@DisplayName("질문 전체 조회 성공 테스트")
@@ -173,6 +183,15 @@ public class QuestionControllerTest {
 			.email("testEmail")
 			.build();
 
+		BindingResult bindingResult = new BeanPropertyBindingResult(questionForm, "questionForm");
+		validator.validate(questionForm).forEach(violation ->
+			bindingResult.rejectValue(
+				violation.getPropertyPath().toString(),
+				"error",
+				violation.getMessage()
+			)
+		);
+
 		given(questionService.save(questionForm.subject(), questionForm.content(), givenMember))
 			.willReturn(Question.builder()
 				.id(1L)
@@ -182,7 +201,7 @@ public class QuestionControllerTest {
 				.build());
 
 		//when
-		String viewName = questionController.save(questionForm, givenMember);
+		String viewName = questionController.save(questionForm, bindingResult, givenMember);
 
 	    //then
 		assertThat(viewName).isEqualTo("redirect:/question");
@@ -206,10 +225,18 @@ public class QuestionControllerTest {
 
 		BindingResult bindingResult = new BeanPropertyBindingResult(questionForm, "questionForm");
 
-		//when
-		String viewName = questionController.save(questionForm, givenMember);
+		validator.validate(questionForm).forEach(violation ->
+			bindingResult.rejectValue(
+				violation.getPropertyPath().toString(),
+				"error",
+				violation.getMessage()
+			)
+		);
 
-	    //then
+		//when
+		String viewName = questionController.save(questionForm, bindingResult, givenMember);
+
+		//then
 		assertThat(bindingResult.hasErrors()).isTrue();
 		assertThat(bindingResult.getErrorCount()).isEqualTo(1);
 		assertThat(viewName).isEqualTo("question_form");
