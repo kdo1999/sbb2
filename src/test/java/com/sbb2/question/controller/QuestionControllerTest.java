@@ -239,6 +239,45 @@ public class QuestionControllerTest {
 		//then
 		assertThat(bindingResult.hasErrors()).isTrue();
 		assertThat(bindingResult.getErrorCount()).isEqualTo(1);
+		assertThat(bindingResult.getFieldError("subject").getDefaultMessage())
+			.isEqualTo("제목은 필수 항목입니다.");
+		assertThat(viewName).isEqualTo("question_form");
+	}
+
+	@DisplayName("질문 저장시 내용 빈 값 들어갔을 때 실패 테스트")
+	@Test
+	void save_emptyContent_fail() {
+	    //given
+		QuestionForm questionForm = QuestionForm.builder()
+			.subject("testSubject")
+			.content("")
+			.build();
+
+		Member givenMember = Member.builder()
+			.id(1L)
+			.username("testMember")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
+
+		BindingResult bindingResult = new BeanPropertyBindingResult(questionForm, "questionForm");
+
+		validator.validate(questionForm).forEach(violation ->
+			bindingResult.rejectValue(
+				violation.getPropertyPath().toString(),
+				"error",
+				violation.getMessage()
+			)
+		);
+
+		//when
+		String viewName = questionController.save(questionForm, bindingResult, givenMember);
+
+		//then
+		assertThat(bindingResult.hasErrors()).isTrue();
+		assertThat(bindingResult.getErrorCount()).isEqualTo(1);
+		assertThat(bindingResult.getFieldError("content").getDefaultMessage())
+			.isEqualTo("내용은 필수 항목입니다.");
 		assertThat(viewName).isEqualTo("question_form");
 	}
 	//TODO 질문 삭제
