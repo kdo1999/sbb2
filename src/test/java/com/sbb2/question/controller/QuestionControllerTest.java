@@ -280,7 +280,15 @@ public class QuestionControllerTest {
 			.isEqualTo("내용은 필수 항목입니다.");
 		assertThat(viewName).isEqualTo("question_form");
 	}
+	//TODO 질문 생성 GET
+
+	//TODO 질문 수정
+
+	//TODO 질문 수정 유효성 검사
+
 	//TODO 질문 삭제
 
 	//TODO 질문 추천
+
+	//TODO 질문 추천 삭제
 }
