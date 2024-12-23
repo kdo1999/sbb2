@@ -18,6 +18,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 
 import com.sbb2.answer.controller.request.AnswerForm;
+import com.sbb2.answer.domain.Answer;
 import com.sbb2.answer.service.AnswerService;
 import com.sbb2.answer.service.response.AnswerCreateResponse;
 import com.sbb2.common.response.GenericResponse;
@@ -122,9 +123,37 @@ public class AnswerControllerTest {
 		assertThat(bindingResult.getFieldError("content").getDefaultMessage()).isEqualTo("답변 내용은 필수 항목입니다.");
 	}
 
-	//TODO 답변 수정 GET
-
 	//TODO 답변 수정
+	@DisplayName("답변 수정 성공 테스트")
+	@Test
+	void update_answer_success() {
+		//given
+		AnswerForm answerForm = AnswerForm.builder()
+			.questionId(1L)
+			.content("updateContent")
+			.build();
+
+		Member givenMember = Member.builder()
+			.id(1L)
+			.username("testMember")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
+
+		given(answerService.update(1L, answerForm.content(), givenMember))
+			.willReturn(Answer.builder()
+				.id(1L)
+				.content(answerForm.content())
+				.build());
+
+		//when
+		ResponseEntity<GenericResponse<Void>> result = answerController.update(1L, answerForm, givenMember);
+
+		//then
+		assertThat(result.getBody().getData()).isNull();
+		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+		verify(answerService, times(1)).update(1L, answerForm.content(), givenMember);
+	}
 
 	//TODO 답변 수정 유효성 검사
 
