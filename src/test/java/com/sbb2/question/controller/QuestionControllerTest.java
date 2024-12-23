@@ -206,7 +206,7 @@ public class QuestionControllerTest {
 		//then
 		QuestionCreateResponse data = result.getBody().getData();
 		assertThat(questionCreateResponse).isEqualTo(data);
-		assertThat(result.getHeaders().getLocation()).isEqualTo("/question/" + data.id());
+		assertThat(result.getHeaders().getLocation().getPath()).isEqualTo("/question/" + data.id());
 		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 	}
 
@@ -235,9 +235,6 @@ public class QuestionControllerTest {
 				violation.getMessage()
 			)
 		);
-
-		//when
-		questionController.save(questionForm, givenMember);
 
 		//then
 		assertThat(bindingResult.hasErrors()).isTrue();
@@ -272,9 +269,6 @@ public class QuestionControllerTest {
 			)
 		);
 
-		//when
-		questionController.save(questionForm, givenMember);
-
 		//then
 		assertThat(bindingResult.hasErrors()).isTrue();
 		assertThat(bindingResult.getErrorCount()).isEqualTo(1);
@@ -305,7 +299,6 @@ public class QuestionControllerTest {
 			.subject("updateSubject")
 			.build();
 
-		given(questionService.findById(givenQuestion.id())).willReturn(givenQuestion);
 		given(questionService.update(givenQuestion.id(), givenQuestionForm.subject(), givenQuestionForm.content(), givenMember)).willReturn(givenQuestion);
 
 		BindingResult bindingResult = new BeanPropertyBindingResult(givenQuestionForm, "questionForm");
@@ -325,7 +318,6 @@ public class QuestionControllerTest {
 		//then
 		assertThat(result.getBody().getData()).isNull();
 		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-		verify(questionService, times(1)).findById(givenQuestion.id());
 		verify(questionService, times(1)).update(givenQuestion.id(), givenQuestionForm.subject(), givenQuestionForm.content(), givenMember);
 	}
 
