@@ -174,8 +174,4 @@ public class AnswerControllerTest {
 		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
 		verify(answerService, times(1)).deleteById(1L, givenMember);
 	}
-
-	//TODO 답변 추천
-
-	//TODO 답변 추천 삭제
 }
