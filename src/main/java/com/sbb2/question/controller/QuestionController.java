@@ -4,6 +4,7 @@ import java.net.URI;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -61,11 +62,16 @@ public class QuestionController {
 
 	@PatchMapping("/{id}")
 	public ResponseEntity<GenericResponse<Void>> update(@PathVariable("id") Long id, @Valid @RequestBody QuestionForm questionForm, Member loginMember) {
-		Question question = questionService.findById(id);
-
-		questionService.update(question.id(), questionForm.subject(), questionForm.content(), loginMember);
+		questionService.update(id, questionForm.subject(), questionForm.content(), loginMember);
 
 		return ResponseEntity.ok(GenericResponse.of());
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<GenericResponse<Void>> delete(@PathVariable("id") Long id, Member loginMember) {
+		questionService.deleteById(id, loginMember);
+
+		return ResponseEntity.ok().body(GenericResponse.of());
 	}
 
 	private void authorEqualsLoginMember(Member loginMember, Question question) {

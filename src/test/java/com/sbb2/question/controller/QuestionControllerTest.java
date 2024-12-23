@@ -429,10 +429,11 @@ public class QuestionControllerTest {
 		doNothing().when(questionService).deleteById(givenQuestion.id(), givenMember);
 
 	    //when
-		String viewName = questionController.delete(givenQuestion.id(), givenMember);
+		ResponseEntity<GenericResponse<Void>> result = questionController.delete(givenQuestion.id(), givenMember);
 
 		//then
-		assertThat(viewName).isEqualTo("redirect:/");
+		assertThat(result.getBody().getData()).isNull();
+		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
 		verify(questionService, times(1)).deleteById(givenQuestion.id(), givenMember);
 	}
 }
