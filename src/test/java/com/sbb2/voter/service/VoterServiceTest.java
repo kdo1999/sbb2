@@ -101,12 +101,14 @@ public class VoterServiceTest {
 			.member(member)
 			.build();
 
+		VoterType voterType = VoterType.QUESTION;
 		question.voterSet().add(voter);
 
+		given(questionRepository.findById(question.id())).willReturn(Optional.of(question));
 		doNothing().when(voterRepository).deleteById(voter.id());
 
 		//when
-		voterService.delete(question, member);
+		voterService.delete(question.id(), voterType, member);
 
 		//then
 		verify(voterRepository, times(1)).deleteById(voter.id());
@@ -219,12 +221,14 @@ public class VoterServiceTest {
 			.member(member)
 			.build();
 
+		VoterType voterType = VoterType.ANSWER;
 		answer.voterSet().add(voter);
 
+		given(answerRepository.findById(answer.id())).willReturn(Optional.of(answer));
 		doNothing().when(voterRepository).deleteById(voter.id());
 
 		//when
-		voterService.delete(answer, member);
+		voterService.delete(answer.id(), voterType, member);
 
 		//then
 		verify(voterRepository, times(1)).deleteById(voter.id());

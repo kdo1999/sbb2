@@ -1,6 +1,7 @@
 package com.sbb2.voter.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,10 +23,18 @@ public class VoterController {
 	private final VoterService voterService;
 
 	@PostMapping("/{id}")
-	public ResponseEntity<GenericResponse<VoterCreateResponse>> save(@PathVariable("id") Long id, @RequestParam VoterType voterType,
-		Member loginMember) {
+	public ResponseEntity<GenericResponse<VoterCreateResponse>> save(@PathVariable("id") Long id,
+		@RequestParam VoterType voterType, Member loginMember) {
 		VoterCreateResponse voterCreateResponse = voterService.save(id, voterType, loginMember);
 
 		return ResponseEntity.ok().body(GenericResponse.of(voterCreateResponse));
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<GenericResponse<Void>> delete(@PathVariable("id") Long id, @RequestParam VoterType voterType,
+		Member loginMember) {
+		voterService.delete(id, voterType, loginMember);
+
+		return ResponseEntity.ok().body(GenericResponse.of());
 	}
 }

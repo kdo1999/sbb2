@@ -30,28 +30,28 @@ public class VoterServiceImpl implements VoterService {
 	private final AnswerRepository answerRepository;
 
 	@Override
-	public VoterCreateResponse save(Long id, VoterType voterType, Member member) {
+	public VoterCreateResponse save(Long targetId, VoterType voterType, Member member) {
 		boolean exists;
 		VoterCreateResponse voterCreateResponse;
 		switch (voterType) {
 			case QUESTION:
-				exists = voterRepository.existsByQuestionIdAndMemberId(id, member.id());
+				exists = voterRepository.existsByQuestionIdAndMemberId(targetId, member.id());
 
 				if (exists) {
 					throw new VoterBusinessLogicException(VoterErrorCode.DUPLICATE_VOTER);
 				}
 
-				voterCreateResponse = saveQuestionVoter(id, member);
+				voterCreateResponse = saveQuestionVoter(targetId, member);
 
 				break;
 			case ANSWER:
-				exists = voterRepository.existsByAnswerIdAndMemberId(id, member.id());
+				exists = voterRepository.existsByAnswerIdAndMemberId(targetId, member.id());
 
 				if (exists) {
 					throw new VoterBusinessLogicException(VoterErrorCode.DUPLICATE_VOTER);
 				}
 
-				voterCreateResponse = saveAnswerVoter(id, member);
+				voterCreateResponse = saveAnswerVoter(targetId, member);
 
 				break;
 			default:
@@ -62,22 +62,12 @@ public class VoterServiceImpl implements VoterService {
 	}
 
 	@Override
-	public void delete(Question question, Member member) {
-		Voter findVoter = question.voterSet().stream()
-			.filter(voter -> member.id().equals(voter.member().id())).findFirst()
-			.orElseThrow(() -> new VoterBusinessLogicException(VoterErrorCode.NOT_FOUND));
-
-		voterRepository.deleteById(findVoter.id());
-	}
-
-	@Override
-	public void delete(Answer answer, Member member) {
-		Voter findVoter = answer.voterSet().stream()
-			.filter(voter -> member.id().equals(voter.member().id()))
-			.findFirst()
-			.orElseThrow(() -> new VoterBusinessLogicException(VoterErrorCode.NOT_FOUND));
-
-		voterRepository.deleteById(findVoter.id());
+	public void delete(Long targetId, VoterType voterType, Member member) {
+		switch (voterType) {
+			case QUESTION -> deleteQuestion(targetId, member);
+			case ANSWER -> deleteAnswer(targetId, member);
+			default -> throw new VoterBusinessLogicException(VoterErrorCode.NOT_VOTER_TYPE);
+		}
 	}
 
 	private VoterCreateResponse saveQuestionVoter(Long questionId, Member member) {
@@ -98,6 +88,30 @@ public class VoterServiceImpl implements VoterService {
 					.voterType(VoterType.QUESTION)
 					.isVoter(true)
 					.build();
+	}
+
+	private void deleteQuestion(Long questionId, Member member) {
+		Question findQuestion = questionRepository.findById(questionId)
+			.orElseThrow(() -> new QuestionBusinessLogicException(QuestionErrorCode.NOT_FOUND));
+
+		Voter findVoter = findQuestion.voterSet().stream()
+			.filter(voter -> member.id().equals(voter.member().id()))
+			.findFirst()
+			.orElseThrow(() -> new VoterBusinessLogicException(VoterErrorCode.NOT_FOUND));
+
+		voterRepository.deleteById(findVoter.id());
+	}
+
+	private void deleteAnswer(Long answerId, Member member) {
+		Answer findAnswer = answerRepository.findById(answerId)
+			.orElseThrow(() -> new AnswerBusinessLogicException(AnswerErrorCode.NOT_FOUND));
+
+		Voter findVoter = findAnswer.voterSet().stream()
+			.filter(voter -> member.id().equals(voter.member().id()))
+			.findFirst()
+			.orElseThrow(() -> new VoterBusinessLogicException(VoterErrorCode.NOT_FOUND));
+
+		voterRepository.deleteById(findVoter.id());
 	}
 
 	private VoterCreateResponse saveAnswerVoter(Long answerId, Member member) {
