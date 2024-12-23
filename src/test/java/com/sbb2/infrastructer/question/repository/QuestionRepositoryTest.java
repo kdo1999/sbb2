@@ -168,6 +168,25 @@ public class QuestionRepositoryTest {
 		assertThat(questionPage.getContent().size()).isEqualTo(5);
 	}
 
+	@DisplayName("질문 전체 조회 테스트")
+	@Test
+	void find_question() {
+		//given
+		String keyword = "";
+		int page = 0;
+
+		//when
+		List<Sort.Order> sorts = new ArrayList<>();
+		sorts.add(Sort.Order.desc("createdAt"));
+		Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
+		Page<QuestionPageResponse> questionPage = questionRepository.findAll(keyword, pageable);
+		questionPage.getContent().iterator().forEachRemaining(System.out::println);
+		//then
+		assertThat(questionPage.getTotalPages()).isEqualTo(3);
+		assertThat(questionPage.getContent().size()).isEqualTo(10);
+	}
+
+
 	@DisplayName("질문 ID 조회 테스트")
 	@Test
 	void find_id_question() {
