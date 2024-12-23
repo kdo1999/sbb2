@@ -42,70 +42,108 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-tasks.named('test') {
-	useJUnitPlatform()
-	finalizedBy 'jacocoTestReport' // test가 끝나면 jacocoTestReport 동작
-}
-
-// jacoco report 설정
-jacocoTestReport {
-    reports {
-        // html로 report 생성하기
-        // 빌드경로/jacoco/report.html 폴더 내부로 경로 설정
-        html.destination file("$buildDir/jacoco/report.html")
+test {
+    jacoco {
+        destinationFile = file("$buildDir/jacoco/jacoco.exec")
     }
 
-    // jacocoTestReport가 끝나면 jacocoTestCoverageVerification 동작
-    finalizedBy 'jacocoTestCoverageVerification'
-	getClassDirectories().setFrom(
-            files(classDirectories.files.collect {
-                fileTree(dir: it, exclude: [
-                        '**/entity',
-						'**/Q**Entity.class',
-						'**/Q**Response.class',
-                        '**/domain',
-                        '**/common',
-                        '**/exception'// dto package 내부는 제외
-                ])
-            })
+    useJUnitPlatform()
+
+    finalizedBy 'jacocoTestReport'
+}
+
+
+jacoco {
+    // JaCoCo 버전
+    toolVersion = '0.8.12'
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        html.required.set(true)
+    }
+    classDirectories.setFrom(
+        files(classDirectories.files.collect {
+            fileTree(it) {
+                exclude(
+                    'Q*Entity.class',
+                    '**/advice/**',
+                    '**/common/**',
+                    '**/response/**',
+                    '**/request/**',
+                    '**/entity/**',
+                    '**/domain/**',
+                    '**/Sbb2Application.class',
+                    '**/exception/**'
+                )
+            }
+        })
     )
 }
-// jacoco 커버리지 검증 설정
+
 jacocoTestCoverageVerification {
     violationRules {
         rule {
-            enabled = true // 커버리지 적용 여부
-            element = 'CLASS' // 커버리지 적용 단위
-
-            // 라인 커버리지 설정
-            // 적용 대상 전체 소스 코드들을 한줄 한줄 따졌을 때 테스트 코드가 작성되어 있는 줄의 빈도
-            // 테스트 코드가 작성되어 있는 비율이 90% 이상이어야 함
+            // 'element'가 없으면 프로젝트의 전체 파일을 합친 값을 기준으로 한다.
             limit {
-                counter = 'LINE'
-                value = 'COVEREDRATIO'
+                // 'counter'를 지정하지 않으면 default는 'INSTRUCTION'
+                // 'value'를 지정하지 않으면 default는 'COVEREDRATIO'
                 minimum = 0.30
             }
+        }
 
-            // 브랜치 커버리지 설정
-            // if-else 등을 활용하여 발생되는 분기들 중 테스트 코드가 작성되어 있는 빈도
-            // 테스트 코드가 작성되어 있는 비율이 90% 이상이어야 함
+        rule {
+            enabled = true
+
+            element = 'CLASS'
+
             limit {
                 counter = 'BRANCH'
                 value = 'COVEREDRATIO'
-                minimum = 0.30
+                minimum = 0.70
             }
 
-            // 라인 최대 갯수 설정
-            // 빈 줄을 제외하고 하나의 자바 파일에서 작성될 수 있는 최대 라인 갯수
-            // 한 파일에 최대 500줄까지 작성되어야 함
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.70
+            }
+
             limit {
                 counter = 'LINE'
                 value = 'TOTALCOUNT'
-                maximum = 500
+                maximum = 200
             }
+
+            // 커버리지 체크를 제외할 클래스들
+            excludes = [
+                    'Q*Entity',
+                    '**/advice/*Advice',
+                    '**/common/**',
+                    '**/**/response/**',
+                    '**/**/request/**',
+                    '**/entity/**',
+                    '**/domain/**',
+                    '**/Sbb2Application.class',
+                    '**/exception/**'
+            ]
         }
     }
 }
+
+task testCoverage(type: Test) {
+    group 'verification'
+    description 'Runs the unit tests with coverage'
+
+    dependsOn(':test',
+            ':jacocoTestReport',
+            ':jacocoTestCoverageVerification')
+
+    tasks['jacocoTestReport'].mustRunAfter(tasks['test'])
+    tasks['jacocoTestCoverageVerification'].mustRunAfter(tasks['jacocoTestReport'])
+}
+
 // Querydsl 빌드 옵션 (옵셔널)
 def generated = 'src/main/generated'
 
