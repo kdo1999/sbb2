@@ -454,6 +454,50 @@ public class QuestionControllerTest {
 		assertThat(viewName).isEqualTo("question_form");
 	}
 
+	@DisplayName("질문 수정시 내용이 비었을 때 실패 테스트")
+	@Test
+	void update_content_empty_fail() {
+	    //given
+		Member givenMember = Member.builder()
+			.id(1L)
+			.username("testMember")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
+
+		Question givenQuestion = Question.builder()
+			.id(1L)
+			.content("testContent")
+			.subject("testSubject")
+			.author(givenMember)
+			.build();
+
+		QuestionForm givenQuestionForm = QuestionForm.builder()
+			.content("")
+			.subject("updateSubject")
+			.build();
+
+		BindingResult bindingResult = new BeanPropertyBindingResult(givenQuestionForm, "questionForm");
+
+		validator.validate(givenQuestionForm).forEach(violation ->
+			bindingResult.rejectValue(
+				violation.getPropertyPath().toString(),
+				"error",
+				violation.getMessage()
+			)
+		);
+
+		//when
+		String viewName = questionController.update(givenQuestion.id(), givenQuestionForm, bindingResult, givenMember);
+
+		//then
+		assertThat(bindingResult.hasErrors()).isTrue();
+		assertThat(bindingResult.getErrorCount()).isEqualTo(1);
+		assertThat(bindingResult.getFieldError("content").getDefaultMessage())
+			.isEqualTo("내용은 필수 항목입니다.");
+		assertThat(viewName).isEqualTo("question_form");
+	}
+
 	//TODO 질문 삭제
 
 	//TODO 질문 추천
