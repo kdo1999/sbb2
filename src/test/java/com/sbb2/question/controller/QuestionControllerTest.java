@@ -293,7 +293,37 @@ public class QuestionControllerTest {
 		//then
 		assertThat(viewName).isEqualTo("question_form");
 	}
-	//TODO 질문 수정 GET
+
+	@DisplayName("질문 생성 GET 요청 성공 테스트")
+	@Test
+	void update_getUpdate_success() {
+	    //given
+		Member givenMember = Member.builder()
+			.id(1L)
+			.username("testMember")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
+
+		Question givenQuestion = Question.builder()
+			.id(1L)
+			.content("testContent")
+			.subject("testSubject")
+			.author(givenMember)
+			.build();
+
+		QuestionForm givenQuestionForm = QuestionForm.builder()
+			.build();
+
+		given(questionService.findById(givenQuestion.id())).willReturn(givenQuestion);
+
+		//when
+		String viewName = questionController.update(givenQuestion.id(), givenQuestionForm);
+
+		//then
+		assertThat(viewName).isEqualTo("question_form");
+		verify(questionService, times(1)).findById(givenQuestion.id());
+	}
 
 	//TODO 질문 수정
 
