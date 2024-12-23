@@ -280,7 +280,20 @@ public class QuestionControllerTest {
 			.isEqualTo("내용은 필수 항목입니다.");
 		assertThat(viewName).isEqualTo("question_form");
 	}
-	//TODO 질문 생성 GET
+
+	@DisplayName("질문 생성 GET 요청 성공 테스트")
+	@Test
+	void save_getCreate_success() {
+	    //given
+		QuestionForm questionForm = QuestionForm.builder().build();
+
+		//when
+		String viewName = questionController.save(questionForm);
+
+		//then
+		assertThat(viewName).isEqualTo("question_form");
+	}
+	//TODO 질문 수정 GET
 
 	//TODO 질문 수정
 
