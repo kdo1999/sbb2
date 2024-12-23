@@ -13,6 +13,7 @@ public interface QuestionService {
 
 	Question findById(Long id);
 
+	//TODO 반환 타입 void로 바꿀 것
 	Question update(Long id, String subject, String content, Member author);
 
 	void deleteById(Long id, Member author);
