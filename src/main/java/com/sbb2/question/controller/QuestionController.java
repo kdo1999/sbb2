@@ -44,6 +44,11 @@ public class QuestionController {
 		return "question_detail";
 	}
 
+	@GetMapping("/create")
+	public String save(QuestionForm questionForm) {
+		return "question_form";
+	}
+
 	@PostMapping("/create")
 	public String save(@Valid QuestionForm questionForm, BindingResult bindingResult, Member loginMember) {
 		if (bindingResult.hasErrors()) {
