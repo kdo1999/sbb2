@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import com.sbb2.answer.domain.Answer;
 import com.sbb2.common.response.GenericResponse;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
@@ -121,6 +122,51 @@ public class VoterControllerTest {
 		verify(voterService, times(1)).delete(question.id(), voterType, givenMember);
 
 	}
-	//TODO 답변 추천 성공 테스트
+
+	@DisplayName("답변 추천 성공 테스트")
+	@Test
+	void save_answer_voter_success() {
+	    //given
+	    Member givenMember = Member.builder()
+			.id(1L)
+			.username("testMember")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
+
+		Question question = Question.builder()
+			.id(1L)
+			.subject("subject")
+			.content("content")
+			.author(givenMember)
+			.build();
+
+		Answer answer = Answer.builder()
+			.id(1L)
+			.content("testContent")
+			.author(givenMember)
+			.build();
+
+		VoterType voterType = VoterType.QUESTION;
+
+		VoterCreateResponse voterCreateResponse = VoterCreateResponse.builder()
+			.voterId(1L)
+			.voterUsername(givenMember.username())
+			.targetId(answer.id())
+			.voterType(voterType)
+			.isVoter(true)
+			.build();
+
+		given(voterService.save(answer.id(), voterType, givenMember))
+			.willReturn(voterCreateResponse);
+
+	    //when
+		ResponseEntity<GenericResponse<VoterCreateResponse>> result = voterController.save(answer.id(), voterType,
+			givenMember);
+
+		//then
+		assertThat(result.getBody().getData()).isEqualTo(voterCreateResponse);
+		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+	}
 	//TODO 답변 추천 삭제 성공 테스트
 }
