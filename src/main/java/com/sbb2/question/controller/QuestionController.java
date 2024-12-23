@@ -78,4 +78,22 @@ public class QuestionController {
 
 		return "question_form";
 	}
+
+	@PostMapping("/modify/{id}")
+	public String update(@PathVariable("id") Long id, @Valid QuestionForm questionForm,
+		BindingResult bindingResult, Member loginMember) {
+		if (bindingResult.hasErrors()) {
+			return "question_form";
+		}
+
+		Question question = questionService.findById(id);
+
+		if (!question.author().equals(loginMember)) {
+			throw new QuestionBusinessLogicException(QuestionErrorCode.UNAUTHORIZED);
+		}
+
+		questionService.update(question.id(), questionForm.subject(), questionForm.content(), loginMember);
+
+		return String.format("redirect:/question/detail/%s", id);
+	}
 }
