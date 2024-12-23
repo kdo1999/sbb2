@@ -524,8 +524,4 @@ public class QuestionControllerTest {
 		assertThat(viewName).isEqualTo("redirect:/");
 		verify(questionService, times(1)).deleteById(givenQuestion.id(), givenMember);
 	}
-
-	//TODO 질문 추천
-
-	//TODO 질문 추천 삭제
 }
