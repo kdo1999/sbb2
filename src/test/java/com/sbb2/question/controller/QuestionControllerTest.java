@@ -410,7 +410,49 @@ public class QuestionControllerTest {
 		verify(questionService, times(1)).update(givenQuestion.id(), givenQuestionForm.subject(), givenQuestionForm.content(), givenMember);
 	}
 
-	//TODO 질문 수정 유효성 검사
+	@DisplayName("질문 수정시 제목이 비었을 때 실패 테스트")
+	@Test
+	void update_subject_empty_fail() {
+	    //given
+		Member givenMember = Member.builder()
+			.id(1L)
+			.username("testMember")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
+
+		Question givenQuestion = Question.builder()
+			.id(1L)
+			.content("testContent")
+			.subject("testSubject")
+			.author(givenMember)
+			.build();
+
+		QuestionForm givenQuestionForm = QuestionForm.builder()
+			.content("updateContent")
+			.subject("")
+			.build();
+
+		BindingResult bindingResult = new BeanPropertyBindingResult(givenQuestionForm, "questionForm");
+
+		validator.validate(givenQuestionForm).forEach(violation ->
+			bindingResult.rejectValue(
+				violation.getPropertyPath().toString(),
+				"error",
+				violation.getMessage()
+			)
+		);
+
+		//when
+		String viewName = questionController.update(givenQuestion.id(), givenQuestionForm, bindingResult, givenMember);
+
+		//then
+		assertThat(bindingResult.hasErrors()).isTrue();
+		assertThat(bindingResult.getErrorCount()).isEqualTo(1);
+		assertThat(bindingResult.getFieldError("subject").getDefaultMessage())
+			.isEqualTo("제목은 필수 항목입니다.");
+		assertThat(viewName).isEqualTo("question_form");
+	}
 
 	//TODO 질문 삭제
 
