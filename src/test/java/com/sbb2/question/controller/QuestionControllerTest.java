@@ -30,6 +30,8 @@ import com.sbb2.question.controller.request.QuestionForm;
 import com.sbb2.question.domain.Question;
 import com.sbb2.question.domain.QuestionDetailResponse;
 import com.sbb2.question.domain.QuestionPageResponse;
+import com.sbb2.question.exception.QuestionBusinessLogicException;
+import com.sbb2.question.exception.QuestionErrorCode;
 import com.sbb2.question.service.QuestionService;
 import com.sbb2.voter.domain.Voter;
 
@@ -318,14 +320,53 @@ public class QuestionControllerTest {
 		given(questionService.findById(givenQuestion.id())).willReturn(givenQuestion);
 
 		//when
-		String viewName = questionController.update(givenQuestion.id(), givenQuestionForm);
+		String viewName = questionController.update(givenQuestion.id(), givenQuestionForm, givenMember);
 
 		//then
 		assertThat(viewName).isEqualTo("question_form");
 		verify(questionService, times(1)).findById(givenQuestion.id());
 	}
 
+	@DisplayName("질문 생성 GET 요청시 작성자와 요청 사용자가 다를 때 실패 테스트")
+	@Test
+	void update_getUpdate_fail() {
+	    //given
+		Member givenMember = Member.builder()
+			.id(1L)
+			.username("testMember")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
+
+		Member loginMember = Member.builder()
+			.id(2L)
+			.username("loginMember")
+			.password("loginPassword")
+			.email("loginEmail")
+			.build();
+
+		Question givenQuestion = Question.builder()
+			.id(1L)
+			.content("testContent")
+			.subject("testSubject")
+			.author(givenMember)
+			.build();
+
+		QuestionForm givenQuestionForm = QuestionForm.builder()
+			.build();
+
+		given(questionService.findById(givenQuestion.id())).willReturn(givenQuestion);
+
+		//then
+		assertThatThrownBy(() -> questionController.update(givenQuestion.id(), givenQuestionForm, loginMember))
+			.isInstanceOf(QuestionBusinessLogicException.class)
+			.hasMessage(QuestionErrorCode.UNAUTHORIZED.getMessage())
+			.extracting("message", "status")
+       	 	.containsExactly(QuestionErrorCode.UNAUTHORIZED.getMessage(), QuestionErrorCode.UNAUTHORIZED.getHttpStatus());
+	}
+
 	//TODO 질문 수정
+
 
 	//TODO 질문 수정 유효성 검사
 

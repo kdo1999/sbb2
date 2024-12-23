@@ -12,8 +12,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.controller.request.QuestionForm;
+import com.sbb2.question.domain.Question;
 import com.sbb2.question.domain.QuestionDetailResponse;
 import com.sbb2.question.domain.QuestionPageResponse;
+import com.sbb2.question.exception.QuestionBusinessLogicException;
+import com.sbb2.question.exception.QuestionErrorCode;
 import com.sbb2.question.service.QuestionService;
 
 import jakarta.validation.Valid;
@@ -58,5 +61,21 @@ public class QuestionController {
 		questionService.save(questionForm.subject(), questionForm.content(), loginMember);
 
 		return "redirect:/question";
+	}
+
+	@GetMapping("/modify/{id}")
+	public String update(@PathVariable("id") Long id, QuestionForm questionForm, Member loginMember) {
+		Question findQuestion = questionService.findById(id);
+
+		if (!findQuestion.author().equals(loginMember)) {
+			throw new QuestionBusinessLogicException(QuestionErrorCode.UNAUTHORIZED);
+		}
+
+		QuestionForm questionForm1 = QuestionForm.builder()
+			.content(findQuestion.content())
+			.subject(findQuestion.subject())
+			.build();
+
+		return "question_form";
 	}
 }
