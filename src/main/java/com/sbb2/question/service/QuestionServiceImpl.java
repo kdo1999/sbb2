@@ -12,6 +12,7 @@ import com.sbb2.question.domain.QuestionDetailResponse;
 import com.sbb2.question.domain.QuestionPageResponse;
 import com.sbb2.question.exception.QuestionBusinessLogicException;
 import com.sbb2.question.exception.QuestionErrorCode;
+import com.sbb2.question.service.response.QuestionCreateResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,14 +24,18 @@ public class QuestionServiceImpl implements QuestionService {
 	private static final int PAGE_SIZE = 10;
 
 	@Override
-	public Question save(String subject, String content, Member author) {
+	public QuestionCreateResponse save(String subject, String content, Member author) {
 		Question question = Question.builder()
 			.subject(subject)
 			.content(content)
 			.author(author)
 			.build();
 
-		return questionRepository.save(question);
+		Question savedQuestion = questionRepository.save(question);
+
+		return QuestionCreateResponse.builder()
+			.id(savedQuestion.id())
+			.build();
 	}
 
 	@Transactional(readOnly = true)

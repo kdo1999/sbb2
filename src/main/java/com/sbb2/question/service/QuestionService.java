@@ -6,9 +6,10 @@ import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
 import com.sbb2.question.domain.QuestionDetailResponse;
 import com.sbb2.question.domain.QuestionPageResponse;
+import com.sbb2.question.service.response.QuestionCreateResponse;
 
 public interface QuestionService {
-	Question save(String subject, String content, Member author);
+	QuestionCreateResponse save(String subject, String content, Member author);
 
 	Question findById(Long id);
 

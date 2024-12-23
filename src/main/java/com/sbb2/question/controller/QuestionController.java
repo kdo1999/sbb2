@@ -1,15 +1,19 @@
 package com.sbb2.question.controller;
 
+import java.net.URI;
+
 import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
+import com.sbb2.common.response.GenericResponse;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.controller.request.QuestionForm;
 import com.sbb2.question.domain.Question;
@@ -18,85 +22,50 @@ import com.sbb2.question.domain.QuestionPageResponse;
 import com.sbb2.question.exception.QuestionBusinessLogicException;
 import com.sbb2.question.exception.QuestionErrorCode;
 import com.sbb2.question.service.QuestionService;
+import com.sbb2.question.service.response.QuestionCreateResponse;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
-@RequestMapping("/question")
+@RequestMapping("/api/v1/question")
 public class QuestionController {
 	private final QuestionService questionService;
 
 	@GetMapping
-	public String findAll(Model model, @RequestParam(value = "page", defaultValue = "0") int page
+	public ResponseEntity<GenericResponse<Page<QuestionPageResponse>>> findAll(@RequestParam(value = "page", defaultValue = "0") int page
 		, @RequestParam(value = "kw", defaultValue = "") String kw) {
 		Page<QuestionPageResponse> findAllPage = questionService.findAll(page, kw);
-		model.addAttribute("paging", findAllPage);
-		model.addAttribute("kw", kw);
 
-		return "question_list";
+		return ResponseEntity.ok()
+			.body(GenericResponse.of(findAllPage));
 	}
 
-	@GetMapping("/detail/{questionId}")
-	public String findDetailById(Model model, @PathVariable(value = "questionId") Long questionId, Member loginMember) {
+	@GetMapping("/{questionId}")
+	public ResponseEntity<GenericResponse<QuestionDetailResponse>> findDetailById(@PathVariable(value = "questionId") Long questionId, Member loginMember) {
 		QuestionDetailResponse questionDetailResponse = questionService.findDetailById(questionId, loginMember);
 
-		model.addAttribute("questionDetailResponse", questionDetailResponse);
-
-		return "question_detail";
+		return ResponseEntity.ok()
+			.body(GenericResponse.of(questionDetailResponse));
 	}
 
-	@GetMapping("/create")
-	public String save(QuestionForm questionForm) {
-		return "question_form";
+	@PostMapping
+	public ResponseEntity<GenericResponse<QuestionCreateResponse>> save(@Valid @RequestBody QuestionForm questionForm, Member loginMember) {
+
+		QuestionCreateResponse savedQuestion = questionService.save(questionForm.subject(), questionForm.content(), loginMember);
+
+		return ResponseEntity.created(URI.create("/question/" + savedQuestion.id()))
+			.body(GenericResponse.of(savedQuestion));
 	}
 
-	@PostMapping("/create")
-	public String save(@Valid QuestionForm questionForm, BindingResult bindingResult, Member loginMember) {
-		if (bindingResult.hasErrors()) {
-			return "question_form";
-		}
-
-		questionService.save(questionForm.subject(), questionForm.content(), loginMember);
-
-		return "redirect:/question";
-	}
-
-	@GetMapping("/modify/{id}")
-	public String update(@PathVariable("id") Long id, QuestionForm questionForm, Member loginMember) {
-		Question findQuestion = questionService.findById(id);
-
-		authorEqualsLoginMember(loginMember, findQuestion);
-
-		QuestionForm questionForm1 = QuestionForm.builder()
-			.content(findQuestion.content())
-			.subject(findQuestion.subject())
-			.build();
-
-		return "question_form";
-	}
-
-	@PostMapping("/modify/{id}")
-	public String update(@PathVariable("id") Long id, @Valid QuestionForm questionForm,
-		BindingResult bindingResult, Member loginMember) {
-		if (bindingResult.hasErrors()) {
-			return "question_form";
-		}
-
+	@PatchMapping("/{id}")
+	public ResponseEntity<GenericResponse<Void>> update(@PathVariable("id") Long id, @Valid @RequestBody QuestionForm questionForm, Member loginMember) {
 		Question question = questionService.findById(id);
 
 		questionService.update(question.id(), questionForm.subject(), questionForm.content(), loginMember);
 
-		return String.format("redirect:/question/detail/%s", id);
-	}
-
-	@GetMapping("/delete/{id}")
-	public String delete(@PathVariable("id") Long id, Member loginMember) {
-
-		questionService.deleteById(id, loginMember);
-
-		return "redirect:/";
+		return ResponseEntity.ok(GenericResponse.of());
 	}
 
 	private void authorEqualsLoginMember(Member loginMember, Question question) {

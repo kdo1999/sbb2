@@ -18,6 +18,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -25,14 +27,14 @@ import org.springframework.validation.BindingResult;
 
 import com.sbb2.answer.domain.Answer;
 import com.sbb2.answer.domain.AnswerDetailResponse;
+import com.sbb2.common.response.GenericResponse;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.controller.request.QuestionForm;
 import com.sbb2.question.domain.Question;
 import com.sbb2.question.domain.QuestionDetailResponse;
 import com.sbb2.question.domain.QuestionPageResponse;
-import com.sbb2.question.exception.QuestionBusinessLogicException;
-import com.sbb2.question.exception.QuestionErrorCode;
 import com.sbb2.question.service.QuestionService;
+import com.sbb2.question.service.response.QuestionCreateResponse;
 import com.sbb2.voter.domain.Voter;
 
 import jakarta.validation.Validation;
@@ -92,12 +94,12 @@ public class QuestionControllerTest {
 		given(questionService.findAll(page, kw)).willReturn(questionPageResponses);
 
 		//when
-		String viewName = questionController.findAll(model, page, kw);
+		ResponseEntity<GenericResponse<Page<QuestionPageResponse>>> result = questionController.findAll(page, kw);
 
 		//then
-		Page<QuestionPageResponse> getAttributePaging = (Page<QuestionPageResponse>)model.getAttribute("paging");
-		assertThat(viewName).isEqualTo("question_list");
-		assertThat(questionPageResponses).isEqualTo(getAttributePaging);
+		Page<QuestionPageResponse> data = result.getBody().getData();
+		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(questionPageResponses).isEqualTo(data);
 	}
 
 	@DisplayName("질문 단건 조회 성공 테스트")
@@ -158,15 +160,14 @@ public class QuestionControllerTest {
 			.willReturn(questionDetailResponse);
 
 		//when
-		String viewName = questionController.findDetailById(model, question.id(), givenMember);
+		ResponseEntity<GenericResponse<QuestionDetailResponse>> result = questionController.findDetailById(
+			question.id(), givenMember);
 
 		//then
-		QuestionDetailResponse getQuestionDetailResponse = (QuestionDetailResponse)model.getAttribute(
-			"questionDetailResponse");
+		QuestionDetailResponse data = result.getBody().getData();
 
-		assertThat(viewName).isEqualTo("question_detail");
-		assertThat(getQuestionDetailResponse).isEqualTo(questionDetailResponse);
-		assertThat(getQuestionDetailResponse.isVoter()).isTrue();
+		assertThat(data).isEqualTo(questionDetailResponse);
+		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
 	}
 
 	@DisplayName("질문 저장 성공 테스트")
@@ -194,19 +195,19 @@ public class QuestionControllerTest {
 			)
 		);
 
+		QuestionCreateResponse questionCreateResponse = QuestionCreateResponse.builder().id(1L).build();
 		given(questionService.save(questionForm.subject(), questionForm.content(), givenMember))
-			.willReturn(Question.builder()
-				.id(1L)
-				.subject(questionForm.subject())
-				.content(questionForm.content())
-				.author(givenMember)
-				.build());
+			.willReturn(questionCreateResponse);
 
 		//when
-		String viewName = questionController.save(questionForm, bindingResult, givenMember);
+		ResponseEntity<GenericResponse<QuestionCreateResponse>> result = questionController.save(questionForm,
+			givenMember);
 
-	    //then
-		assertThat(viewName).isEqualTo("redirect:/question");
+		//then
+		QuestionCreateResponse data = result.getBody().getData();
+		assertThat(questionCreateResponse).isEqualTo(data);
+		assertThat(result.getHeaders().getLocation()).isEqualTo("/question/" + data.id());
+		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 	}
 
 	@DisplayName("질문 저장시 제목 빈 값 들어갔을 때 실패 테스트")
@@ -236,14 +237,13 @@ public class QuestionControllerTest {
 		);
 
 		//when
-		String viewName = questionController.save(questionForm, bindingResult, givenMember);
+		questionController.save(questionForm, givenMember);
 
 		//then
 		assertThat(bindingResult.hasErrors()).isTrue();
 		assertThat(bindingResult.getErrorCount()).isEqualTo(1);
 		assertThat(bindingResult.getFieldError("subject").getDefaultMessage())
 			.isEqualTo("제목은 필수 항목입니다.");
-		assertThat(viewName).isEqualTo("question_form");
 	}
 
 	@DisplayName("질문 저장시 내용 빈 값 들어갔을 때 실패 테스트")
@@ -273,96 +273,13 @@ public class QuestionControllerTest {
 		);
 
 		//when
-		String viewName = questionController.save(questionForm, bindingResult, givenMember);
+		questionController.save(questionForm, givenMember);
 
 		//then
 		assertThat(bindingResult.hasErrors()).isTrue();
 		assertThat(bindingResult.getErrorCount()).isEqualTo(1);
 		assertThat(bindingResult.getFieldError("content").getDefaultMessage())
 			.isEqualTo("내용은 필수 항목입니다.");
-		assertThat(viewName).isEqualTo("question_form");
-	}
-
-	@DisplayName("질문 생성 GET 요청 성공 테스트")
-	@Test
-	void save_getCreate_success() {
-	    //given
-		QuestionForm questionForm = QuestionForm.builder().build();
-
-		//when
-		String viewName = questionController.save(questionForm);
-
-		//then
-		assertThat(viewName).isEqualTo("question_form");
-	}
-
-	@DisplayName("질문 수정 GET 요청 성공 테스트")
-	@Test
-	void update_getUpdate_success() {
-	    //given
-		Member givenMember = Member.builder()
-			.id(1L)
-			.username("testMember")
-			.password("testPassword")
-			.email("testEmail")
-			.build();
-
-		Question givenQuestion = Question.builder()
-			.id(1L)
-			.content("testContent")
-			.subject("testSubject")
-			.author(givenMember)
-			.build();
-
-		QuestionForm givenQuestionForm = QuestionForm.builder()
-			.build();
-
-		given(questionService.findById(givenQuestion.id())).willReturn(givenQuestion);
-
-		//when
-		String viewName = questionController.update(givenQuestion.id(), givenQuestionForm, givenMember);
-
-		//then
-		assertThat(viewName).isEqualTo("question_form");
-		verify(questionService, times(1)).findById(givenQuestion.id());
-	}
-
-	@DisplayName("질문 생성 GET 요청시 작성자와 요청 사용자가 다를 때 실패 테스트")
-	@Test
-	void update_getUpdate_fail() {
-	    //given
-		Member givenMember = Member.builder()
-			.id(1L)
-			.username("testMember")
-			.password("testPassword")
-			.email("testEmail")
-			.build();
-
-		Member loginMember = Member.builder()
-			.id(2L)
-			.username("loginMember")
-			.password("loginPassword")
-			.email("loginEmail")
-			.build();
-
-		Question givenQuestion = Question.builder()
-			.id(1L)
-			.content("testContent")
-			.subject("testSubject")
-			.author(givenMember)
-			.build();
-
-		QuestionForm givenQuestionForm = QuestionForm.builder()
-			.build();
-
-		given(questionService.findById(givenQuestion.id())).willReturn(givenQuestion);
-
-		//then
-		assertThatThrownBy(() -> questionController.update(givenQuestion.id(), givenQuestionForm, loginMember))
-			.isInstanceOf(QuestionBusinessLogicException.class)
-			.hasMessage(QuestionErrorCode.UNAUTHORIZED.getMessage())
-			.extracting("message", "status")
-       	 	.containsExactly(QuestionErrorCode.UNAUTHORIZED.getMessage(), QuestionErrorCode.UNAUTHORIZED.getHttpStatus());
 	}
 
 	@DisplayName("질문 수정 성공 테스트")
@@ -402,10 +319,12 @@ public class QuestionControllerTest {
 		);
 
 		//when
-		String viewName = questionController.update(givenQuestion.id(), givenQuestionForm, bindingResult, givenMember);
+		ResponseEntity<GenericResponse<Void>> result = questionController.update(givenQuestion.id(), givenQuestionForm,
+			givenMember);
 
 		//then
-		assertThat(viewName).isEqualTo("redirect:/question/detail/" + givenQuestion.id());
+		assertThat(result.getBody().getData()).isNull();
+		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
 		verify(questionService, times(1)).findById(givenQuestion.id());
 		verify(questionService, times(1)).update(givenQuestion.id(), givenQuestionForm.subject(), givenQuestionForm.content(), givenMember);
 	}
@@ -443,15 +362,11 @@ public class QuestionControllerTest {
 			)
 		);
 
-		//when
-		String viewName = questionController.update(givenQuestion.id(), givenQuestionForm, bindingResult, givenMember);
-
 		//then
 		assertThat(bindingResult.hasErrors()).isTrue();
 		assertThat(bindingResult.getErrorCount()).isEqualTo(1);
 		assertThat(bindingResult.getFieldError("subject").getDefaultMessage())
 			.isEqualTo("제목은 필수 항목입니다.");
-		assertThat(viewName).isEqualTo("question_form");
 	}
 
 	@DisplayName("질문 수정시 내용이 비었을 때 실패 테스트")
@@ -487,15 +402,11 @@ public class QuestionControllerTest {
 			)
 		);
 
-		//when
-		String viewName = questionController.update(givenQuestion.id(), givenQuestionForm, bindingResult, givenMember);
-
 		//then
 		assertThat(bindingResult.hasErrors()).isTrue();
 		assertThat(bindingResult.getErrorCount()).isEqualTo(1);
 		assertThat(bindingResult.getFieldError("content").getDefaultMessage())
 			.isEqualTo("내용은 필수 항목입니다.");
-		assertThat(viewName).isEqualTo("question_form");
 	}
 
 	@DisplayName("질문 삭제 성공 테스트")

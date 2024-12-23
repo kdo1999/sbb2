@@ -31,6 +31,7 @@ import com.sbb2.question.domain.QuestionDetailResponse;
 import com.sbb2.question.domain.QuestionPageResponse;
 import com.sbb2.question.exception.QuestionBusinessLogicException;
 import com.sbb2.question.exception.QuestionErrorCode;
+import com.sbb2.question.service.response.QuestionCreateResponse;
 import com.sbb2.voter.domain.Voter;
 
 @ExtendWith(MockitoExtension.class)
@@ -69,12 +70,10 @@ public class QuestionServiceTest {
 			);
 
 		//when
-		Question savedQuestion = questionService.save("questionSubject", "questionContent", givenMember);
+		QuestionCreateResponse questionCreateResponse = questionService.save("questionSubject", "questionContent", givenMember);
 
 		//then
-		assertThat(savedQuestion.author()).isEqualTo(givenMember);
-		assertThat(savedQuestion.subject()).isEqualTo(questionSubject);
-		assertThat(savedQuestion.content()).isEqualTo(questionContent);
+		assertThat(questionCreateResponse.id()).isEqualTo(1L);
 	}
 
 	@DisplayName("질문 ID로 조회 성공 테스트")
