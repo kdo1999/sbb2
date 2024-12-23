@@ -67,9 +67,7 @@ public class QuestionController {
 	public String update(@PathVariable("id") Long id, QuestionForm questionForm, Member loginMember) {
 		Question findQuestion = questionService.findById(id);
 
-		if (!findQuestion.author().equals(loginMember)) {
-			throw new QuestionBusinessLogicException(QuestionErrorCode.UNAUTHORIZED);
-		}
+		authorEqualsLoginMember(loginMember, findQuestion);
 
 		QuestionForm questionForm1 = QuestionForm.builder()
 			.content(findQuestion.content())
@@ -88,12 +86,22 @@ public class QuestionController {
 
 		Question question = questionService.findById(id);
 
-		if (!question.author().equals(loginMember)) {
-			throw new QuestionBusinessLogicException(QuestionErrorCode.UNAUTHORIZED);
-		}
-
 		questionService.update(question.id(), questionForm.subject(), questionForm.content(), loginMember);
 
 		return String.format("redirect:/question/detail/%s", id);
+	}
+
+	@GetMapping("/delete/{id}")
+	public String delete(@PathVariable("id") Long id, Member loginMember) {
+
+		questionService.deleteById(id, loginMember);
+
+		return "redirect:/";
+	}
+
+	private void authorEqualsLoginMember(Member loginMember, Question question) {
+		if (!question.author().equals(loginMember)) {
+			throw new QuestionBusinessLogicException(QuestionErrorCode.UNAUTHORIZED);
+		}
 	}
 }
