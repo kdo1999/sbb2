@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.sbb2.answer.domain.Answer;
 import com.sbb2.answer.exception.AnswerBusinessLogicException;
 import com.sbb2.answer.exception.AnswerErrorCode;
+import com.sbb2.answer.service.response.AnswerCreateResponse;
 import com.sbb2.infrastructer.answer.repository.AnswerRepository;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
 import com.sbb2.member.domain.Member;
@@ -25,7 +26,7 @@ public class AnswerServiceImpl implements AnswerService {
 	private final AnswerRepository answerRepository;
 
 	@Override
-	public Answer save(Long questionId, String content, Member author) {
+	public AnswerCreateResponse save(Long questionId, String content, Member author) {
 		Question findQuestion = questionRepository.findById(questionId)
 			.orElseThrow(() -> new QuestionBusinessLogicException(QuestionErrorCode.NOT_FOUND));
 
@@ -35,7 +36,14 @@ public class AnswerServiceImpl implements AnswerService {
 			.author(author)
 			.build();
 
-		return answerRepository.save(answer);
+		Answer savedAnswer = answerRepository.save(answer);
+
+		return AnswerCreateResponse.builder()
+			.questionId(savedAnswer.question().id())
+			.answerId(savedAnswer.id())
+			.content(savedAnswer.content())
+			.author(savedAnswer.author().username())
+			.build();
 	}
 
 	@Override

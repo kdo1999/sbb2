@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.sbb2.answer.domain.Answer;
 import com.sbb2.answer.exception.AnswerBusinessLogicException;
 import com.sbb2.answer.exception.AnswerErrorCode;
+import com.sbb2.answer.service.response.AnswerCreateResponse;
 import com.sbb2.infrastructer.answer.repository.AnswerRepository;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
 import com.sbb2.member.domain.Member;
@@ -69,13 +70,12 @@ public class AnswerServiceTest {
 				.build());
 
 		//when
-		Answer savedAnswer = answerService.save(questionId, content, member);
+		AnswerCreateResponse savedAnswer = answerService.save(questionId, content, member);
 
 		//then
-		assertThat(savedAnswer.id()).isEqualTo(questionId);
+		assertThat(savedAnswer.questionId()).isEqualTo(questionId);
 		assertThat(savedAnswer.content()).isEqualTo(content);
-		assertThat(savedAnswer.author()).isEqualTo(member);
-		assertThat(savedAnswer.question()).isEqualTo(question);
+		assertThat(savedAnswer.author()).isEqualTo(member.username());
 	}
 
 	@DisplayName("답변 저장 질문 조회 실패 테스트")

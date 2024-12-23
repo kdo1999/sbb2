@@ -21,18 +21,4 @@ public record AnswerDetailResponse(Long id, String content, String username, Lon
 		this.voterCount = voterCount;
 		this.isVoter = isVoter;
 	}
-
-	@Override
-	public String toString() {
-		return "AnswerDetailResponse{" +
-			"id=" + id +
-			", content='" + content + '\'' +
-			", username='" + username + '\'' +
-			", questionId=" + questionId +
-			", createdAt=" + createdAt +
-			", modifiedAt=" + modifiedAt +
-			", voterCount=" + voterCount +
-			", isVoter=" + isVoter +
-			'}';
-	}
 }
