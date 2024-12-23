@@ -3,6 +3,8 @@ package com.sbb2.answer.controller;
 import java.net.URI;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,5 +31,12 @@ public class AnswerController {
 
 		return ResponseEntity.created(URI.create("/question/" + answerCreateResponse.questionId()))
 			.body(GenericResponse.of(answerCreateResponse));
+	}
+
+	@PatchMapping("/{id}")
+	public ResponseEntity<GenericResponse<Void>> update(@PathVariable("id") Long answerId, @Valid @RequestBody AnswerForm answerForm, Member loginMember) {
+		answerService.update(answerId, answerForm.content(), loginMember);
+
+		return ResponseEntity.ok(GenericResponse.of());
 	}
 }
