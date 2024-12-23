@@ -91,7 +91,36 @@ public class AnswerControllerTest {
 		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 	}
 
-	//TODO 답변 생성 유효성 검사
+	@DisplayName("답변 저장시 내용이 비었을 때 실패 테스트")
+	@Test
+	void save_answer_content_empty_fail() {
+	    //given
+		AnswerForm answerForm = AnswerForm.builder()
+			.questionId(1L)
+			.content("")
+			.build();
+
+		Member givenMember = Member.builder()
+			.id(1L)
+			.username("testMember")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
+
+		BindingResult bindingResult = new BeanPropertyBindingResult(answerForm, "answerForm");
+		validator.validate(answerForm).forEach(violation ->
+			bindingResult.rejectValue(
+				violation.getPropertyPath().toString(),
+				"error",
+				violation.getMessage()
+			)
+		);
+
+		//then
+		assertThat(bindingResult.hasErrors()).isTrue();
+		assertThat(bindingResult.getErrorCount()).isEqualTo(1);
+		assertThat(bindingResult.getFieldError("content").getDefaultMessage()).isEqualTo("답변 내용은 필수 항목입니다.");
+	}
 
 	//TODO 답변 수정 GET
 
