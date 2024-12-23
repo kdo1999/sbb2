@@ -3,6 +3,8 @@ package com.sbb2.voter.service;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,22 +13,30 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.sbb2.answer.domain.Answer;
+import com.sbb2.infrastructer.answer.repository.AnswerRepository;
+import com.sbb2.infrastructer.question.repository.QuestionRepository;
 import com.sbb2.infrastructer.voter.repository.VoterRepository;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
 import com.sbb2.voter.domain.Voter;
+import com.sbb2.voter.domain.VoterType;
 import com.sbb2.voter.exception.VoterBusinessLogicException;
 import com.sbb2.voter.exception.VoterErrorCode;
+import com.sbb2.voter.service.response.VoterCreateResponse;
 
 @ExtendWith(MockitoExtension.class)
 public class VoterServiceTest {
 	@Mock
 	private VoterRepository voterRepository;
+	@Mock
+	private QuestionRepository questionRepository;
+	@Mock
+	private AnswerRepository answerRepository;
 	private VoterService voterService;
 
 	@BeforeEach
 	void setUp() {
-		voterService = new VoterServiceImpl(voterRepository);
+		voterService = new VoterServiceImpl(voterRepository, questionRepository, answerRepository);
 	}
 
 	@DisplayName("질문 추천 성공 테스트")
@@ -52,13 +62,19 @@ public class VoterServiceTest {
 			.member(member)
 			.build();
 
+		VoterType voterType = VoterType.QUESTION;
 		given(voterRepository.save(voter)).willReturn(voter);
+		given(questionRepository.findById(question.id())).willReturn(Optional.of(question));
+		given(voterRepository.existsByQuestionIdAndMemberId(question.id(), member.id())).willReturn(false);
 
 		//when
-		Voter savedVoter = voterService.save(question, member);
+		VoterCreateResponse voterCreateResponse = voterService.save(question.id(), voterType, member);
 
 		//then
-		assertThat(savedVoter).isEqualTo(voter);
+		assertThat(voterCreateResponse.targetId()).isEqualTo(question.id());
+		assertThat(voterCreateResponse.voterType()).isEqualTo(voterType);
+		assertThat(voterCreateResponse.voterUsername()).isEqualTo(member.username());
+		assertThat(voterCreateResponse.isVoter()).isTrue();
 	}
 
 	@DisplayName("질문 추천 삭제 성공 테스트")
@@ -118,10 +134,12 @@ public class VoterServiceTest {
 			.member(member)
 			.build();
 
+		VoterType voterType = VoterType.QUESTION;
+
 		given(voterRepository.existsByQuestionIdAndMemberId(question.id(), member.id())).willReturn(true);
 
 	    //then
-		assertThatThrownBy(() -> voterService.save(question, member))
+		assertThatThrownBy(() -> voterService.save(question.id(), voterType, member))
 			.isInstanceOf(VoterBusinessLogicException.class)
 			.hasMessage(VoterErrorCode.DUPLICATE_VOTER.getMessage());
 	}
@@ -155,13 +173,20 @@ public class VoterServiceTest {
 			.member(member)
 			.build();
 
+		VoterType voterType = VoterType.ANSWER;
+
 		given(voterRepository.save(voter)).willReturn(voter);
+		given(answerRepository.findById(question.id())).willReturn(Optional.of(answer));
+		given(voterRepository.existsByAnswerIdAndMemberId(answer.id(), member.id())).willReturn(false);
 
-	    //when
-		Voter savedVoter = voterService.save(answer, member);
+		//when
+		VoterCreateResponse voterCreateResponse = voterService.save(answer.id(), voterType, member);
 
-	    //then
-	    assertThat(savedVoter).isEqualTo(voter);
+		//then
+		assertThat(voterCreateResponse.targetId()).isEqualTo(answer.id());
+		assertThat(voterCreateResponse.voterType()).isEqualTo(voterType);
+		assertThat(voterCreateResponse.voterUsername()).isEqualTo(member.username());
+		assertThat(voterCreateResponse.isVoter()).isTrue();
 	}
 
 	@DisplayName("답변 추천 삭제 성공 테스트")
