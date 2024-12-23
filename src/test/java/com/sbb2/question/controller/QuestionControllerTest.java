@@ -296,7 +296,7 @@ public class QuestionControllerTest {
 		assertThat(viewName).isEqualTo("question_form");
 	}
 
-	@DisplayName("질문 생성 GET 요청 성공 테스트")
+	@DisplayName("질문 수정 GET 요청 성공 테스트")
 	@Test
 	void update_getUpdate_success() {
 	    //given
@@ -365,8 +365,50 @@ public class QuestionControllerTest {
        	 	.containsExactly(QuestionErrorCode.UNAUTHORIZED.getMessage(), QuestionErrorCode.UNAUTHORIZED.getHttpStatus());
 	}
 
-	//TODO 질문 수정
+	@DisplayName("질문 수정 성공 테스트")
+	@Test
+	void update_question_success() {
+	    //given
+		Member givenMember = Member.builder()
+			.id(1L)
+			.username("testMember")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
 
+		Question givenQuestion = Question.builder()
+			.id(1L)
+			.content("testContent")
+			.subject("testSubject")
+			.author(givenMember)
+			.build();
+
+		QuestionForm givenQuestionForm = QuestionForm.builder()
+			.content("updateContent")
+			.subject("updateSubject")
+			.build();
+
+		given(questionService.findById(givenQuestion.id())).willReturn(givenQuestion);
+		given(questionService.update(givenQuestion.id(), givenQuestionForm.subject(), givenQuestionForm.content(), givenMember)).willReturn(givenQuestion);
+
+		BindingResult bindingResult = new BeanPropertyBindingResult(givenQuestionForm, "questionForm");
+
+		validator.validate(givenQuestionForm).forEach(violation ->
+			bindingResult.rejectValue(
+				violation.getPropertyPath().toString(),
+				"error",
+				violation.getMessage()
+			)
+		);
+
+		//when
+		String viewName = questionController.update(givenQuestion.id(), givenQuestionForm, bindingResult, givenMember);
+
+		//then
+		assertThat(viewName).isEqualTo("redirect:/question/detail/" + givenQuestion.id());
+		verify(questionService, times(1)).findById(givenQuestion.id());
+		verify(questionService, times(1)).update(givenQuestion.id(), givenQuestionForm.subject(), givenQuestionForm.content(), givenMember);
+	}
 
 	//TODO 질문 수정 유효성 검사
 
