@@ -168,5 +168,51 @@ public class VoterControllerTest {
 		assertThat(result.getBody().getData()).isEqualTo(voterCreateResponse);
 		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
 	}
-	//TODO 답변 추천 삭제 성공 테스트
+
+	@DisplayName("답변 추천 삭제 성공 테스트")
+	@Test
+	void delete_answer_success() {
+	     //given
+	    Member givenMember = Member.builder()
+			.id(1L)
+			.username("testMember")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
+
+		Question question = Question.builder()
+			.id(1L)
+			.subject("subject")
+			.content("content")
+			.author(givenMember)
+			.build();
+
+		Answer answer = Answer.builder()
+			.id(1L)
+			.content("testContent")
+			.author(givenMember)
+			.build();
+
+		Voter voter = Voter.builder()
+			.id(1L)
+			.answer(answer)
+			.member(givenMember)
+			.build();
+
+		answer.voterSet().add(voter);
+
+		VoterType voterType = VoterType.ANSWER;
+
+		doNothing().when(voterService).delete(answer.id(), voterType, givenMember);
+
+	    //when
+		ResponseEntity<GenericResponse<Void>> result = voterController.delete(answer.id(), voterType,
+			givenMember);
+
+		//then
+		assertThat(result.getBody().getData()).isNull();
+		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+		verify(voterService, times(1)).delete(answer.id(), voterType, givenMember);
+
+	}
 }
