@@ -17,11 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sbb2.common.response.GenericResponse;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.controller.request.QuestionForm;
-import com.sbb2.question.domain.Question;
 import com.sbb2.question.domain.QuestionDetailResponse;
 import com.sbb2.question.domain.QuestionPageResponse;
-import com.sbb2.question.exception.QuestionBusinessLogicException;
-import com.sbb2.question.exception.QuestionErrorCode;
 import com.sbb2.question.service.QuestionService;
 import com.sbb2.question.service.response.QuestionCreateResponse;
 
@@ -72,11 +69,5 @@ public class QuestionController {
 		questionService.deleteById(id, loginMember);
 
 		return ResponseEntity.ok().body(GenericResponse.of());
-	}
-
-	private void authorEqualsLoginMember(Member loginMember, Question question) {
-		if (!question.author().equals(loginMember)) {
-			throw new QuestionBusinessLogicException(QuestionErrorCode.UNAUTHORIZED);
-		}
 	}
 }
