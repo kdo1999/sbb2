@@ -498,7 +498,32 @@ public class QuestionControllerTest {
 		assertThat(viewName).isEqualTo("question_form");
 	}
 
-	//TODO 질문 삭제
+	@DisplayName("질문 삭제 성공 테스트")
+	@Test
+	void delete_question_success() {
+	    //given
+		Member givenMember = Member.builder()
+			.id(1L)
+			.username("testMember")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
+
+		Question givenQuestion = Question.builder()
+			.id(1L)
+			.content("testContent")
+			.subject("testSubject")
+			.author(givenMember)
+			.build();
+		doNothing().when(questionService).deleteById(givenQuestion.id(), givenMember);
+
+	    //when
+		String viewName = questionController.delete(givenQuestion.id(), givenMember);
+
+		//then
+		assertThat(viewName).isEqualTo("redirect:/");
+		verify(questionService, times(1)).deleteById(givenQuestion.id(), givenMember);
+	}
 
 	//TODO 질문 추천
 
