@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import com.sbb2.common.response.GenericResponse;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
+import com.sbb2.voter.domain.Voter;
 import com.sbb2.voter.domain.VoterType;
 import com.sbb2.voter.service.VoterService;
 import com.sbb2.voter.service.response.VoterCreateResponse;
@@ -79,7 +80,47 @@ public class VoterControllerTest {
 		assertThat(result.getBody().getData()).isEqualTo(voterCreateResponse);
 		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
 	}
-	//TODO 질문 추천 삭제 성공 테스트
+
+	@DisplayName("질문 추천 삭제 성공 테스트")
+	@Test
+	void delete_question_success() {
+	     //given
+	    Member givenMember = Member.builder()
+			.id(1L)
+			.username("testMember")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
+
+		Question question = Question.builder()
+			.id(1L)
+			.subject("subject")
+			.content("content")
+			.author(givenMember)
+			.build();
+
+		Voter voter = Voter.builder()
+			.id(1L)
+			.question(question)
+			.member(givenMember)
+			.build();
+
+		question.voterSet().add(voter);
+
+		VoterType voterType = VoterType.QUESTION;
+
+		doNothing().when(voterService).delete(question.id(), voterType, givenMember);
+
+	    //when
+		ResponseEntity<GenericResponse<Void>> result = voterController.delete(question.id(), voterType,
+			givenMember);
+
+		//then
+		assertThat(result.getBody().getData()).isNull();
+		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+		verify(voterService, times(1)).delete(question.id(), voterType, givenMember);
+
+	}
 	//TODO 답변 추천 성공 테스트
 	//TODO 답변 추천 삭제 성공 테스트
 }
