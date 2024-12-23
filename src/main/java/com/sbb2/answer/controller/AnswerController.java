@@ -3,6 +3,7 @@ package com.sbb2.answer.controller;
 import java.net.URI;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,5 +39,12 @@ public class AnswerController {
 		answerService.update(answerId, answerForm.content(), loginMember);
 
 		return ResponseEntity.ok(GenericResponse.of());
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<GenericResponse<Void>> delete(@PathVariable("id") Long answerId, Member loginMember) {
+		answerService.deleteById(answerId, loginMember);
+
+		return ResponseEntity.ok().body(GenericResponse.of());
 	}
 }
