@@ -28,22 +28,26 @@ public class AnswerController {
 	private final AnswerService answerService;
 
 	@PostMapping
-	public ResponseEntity<GenericResponse<AnswerCreateResponse>> save(@Valid @RequestBody AnswerForm answerForm, @AuthenticationPrincipal MemberUserDetails loginMember) {
-		AnswerCreateResponse answerCreateResponse = answerService.save(answerForm.questionId(), answerForm.content(), loginMember.getMember());
+	public ResponseEntity<GenericResponse<AnswerCreateResponse>> save(@Valid @RequestBody AnswerForm answerForm,
+		@AuthenticationPrincipal MemberUserDetails loginMember) {
+		AnswerCreateResponse answerCreateResponse = answerService.save(answerForm.questionId(), answerForm.content(),
+			loginMember.getMember());
 
 		return ResponseEntity.created(URI.create("/question/" + answerCreateResponse.questionId()))
 			.body(GenericResponse.of(answerCreateResponse));
 	}
 
 	@PatchMapping("/{id}")
-	public ResponseEntity<GenericResponse<Void>> update(@PathVariable("id") Long answerId, @Valid @RequestBody AnswerForm answerForm, @AuthenticationPrincipal MemberUserDetails loginMember) {
+	public ResponseEntity<GenericResponse<Void>> update(@PathVariable("id") Long answerId,
+		@Valid @RequestBody AnswerForm answerForm, @AuthenticationPrincipal MemberUserDetails loginMember) {
 		answerService.update(answerId, answerForm.content(), loginMember.getMember());
 
 		return ResponseEntity.ok(GenericResponse.of());
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<GenericResponse<Void>> delete(@PathVariable("id") Long answerId, @AuthenticationPrincipal MemberUserDetails loginMember) {
+	public ResponseEntity<GenericResponse<Void>> delete(@PathVariable("id") Long answerId,
+		@AuthenticationPrincipal MemberUserDetails loginMember) {
 		answerService.deleteById(answerId, loginMember.getMember());
 
 		return ResponseEntity.ok().body(GenericResponse.of());
