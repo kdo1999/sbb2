@@ -299,7 +299,7 @@ public class VoterServiceTest {
 		VoterType voterType = VoterType.ANSWER;
 		answer.voterSet().add(voter);
 
-		given(answerRepository.findById(answer.id())).willReturn(Optional.of(answer));
+		given(voterRepository.findByAnswerIdAndMemberId(answer.id(), member.id())).willReturn(Optional.of(voter));
 		doNothing().when(voterRepository).deleteById(voter.id());
 
 		//when
@@ -308,6 +308,41 @@ public class VoterServiceTest {
 		//then
 		verify(voterRepository, times(1)).deleteById(voter.id());
 	}
+
+	@DisplayName("답변 추천 삭제시 조회 실패 테스트")
+	@Test
+	void delete_answer_voter_not_found_fail() {
+		//given
+		Member member = Member.builder()
+			.id(1L)
+			.username("testUsername")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
+
+		Question question = Question.builder()
+			.id(1L)
+			.subject("testSubject")
+			.content("testContent")
+			.author(member)
+			.build();
+
+		Answer answer = Answer.builder()
+			.id(1L)
+			.content("testContent")
+			.author(member)
+			.build();
+
+		VoterType voterType = VoterType.ANSWER;
+
+		given(voterRepository.findByAnswerIdAndMemberId(answer.id(), member.id())).willReturn(Optional.empty());
+
+		//when & then
+		assertThatThrownBy(() -> voterService.delete(answer.id(), voterType, member))
+			.isInstanceOf(VoterBusinessLogicException.class)
+			.hasMessage(VoterErrorCode.NOT_FOUND.getMessage());
+	}
+
 
 	@DisplayName("추천 타입이 일치하는게 없을 때 실패 테스트")
 	@Test
