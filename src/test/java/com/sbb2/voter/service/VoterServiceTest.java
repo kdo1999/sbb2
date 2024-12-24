@@ -272,4 +272,41 @@ public class VoterServiceTest {
 		//then
 		verify(voterRepository, times(1)).deleteById(voter.id());
 	}
+
+	@DisplayName("추천 타입이 일치하는게 없을 때 실패 테스트")
+	@Test
+	void save_voterType_not_match_fail() {
+	    //given
+		Member member = Member.builder()
+			.id(1L)
+			.username("testUsername")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
+
+		Question question = Question.builder()
+			.id(1L)
+			.subject("testSubject")
+			.content("testContent")
+			.author(member)
+			.build();
+
+		Answer answer = Answer.builder()
+			.id(1L)
+			.author(member)
+			.question(question)
+			.build();
+
+		Voter voter = Voter.builder()
+			.answer(answer)
+			.member(member)
+			.build();
+
+		VoterType voterType = null;
+
+	    //then
+		assertThatThrownBy(() -> voterService.save(question.id(), voterType, member))
+			.isInstanceOf(VoterBusinessLogicException.class)
+			.hasMessage(VoterErrorCode.NOT_VOTER_TYPE.getMessage());
+	}
 }
