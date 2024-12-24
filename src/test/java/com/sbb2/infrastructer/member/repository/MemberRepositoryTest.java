@@ -92,6 +92,29 @@ public class MemberRepositoryTest {
 		assertThat(findMember).isEqualTo(savedMember);
 	}
 
+	@DisplayName("회원 이메일 조회 성공 테스트")
+	@Test
+	void find_email_member() {
+		//given
+		String username = "findUsername";
+		String password = "testPassword";
+		String email = "testEmail";
+
+		Member member = Member.builder()
+			.username(username)
+			.password(password)
+			.email(email)
+			.build();
+
+		Member savedMember = memberRepository.save(member);
+
+		//when
+		Member findMember = memberRepository.findByEmail(savedMember.email()).get();
+
+		//then
+		assertThat(findMember).isEqualTo(savedMember);
+	}
+
 	@Test
 	@DisplayName("동일한 이메일의 데이터가 존재하는 성공 테스트")
 	void exists_email_success() {
