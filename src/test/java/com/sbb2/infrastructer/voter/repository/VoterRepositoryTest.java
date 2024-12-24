@@ -210,7 +210,7 @@ public class VoterRepositoryTest {
 	    assertThat(findVoter).isEqualTo(savedVoter);
 	}
 
-	@DisplayName("댓글 추천 성공 테스트")
+	@DisplayName("답변 추천 성공 테스트")
 	@Test
 	void save_answer_voter_success() {
 	    //given
@@ -230,7 +230,7 @@ public class VoterRepositoryTest {
 		assertThat(savedVoter.member()).isEqualTo(findMember);
 	}
 
-	@DisplayName("댓글 ID로 조회 성공 테스트")
+	@DisplayName("답변 ID로 조회 성공 테스트")
 	@Test
 	void find_answerId_voter_success() {
 	    //given
@@ -260,7 +260,36 @@ public class VoterRepositoryTest {
 		assertThat(findVoterList.get(0)).isNotEqualTo(savedVoter2);
 	}
 
-	@DisplayName("댓글 ID와 멤버 ID가 일치하는 추천 조회가 됐을 때 테스트")
+	@DisplayName("질문ID와 회원ID로 추천 조회 성공 테스트")
+	@Test
+	void find_answerId_and_memberId_voter_success() {
+	    //given
+		Answer findAnswer1 = answerRepository.findById(1L).get();
+		Answer findAnswer2 = answerRepository.findById(2L).get();
+		Member findMember1 = memberRepository.findById(1L).get();
+		Member findMember2 = memberRepository.findById(2L).get();
+
+		Voter voter1 = Voter.builder()
+			.answer(findAnswer1)
+			.member(findMember1)
+			.build();
+
+		Voter voter2 = Voter.builder()
+			.answer(findAnswer2)
+			.member(findMember1)
+			.build();
+
+		Voter savedVoter1 = voterRepository.save(voter1);
+		Voter savedVoter2 = voterRepository.save(voter2);
+
+		//when
+		Voter findVoter = voterRepository.findByAnswerIdAndMemberId(findAnswer1.id(), findMember1.id()).get();
+
+		//then
+	    assertThat(findVoter).isEqualTo(savedVoter1);
+	}
+
+	@DisplayName("답변 ID와 멤버 ID가 일치하는 추천 데이터가 있을 때 테스트")
 	@Test
 	void exists_answerId_memberId_voter_success() {
 	    //given
