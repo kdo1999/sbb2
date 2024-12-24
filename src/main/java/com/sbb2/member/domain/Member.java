@@ -4,14 +4,15 @@ import java.util.Objects;
 
 import lombok.Builder;
 
-public record Member(Long id, String email, String username, String password) {
+public record Member(Long id, String email, String username, String password, MemberRole memberRole) {
 
 	@Builder
-	public Member(Long id, String email, String username, String password) {
+	public Member(Long id, String email, String username, String password, MemberRole memberRole) {
 		this.id = id;
 		this.email = email;
 		this.username = username;
 		this.password = password;
+		this.memberRole = memberRole;
 	}
 
 	@Override
