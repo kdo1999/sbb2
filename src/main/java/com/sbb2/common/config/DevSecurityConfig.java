@@ -113,7 +113,7 @@ public class DevSecurityConfig {
 
 		jwtFilter.addUriPattern(HttpMethod.POST, "/api/v1/question", "/api/v1/answer", "/api/v1/voter/*")
 			.addUriPattern(HttpMethod.PATCH, "/api/v1/question/*", "/api/v1/answer/*")
-			.addUriPattern(HttpMethod.DELETE, "/api/v1/question/*", "/api/v1/answer/*", "/api/v1/voter/*")
+			.addUriPattern(HttpMethod.DELETE, "/api/v1/question/*", "/api/v1/answer/*", "/api/v1/voter/*");
 		return jwtFilter;
 	}
 }
