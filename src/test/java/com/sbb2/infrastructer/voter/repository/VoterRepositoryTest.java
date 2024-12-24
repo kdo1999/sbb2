@@ -174,7 +174,6 @@ public class VoterRepositoryTest {
 	    //given
 	    Member member = memberRepository.findById(1L).get();
 		Question findQuestion1 = questionRepository.findById(1L).get();
-		Question findQuestion2 = questionRepository.findById(2L).get();
 
 		Voter voter1 = Voter.builder()
 			.question(findQuestion1)
