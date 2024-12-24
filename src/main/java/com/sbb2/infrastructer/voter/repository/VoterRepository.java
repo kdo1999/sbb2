@@ -14,6 +14,8 @@ public interface VoterRepository {
 
 	Optional<Voter> findByQuestionIdAndMemberId(Long questionId, Long memberId);
 
+	Optional<Voter> findByAnswerIdAndMemberId(Long answerId, Long memberId);
+
 	void deleteById(Long voterId);
 
 	Optional<Voter> findById(Long voterId);

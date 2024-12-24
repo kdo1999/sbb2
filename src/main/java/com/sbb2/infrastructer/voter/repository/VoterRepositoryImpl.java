@@ -38,6 +38,11 @@ public class VoterRepositoryImpl implements VoterRepository {
 	}
 
 	@Override
+	public Optional<Voter> findByAnswerIdAndMemberId(Long answerId, Long memberId) {
+		return voterJpaRepository.findByAnswerIdAndMemberId(answerId, memberId).map(VoterEntity::toModel);
+	}
+
+	@Override
 	public void deleteById(Long voterId) {
 		voterJpaRepository.deleteById(voterId);
 	}
