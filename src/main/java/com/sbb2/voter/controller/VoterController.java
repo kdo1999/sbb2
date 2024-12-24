@@ -1,5 +1,6 @@
 package com.sbb2.voter.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,7 +29,8 @@ public class VoterController {
 		@RequestParam VoterType voterType, @AuthenticationPrincipal MemberUserDetails loginMember) {
 		VoterCreateResponse voterCreateResponse = voterService.save(id, voterType, loginMember.getMember());
 
-		return ResponseEntity.ok().body(GenericResponse.of(voterCreateResponse));
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(GenericResponse.of(voterCreateResponse));
 	}
 
 	@DeleteMapping("/{id}")

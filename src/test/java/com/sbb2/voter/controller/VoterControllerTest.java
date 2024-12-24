@@ -82,7 +82,7 @@ public class VoterControllerTest {
 
 		//then
 		assertThat(result.getBody().getData()).isEqualTo(voterCreateResponse);
-		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 	}
 
 	@DisplayName("질문 추천 삭제 성공 테스트")
@@ -173,7 +173,7 @@ public class VoterControllerTest {
 
 		//then
 		assertThat(result.getBody().getData()).isEqualTo(voterCreateResponse);
-		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 	}
 
 	@DisplayName("답변 추천 삭제 성공 테스트")
