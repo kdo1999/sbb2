@@ -104,7 +104,7 @@ public class VoterServiceTest {
 		VoterType voterType = VoterType.QUESTION;
 		question.voterSet().add(voter);
 
-		given(questionRepository.findById(question.id())).willReturn(Optional.of(question));
+		given(voterRepository.findByQuestionIdAndMemberId(question.id(), member.id())).willReturn(Optional.of(voter));
 		doNothing().when(voterRepository).deleteById(voter.id());
 
 		//when

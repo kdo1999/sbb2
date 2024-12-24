@@ -97,12 +97,7 @@ public class VoterServiceImpl implements VoterService {
 	}
 
 	private void deleteQuestion(Long questionId, Member member) {
-		Question findQuestion = questionRepository.findById(questionId)
-			.orElseThrow(() -> new QuestionBusinessLogicException(QuestionErrorCode.NOT_FOUND));
-
-		Voter findVoter = findQuestion.voterSet().stream()
-			.filter(voter -> member.id().equals(voter.member().id()))
-			.findFirst()
+		Voter findVoter = voterRepository.findByQuestionIdAndMemberId(questionId, member.id())
 			.orElseThrow(() -> new VoterBusinessLogicException(VoterErrorCode.NOT_FOUND));
 
 		voterRepository.deleteById(findVoter.id());
