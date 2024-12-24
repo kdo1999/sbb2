@@ -146,7 +146,7 @@ public class VoterServiceTest {
 			.hasMessage(VoterErrorCode.DUPLICATE_VOTER.getMessage());
 	}
 
-	@DisplayName("댓글 추천 성공 테스트")
+	@DisplayName("답변 추천 성공 테스트")
 	@Test
 	void save_answer_voter_success() {
 	    //given
@@ -189,6 +189,45 @@ public class VoterServiceTest {
 		assertThat(voterCreateResponse.voterType()).isEqualTo(voterType);
 		assertThat(voterCreateResponse.voterUsername()).isEqualTo(member.username());
 		assertThat(voterCreateResponse.isVoter()).isTrue();
+	}
+
+	@DisplayName("답변 중복 추천 방지 성공 테스트")
+	@Test
+	void prevent_duplicate_answer_voter_success() {
+	    //given
+		Member member = Member.builder()
+			.id(1L)
+			.username("testUsername")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
+
+		Question question = Question.builder()
+			.id(1L)
+			.subject("testSubject")
+			.content("testContent")
+			.author(member)
+			.build();
+
+		Answer answer = Answer.builder()
+			.id(1L)
+			.author(member)
+			.question(question)
+			.build();
+
+		Voter voter = Voter.builder()
+			.answer(answer)
+			.member(member)
+			.build();
+
+		VoterType voterType = VoterType.ANSWER;
+
+		given(voterRepository.existsByAnswerIdAndMemberId(answer.id(), member.id())).willReturn(true);
+
+	    //then
+		assertThatThrownBy(() -> voterService.save(question.id(), voterType, member))
+			.isInstanceOf(VoterBusinessLogicException.class)
+			.hasMessage(VoterErrorCode.DUPLICATE_VOTER.getMessage());
 	}
 
 	@DisplayName("답변 추천 삭제 성공 테스트")
