@@ -170,6 +170,43 @@ public class QuestionServiceTest {
 		assertThat(updateQuestion.content()).isEqualTo(questionForm.content());
 	}
 
+	@DisplayName("질문 수정시 작성자가 아닐 때 실패 테스트")
+	@Test
+	void update_author_loginMember_not_match_fail() {
+		//given
+		QuestionForm questionForm = QuestionForm.builder()
+			.subject("updateSubject")
+			.content("updateContent")
+			.build();
+
+		Member givenMember = Member.builder()
+			.id(1L)
+			.username("testMember")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
+
+		Member givenMember2 = Member.builder()
+			.id(2L)
+			.username("testMember2")
+			.password("testPassword2")
+			.email("testEmail2")
+			.build();
+
+		given(questionRepository.findById(any(Long.class)))
+			.willReturn(Optional.of(Question.builder()
+				.id(1L)
+				.subject("subject")
+				.content("content")
+				.author(givenMember)
+				.build()));
+
+		//when & then
+		assertThatThrownBy(() -> questionService.update(1L, questionForm.subject(), questionForm.content(), givenMember2))
+			.isInstanceOf(QuestionBusinessLogicException.class)
+			.hasMessage(QuestionErrorCode.UNAUTHORIZED.getMessage());
+	}
+
 	@DisplayName("질문 수정시 조회 실패 테스트")
 	@Test
 	void update_find_question_fail() {
