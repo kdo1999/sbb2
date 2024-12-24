@@ -1,45 +1,57 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.4.0'
-	id 'io.spring.dependency-management' version '1.1.6'
-	id 'jacoco'
+    id 'java'
+    id 'org.springframework.boot' version '3.4.0'
+    id 'io.spring.dependency-management' version '1.1.6'
+    id 'jacoco'
 }
 
 group = 'com'
 version = '0.0.1-SNAPSHOT'
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
-	}
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'com.mysql:mysql-connector-j:9.1.0'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'com.querydsl:querydsl-jpa:5.1.0:jakarta'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'com.querydsl:querydsl-jpa:5.1.0:jakarta'
     annotationProcessor "com.querydsl:querydsl-apt:5.1.0:jakarta"
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
-	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'com.h2database:h2'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    //Spring Security 추가
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    //jwt 0.12.3
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+
+    // spring-redis-data 라이브러리
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'com.h2database:h2'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 test {
@@ -64,21 +76,21 @@ jacocoTestReport {
         html.required.set(true)
     }
     classDirectories.setFrom(
-        files(classDirectories.files.collect {
-            fileTree(it) {
-                exclude(
-                    'Q*Entity.class',
-                    '**/advice/**',
-                    '**/common/**',
-                    '**/response/**',
-                    '**/request/**',
-                    '**/entity/**',
-                    '**/domain/**',
-                    '**/Sbb2Application.class',
-                    '**/exception/**'
-                )
-            }
-        })
+            files(classDirectories.files.collect {
+                fileTree(it) {
+                    exclude(
+                            'Q*Entity.class',
+                            '**/advice/**',
+                            '**/common/**',
+                            '**/response/**',
+                            '**/request/**',
+                            '**/entity/**',
+                            '**/domain/**',
+                            '**/Sbb2Application.class',
+                            '**/exception/**'
+                    )
+                }
+            })
     )
 }
 
