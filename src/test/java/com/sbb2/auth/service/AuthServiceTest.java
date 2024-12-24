@@ -76,4 +76,21 @@ public class AuthServiceTest {
 			.isInstanceOf(MemberBusinessLoginException.class)
 			.hasMessage(MemberErrorCode.EXISTS_EMAIL.getMessage());
 	}
+
+	@DisplayName("회원가입시 username 중복 실패 테스트")
+	@Test
+	void signup_exists_username_fail() {
+	    //given
+		String email = "testEmail@naver.com";
+		String username = "testUsername";
+		String password = "testPassword";
+
+		given(memberRepository.existsByEmail(email)).willReturn(false);
+		given(memberRepository.existsByUsername(username)).willReturn(true);
+
+	    //when & then
+		assertThatThrownBy(() -> authService.signup(email, username, password))
+			.isInstanceOf(MemberBusinessLoginException.class)
+			.hasMessage(MemberErrorCode.EXISTS_USERNAME.getMessage());
+	}
 }
