@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,12 +15,17 @@ import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sbb2.common.auth.filter.JwtFilter;
+import com.sbb2.common.auth.service.MemberDetailsService;
+import com.sbb2.common.jwt.JwtUtil;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,8 +36,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DevSecurityConfig {
 	private final ObjectMapper objectMapper;
-	// private final JwtUtil jwtUtil;
-	// private final MemberDetailsService memberDetailsService;
+	private final JwtUtil jwtUtil;
+	private final MemberDetailsService memberDetailsService;
 
 	@Bean
 	public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -49,6 +55,16 @@ public class DevSecurityConfig {
             .permitAll()
             .requestMatchers("/", "/docs/**", "/error")
             .permitAll()
+			.requestMatchers(HttpMethod.POST, "/api/v1/question", "/api/v1/answer")
+			.hasRole("USER")
+			.requestMatchers(HttpMethod.PATCH, "/api/v1/question/{id}", "/api/v1/answer/{id}")
+			.hasRole("USER")
+			.requestMatchers(HttpMethod.DELETE, "/api/v1/question/{id}", "/api/v1/answer/{id}")
+			.hasRole("USER")
+			.requestMatchers(HttpMethod.POST, "/api/v1/voter/{id}")
+			.hasRole("USER")
+			.requestMatchers(HttpMethod.DELETE, "/api/v1/voter/{id}")
+			.hasRole("USER")
             .anyRequest()
             .authenticated()
         )
@@ -57,6 +73,8 @@ public class DevSecurityConfig {
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         );
+		httpSecurity
+			.addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class);
 		return httpSecurity.build();
 	}
 
@@ -98,5 +116,12 @@ public class DevSecurityConfig {
 	@Bean
 	public AntPathMatcher antPathMatcher() {
 		return new AntPathMatcher();
+	}
+
+	public OncePerRequestFilter jwtFilter() {
+		JwtFilter jwtFilter = new JwtFilter(jwtUtil, objectMapper, memberDetailsService, antPathMatcher());
+
+		jwtFilter.addUriPattern(HttpMethod.POST, "/api/v1/question");
+		return jwtFilter;
 	}
 }

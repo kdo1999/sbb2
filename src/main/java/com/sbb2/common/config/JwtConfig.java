@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.sbb2.common.jwt.JwtUtil;
-import com.sbb2.redis.service.RedisService;
+import com.sbb2.common.redis.service.RedisService;
 
 @Configuration
 public class JwtConfig {

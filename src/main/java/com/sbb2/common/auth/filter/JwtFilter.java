@@ -123,6 +123,8 @@ public class JwtFilter extends OncePerRequestFilter {
 			message,
 			ErrorDetail.of(Collections.emptyList()));
 
+		response.setCharacterEncoding("UTF-8");
+    	response.setContentType("application/json;charset=UTF-8");
 		response.getWriter().write(objectMapper.writeValueAsString(httpErrorInfo));
 		response.setStatus(httpErrorInfo.code());
 	}
@@ -141,12 +143,13 @@ public class JwtFilter extends OncePerRequestFilter {
 	 * @param httpMethod
 	 * @param uri
 	 */
-	public void addUriPattern(HttpMethod httpMethod, String... uri) {
+	public JwtFilter addUriPattern(HttpMethod httpMethod, String... uri) {
 		List<String> uriPattern = this.uriPattern.get(httpMethod);
 		uriPattern.addAll(Arrays.asList(uri));
 		List<String> strings = this.uriPattern.get(httpMethod);
 		for (String string : strings) {
 			log.info("jwtFilter test={}", string);
 		}
+		return this;
 	}
 }

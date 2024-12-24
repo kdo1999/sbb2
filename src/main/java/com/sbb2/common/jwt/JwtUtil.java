@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.sbb2.auth.service.response.MemberLoginResponse;
 import com.sbb2.common.jwt.exception.JwtTokenBusinessLogicException;
 import com.sbb2.common.jwt.exception.JwtTokenErrorCode;
-import com.sbb2.redis.service.RedisService;
+import com.sbb2.common.redis.service.RedisService;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
