@@ -27,6 +27,7 @@ import org.springframework.validation.BindingResult;
 
 import com.sbb2.answer.domain.Answer;
 import com.sbb2.answer.domain.AnswerDetailResponse;
+import com.sbb2.common.auth.userdetails.MemberUserDetails;
 import com.sbb2.common.response.GenericResponse;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.controller.request.QuestionForm;
@@ -156,12 +157,14 @@ public class QuestionControllerTest {
 			.modifiedAt(LocalDateTime.now())
 			.build();
 
+		MemberUserDetails member = new MemberUserDetails(givenMember);
+
 		given(questionService.findDetailById(question.id(), givenMember))
 			.willReturn(questionDetailResponse);
 
 		//when
 		ResponseEntity<GenericResponse<QuestionDetailResponse>> result = questionController.findDetailById(
-			question.id(), givenMember);
+			question.id(), member);
 
 		//then
 		QuestionDetailResponse data = result.getBody().getData();
@@ -186,6 +189,8 @@ public class QuestionControllerTest {
 			.email("testEmail")
 			.build();
 
+		MemberUserDetails member = new MemberUserDetails(givenMember);
+
 		BindingResult bindingResult = new BeanPropertyBindingResult(questionForm, "questionForm");
 		validator.validate(questionForm).forEach(violation ->
 			bindingResult.rejectValue(
@@ -201,7 +206,7 @@ public class QuestionControllerTest {
 
 		//when
 		ResponseEntity<GenericResponse<QuestionCreateResponse>> result = questionController.save(questionForm,
-			givenMember);
+			member);
 
 		//then
 		QuestionCreateResponse data = result.getBody().getData();
@@ -299,6 +304,8 @@ public class QuestionControllerTest {
 			.subject("updateSubject")
 			.build();
 
+		MemberUserDetails member = new MemberUserDetails(givenMember);
+
 		given(questionService.update(givenQuestion.id(), givenQuestionForm.subject(), givenQuestionForm.content(), givenMember)).willReturn(givenQuestion);
 
 		BindingResult bindingResult = new BeanPropertyBindingResult(givenQuestionForm, "questionForm");
@@ -313,7 +320,7 @@ public class QuestionControllerTest {
 
 		//when
 		ResponseEntity<GenericResponse<Void>> result = questionController.update(givenQuestion.id(), givenQuestionForm,
-			givenMember);
+			member);
 
 		//then
 		assertThat(result.getBody().getData()).isNull();
@@ -418,10 +425,13 @@ public class QuestionControllerTest {
 			.subject("testSubject")
 			.author(givenMember)
 			.build();
+
+		MemberUserDetails member = new MemberUserDetails(givenMember);
+
 		doNothing().when(questionService).deleteById(givenQuestion.id(), givenMember);
 
 	    //when
-		ResponseEntity<GenericResponse<Void>> result = questionController.delete(givenQuestion.id(), givenMember);
+		ResponseEntity<GenericResponse<Void>> result = questionController.delete(givenQuestion.id(), member);
 
 		//then
 		assertThat(result.getBody().getData()).isNull();

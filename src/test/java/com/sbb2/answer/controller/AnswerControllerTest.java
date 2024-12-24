@@ -21,6 +21,7 @@ import com.sbb2.answer.controller.request.AnswerForm;
 import com.sbb2.answer.domain.Answer;
 import com.sbb2.answer.service.AnswerService;
 import com.sbb2.answer.service.response.AnswerCreateResponse;
+import com.sbb2.common.auth.userdetails.MemberUserDetails;
 import com.sbb2.common.response.GenericResponse;
 import com.sbb2.member.domain.Member;
 
@@ -62,6 +63,8 @@ public class AnswerControllerTest {
 			.email("testEmail")
 			.build();
 
+		MemberUserDetails member = new MemberUserDetails(givenMember);
+
 		BindingResult bindingResult = new BeanPropertyBindingResult(answerForm, "answerForm");
 		validator.validate(answerForm).forEach(violation ->
 			bindingResult.rejectValue(
@@ -83,7 +86,7 @@ public class AnswerControllerTest {
 
 		//when
 		ResponseEntity<GenericResponse<AnswerCreateResponse>> result = answerController.save(answerForm,
-			givenMember);
+			member);
 
 		//then
 		AnswerCreateResponse data = result.getBody().getData();
@@ -139,6 +142,8 @@ public class AnswerControllerTest {
 			.email("testEmail")
 			.build();
 
+		MemberUserDetails member = new MemberUserDetails(givenMember);
+
 		given(answerService.update(1L, answerForm.content(), givenMember))
 			.willReturn(Answer.builder()
 				.id(1L)
@@ -146,7 +151,7 @@ public class AnswerControllerTest {
 				.build());
 
 		//when
-		ResponseEntity<GenericResponse<Void>> result = answerController.update(1L, answerForm, givenMember);
+		ResponseEntity<GenericResponse<Void>> result = answerController.update(1L, answerForm, member);
 
 		//then
 		assertThat(result.getBody().getData()).isNull();
@@ -165,9 +170,12 @@ public class AnswerControllerTest {
 			.email("testEmail")
 			.build();
 
+		MemberUserDetails member = new MemberUserDetails(givenMember);
+
 		doNothing().when(answerService).deleteById(1L, givenMember);
+
 		//when
-		ResponseEntity<GenericResponse<Void>> result = answerController.delete(1L, givenMember);
+		ResponseEntity<GenericResponse<Void>> result = answerController.delete(1L, member);
 
 		//then
 		assertThat(result.getBody().getData()).isNull();

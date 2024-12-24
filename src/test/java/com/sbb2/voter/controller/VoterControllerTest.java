@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.sbb2.answer.domain.Answer;
+import com.sbb2.common.auth.userdetails.MemberUserDetails;
 import com.sbb2.common.response.GenericResponse;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
@@ -70,12 +71,14 @@ public class VoterControllerTest {
 			.isVoter(true)
 			.build();
 
+		MemberUserDetails member = new MemberUserDetails(givenMember);
+
 		given(voterService.save(question.id(), voterType, givenMember))
 			.willReturn(voterCreateResponse);
 
 	    //when
 		ResponseEntity<GenericResponse<VoterCreateResponse>> result = voterController.save(question.id(), voterType,
-			givenMember);
+			member);
 
 		//then
 		assertThat(result.getBody().getData()).isEqualTo(voterCreateResponse);
@@ -108,13 +111,15 @@ public class VoterControllerTest {
 
 		question.voterSet().add(voter);
 
+		MemberUserDetails member = new MemberUserDetails(givenMember);
+
 		VoterType voterType = VoterType.QUESTION;
 
 		doNothing().when(voterService).delete(question.id(), voterType, givenMember);
 
 	    //when
 		ResponseEntity<GenericResponse<Void>> result = voterController.delete(question.id(), voterType,
-			givenMember);
+			member);
 
 		//then
 		assertThat(result.getBody().getData()).isNull();
@@ -149,6 +154,8 @@ public class VoterControllerTest {
 
 		VoterType voterType = VoterType.QUESTION;
 
+		MemberUserDetails member = new MemberUserDetails(givenMember);
+
 		VoterCreateResponse voterCreateResponse = VoterCreateResponse.builder()
 			.voterId(1L)
 			.voterUsername(givenMember.username())
@@ -162,7 +169,7 @@ public class VoterControllerTest {
 
 	    //when
 		ResponseEntity<GenericResponse<VoterCreateResponse>> result = voterController.save(answer.id(), voterType,
-			givenMember);
+			member);
 
 		//then
 		assertThat(result.getBody().getData()).isEqualTo(voterCreateResponse);
@@ -201,13 +208,15 @@ public class VoterControllerTest {
 
 		answer.voterSet().add(voter);
 
+		MemberUserDetails member = new MemberUserDetails(givenMember);
+
 		VoterType voterType = VoterType.ANSWER;
 
 		doNothing().when(voterService).delete(answer.id(), voterType, givenMember);
 
 	    //when
 		ResponseEntity<GenericResponse<Void>> result = voterController.delete(answer.id(), voterType,
-			givenMember);
+			member);
 
 		//then
 		assertThat(result.getBody().getData()).isNull();
