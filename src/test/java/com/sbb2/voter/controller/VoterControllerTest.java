@@ -77,7 +77,7 @@ public class VoterControllerTest {
 			.willReturn(voterCreateResponse);
 
 	    //when
-		ResponseEntity<GenericResponse<VoterCreateResponse>> result = voterController.save(question.id(), voterType,
+		ResponseEntity<GenericResponse<VoterCreateResponse>> result = voterController.save(question.id(), voterType.toString(),
 			member);
 
 		//then
@@ -118,7 +118,7 @@ public class VoterControllerTest {
 		doNothing().when(voterService).delete(question.id(), voterType, givenMember);
 
 	    //when
-		ResponseEntity<GenericResponse<Void>> result = voterController.delete(question.id(), voterType,
+		ResponseEntity<GenericResponse<Void>> result = voterController.delete(question.id(), voterType.toString(),
 			member);
 
 		//then
@@ -168,7 +168,7 @@ public class VoterControllerTest {
 			.willReturn(voterCreateResponse);
 
 	    //when
-		ResponseEntity<GenericResponse<VoterCreateResponse>> result = voterController.save(answer.id(), voterType,
+		ResponseEntity<GenericResponse<VoterCreateResponse>> result = voterController.save(answer.id(), voterType.toString(),
 			member);
 
 		//then
@@ -215,7 +215,7 @@ public class VoterControllerTest {
 		doNothing().when(voterService).delete(answer.id(), voterType, givenMember);
 
 	    //when
-		ResponseEntity<GenericResponse<Void>> result = voterController.delete(answer.id(), voterType,
+		ResponseEntity<GenericResponse<Void>> result = voterController.delete(answer.id(), voterType.toString(),
 			member);
 
 		//then

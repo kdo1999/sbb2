@@ -5,6 +5,7 @@ import java.net.URI;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,8 +18,8 @@ import com.sbb2.auth.service.response.MemberEmailSignupResponse;
 import com.sbb2.auth.service.response.MemberLoginResponse;
 import com.sbb2.common.jwt.JwtUtil;
 import com.sbb2.common.response.GenericResponse;
+import com.sbb2.common.validation.ValidationSequence;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -30,7 +31,7 @@ public class AuthController {
 	private final JwtUtil jwtUtil;
 
 	@PostMapping("/signup")
-	public ResponseEntity<GenericResponse<MemberEmailSignupResponse>> signup(@Valid @RequestBody MemberEmailSignupRequest memberEmailSignupRequest) {
+	public ResponseEntity<GenericResponse<MemberEmailSignupResponse>> signup(@Validated(ValidationSequence.class) @RequestBody MemberEmailSignupRequest memberEmailSignupRequest) {
 		MemberEmailSignupResponse signup = authService.signup(memberEmailSignupRequest.email(),
 			memberEmailSignupRequest.username(), memberEmailSignupRequest.password());
 
@@ -38,7 +39,7 @@ public class AuthController {
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<GenericResponse<MemberLoginResponse>> login(@Valid @RequestBody MemberLoginRequest memberLoginRequest) {
+	public ResponseEntity<GenericResponse<MemberLoginResponse>> login(@Validated(ValidationSequence.class) @RequestBody MemberLoginRequest memberLoginRequest) {
 		MemberLoginResponse memberLoginResponse = authService.memberLogin(memberLoginRequest.email(),
 			memberLoginRequest.password());
 

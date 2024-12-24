@@ -5,6 +5,7 @@ import java.net.URI;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -17,13 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sbb2.common.auth.userdetails.MemberUserDetails;
 import com.sbb2.common.response.GenericResponse;
+import com.sbb2.common.validation.ValidationSequence;
 import com.sbb2.question.controller.request.QuestionForm;
 import com.sbb2.question.domain.QuestionDetailResponse;
 import com.sbb2.question.domain.QuestionPageResponse;
 import com.sbb2.question.service.QuestionService;
 import com.sbb2.question.service.response.QuestionCreateResponse;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -53,7 +54,7 @@ public class QuestionController {
 	}
 
 	@PostMapping
-	public ResponseEntity<GenericResponse<QuestionCreateResponse>> save(@Valid @RequestBody QuestionForm questionForm,
+	public ResponseEntity<GenericResponse<QuestionCreateResponse>> save(@Validated(ValidationSequence.class) @RequestBody QuestionForm questionForm,
 		@AuthenticationPrincipal MemberUserDetails loginMember) {
 
 		QuestionCreateResponse savedQuestion = questionService.save(questionForm.subject(), questionForm.content(),
@@ -65,7 +66,7 @@ public class QuestionController {
 
 	@PatchMapping("/{id}")
 	public ResponseEntity<GenericResponse<Void>> update(@PathVariable("id") Long id,
-		@Valid @RequestBody QuestionForm questionForm, @AuthenticationPrincipal MemberUserDetails loginMember) {
+		@Validated(ValidationSequence.class) @RequestBody QuestionForm questionForm, @AuthenticationPrincipal MemberUserDetails loginMember) {
 		questionService.update(id, questionForm.subject(), questionForm.content(), loginMember.getMember());
 
 		return ResponseEntity.ok(GenericResponse.of());

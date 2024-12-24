@@ -4,6 +4,7 @@ import java.net.URI;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,8 +18,8 @@ import com.sbb2.answer.service.AnswerService;
 import com.sbb2.answer.service.response.AnswerCreateResponse;
 import com.sbb2.common.auth.userdetails.MemberUserDetails;
 import com.sbb2.common.response.GenericResponse;
+import com.sbb2.common.validation.ValidationSequence;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -28,7 +29,8 @@ public class AnswerController {
 	private final AnswerService answerService;
 
 	@PostMapping
-	public ResponseEntity<GenericResponse<AnswerCreateResponse>> save(@Valid @RequestBody AnswerForm answerForm,
+	public ResponseEntity<GenericResponse<AnswerCreateResponse>> save(
+		@Validated(ValidationSequence.class) @RequestBody AnswerForm answerForm,
 		@AuthenticationPrincipal MemberUserDetails loginMember) {
 		AnswerCreateResponse answerCreateResponse = answerService.save(answerForm.questionId(), answerForm.content(),
 			loginMember.getMember());
@@ -39,7 +41,8 @@ public class AnswerController {
 
 	@PatchMapping("/{id}")
 	public ResponseEntity<GenericResponse<Void>> update(@PathVariable("id") Long answerId,
-		@Valid @RequestBody AnswerForm answerForm, @AuthenticationPrincipal MemberUserDetails loginMember) {
+		@Validated(ValidationSequence.class) @RequestBody AnswerForm answerForm,
+		@AuthenticationPrincipal MemberUserDetails loginMember) {
 		answerService.update(answerId, answerForm.content(), loginMember.getMember());
 
 		return ResponseEntity.ok(GenericResponse.of());

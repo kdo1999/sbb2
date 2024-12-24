@@ -42,6 +42,8 @@ public class VoterControllerAdvice {
 				Collections.emptyList())));
 	}
 
+
+
 	protected HttpErrorInfo createHttpErrorInfo(int code, String path, String message, ErrorDetail errorDetail) {
 		HttpErrorInfo httpErrorInfo = HttpErrorInfo.of(code, path, message, errorDetail);
 

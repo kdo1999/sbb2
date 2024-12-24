@@ -121,7 +121,8 @@ public class DevSecurityConfig {
 	public OncePerRequestFilter jwtFilter() {
 		JwtFilter jwtFilter = new JwtFilter(jwtUtil, objectMapper, memberDetailsService, antPathMatcher());
 
-		jwtFilter.addUriPattern(HttpMethod.POST, "/api/v1/question");
+		jwtFilter.addUriPattern(HttpMethod.POST, "/api/v1/question")
+			.addUriPattern(HttpMethod.DELETE, "/api/v1/voter/*");
 		return jwtFilter;
 	}
 }
