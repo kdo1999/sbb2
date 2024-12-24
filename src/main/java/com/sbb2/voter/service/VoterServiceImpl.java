@@ -32,7 +32,12 @@ public class VoterServiceImpl implements VoterService {
 	@Override
 	public VoterCreateResponse save(Long targetId, VoterType voterType, Member member) {
 		boolean exists;
-		VoterCreateResponse voterCreateResponse;
+		VoterCreateResponse voterCreateResponse = null;
+		
+		if (voterType == null) {
+				throw new VoterBusinessLogicException(VoterErrorCode.NOT_VOTER_TYPE);
+		}
+		
 		switch (voterType) {
 			case QUESTION:
 				exists = voterRepository.existsByQuestionIdAndMemberId(targetId, member.id());
@@ -54,8 +59,6 @@ public class VoterServiceImpl implements VoterService {
 				voterCreateResponse = saveAnswerVoter(targetId, member);
 
 				break;
-			default:
-				throw new VoterBusinessLogicException(VoterErrorCode.NOT_FOUND);
 		}
 
 		return voterCreateResponse;
@@ -63,10 +66,13 @@ public class VoterServiceImpl implements VoterService {
 
 	@Override
 	public void delete(Long targetId, VoterType voterType, Member member) {
+		if (voterType == null) {
+			throw new VoterBusinessLogicException(VoterErrorCode.NOT_VOTER_TYPE);
+		}
+
 		switch (voterType) {
 			case QUESTION -> deleteQuestion(targetId, member);
 			case ANSWER -> deleteAnswer(targetId, member);
-			default -> throw new VoterBusinessLogicException(VoterErrorCode.NOT_VOTER_TYPE);
 		}
 	}
 
