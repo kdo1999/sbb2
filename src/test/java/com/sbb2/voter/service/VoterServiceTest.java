@@ -113,6 +113,42 @@ public class VoterServiceTest {
 		//then
 		verify(voterRepository, times(1)).deleteById(voter.id());
 	}
+
+	@DisplayName("질문 추천 삭제시 조회 실패 테스트")
+	@Test
+	void delete_question_voter_not_found_fail() {
+		//given
+		Member member = Member.builder()
+			.id(1L)
+			.username("testUsername")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
+
+		Question question = Question.builder()
+			.id(1L)
+			.subject("testSubject")
+			.content("testContent")
+			.author(member)
+			.build();
+
+		Voter voter = Voter.builder()
+			.id(1L)
+			.question(question)
+			.member(member)
+			.build();
+
+		VoterType voterType = VoterType.QUESTION;
+		question.voterSet().add(voter);
+
+		given(voterRepository.findByQuestionIdAndMemberId(question.id(), member.id())).willReturn(Optional.empty());
+
+		//when & then
+		assertThatThrownBy(() -> voterService.delete(question.id(), voterType, member))
+			.isInstanceOf(VoterBusinessLogicException.class)
+			.hasMessage(VoterErrorCode.NOT_FOUND.getMessage());
+	}
+
 	@DisplayName("질문 중복 추천 방지 성공 테스트")
 	@Test
 	void prevent_duplicate_voter_success() {
