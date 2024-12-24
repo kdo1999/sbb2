@@ -28,4 +28,14 @@ public class MemberRepositoryImpl implements MemberRepository{
 	public Optional<Member> findByUsername(String username) {
 		return memberJpaRepository.findByUsername(username).map(MemberEntity::toModel);
 	}
+
+	@Override
+	public Boolean existsByUsername(String username) {
+		return memberJpaRepository.existsByUsername(username);
+	}
+
+	@Override
+	public Boolean existsByEmail(String email) {
+		return memberJpaRepository.existsByEmail(email);
+	}
 }

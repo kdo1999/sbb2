@@ -91,4 +91,26 @@ public class MemberRepositoryTest {
 		//then
 		assertThat(findMember).isEqualTo(savedMember);
 	}
+
+	@Test
+	@DisplayName("동일한 이메일의 데이터가 존재하는 성공 테스트")
+	void exists_email_success() {
+		//given
+		String username = "testUsername";
+		String password = "testPassword";
+		String email = "testEmail";
+
+		Member member = Member.builder()
+			.username(username)
+			.password(password)
+			.email(email)
+			.build();
+		Member savedMember = memberRepository.save(member);
+
+		//when
+		Boolean exists = memberRepository.existsByEmail(savedMember.email());
+
+		//then
+		assertThat(exists).isTrue();
+	}
 }
