@@ -1,10 +1,10 @@
-package com.sbb2.redis.service;
+package com.sbb2.common.redis.service;
 
 import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
-import com.sbb2.infrastructer.redis.RedisDao;
+import com.sbb2.common.redis.RedisDao;
 
 @Component
 public class RedisServiceImpl implements RedisService {

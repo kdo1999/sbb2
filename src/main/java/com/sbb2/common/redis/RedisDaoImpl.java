@@ -1,4 +1,4 @@
-package com.sbb2.infrastructer.redis;
+package com.sbb2.common.redis;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;

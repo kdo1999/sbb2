@@ -1,4 +1,4 @@
-package com.sbb2.redis.service;
+package com.sbb2.common.redis.service;
 
 import java.util.Map;
 
