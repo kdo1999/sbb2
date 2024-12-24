@@ -1,4 +1,4 @@
-package com.sbb2.question.advice;
+package com.sbb2.answer.advice;
 
 import java.util.Collections;
 
@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.sbb2.answer.exception.AnswerBusinessLogicException;
 import com.sbb2.common.httpError.ErrorDetail;
 import com.sbb2.common.httpError.HttpErrorInfo;
 import com.sbb2.question.exception.QuestionBusinessLogicException;
@@ -14,8 +15,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@RestControllerAdvice(basePackages = "com/sbb2/question/controller")
-public class QuestionControllerAdvice {
+@RestControllerAdvice(basePackages = "com/sbb2/answer/controller")
+public class AnswerControllerAdvice {
 
 	@ExceptionHandler(QuestionBusinessLogicException.class)
 	public ResponseEntity<HttpErrorInfo> handlerQuestionBizLogicException(QuestionBusinessLogicException ex,
@@ -25,10 +26,18 @@ public class QuestionControllerAdvice {
 				Collections.emptyList())));
 	}
 
+	@ExceptionHandler(AnswerBusinessLogicException.class)
+	public ResponseEntity<HttpErrorInfo> handlerAnswerBizLogicException(AnswerBusinessLogicException ex,
+		HttpServletRequest request) {
+		return ResponseEntity.status(ex.getStatus().value())
+			.body(createHttpErrorInfo(ex.getStatus().value(), request.getRequestURI(), ex.getMessage(), ErrorDetail.of(
+				Collections.emptyList())));
+	}
+
 	protected HttpErrorInfo createHttpErrorInfo(int code, String path, String message, ErrorDetail errorDetail) {
 		HttpErrorInfo httpErrorInfo = HttpErrorInfo.of(code, path, message, errorDetail);
 
-		log.error("QuestionControllerAdvice = {}", httpErrorInfo);
+		log.error("AnswerControllerAdvice = {}", httpErrorInfo);
 
 		return httpErrorInfo;
 	}
