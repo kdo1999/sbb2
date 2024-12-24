@@ -1,5 +1,7 @@
 package com.sbb2.auth.controller;
 
+import java.net.URI;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +34,7 @@ public class AuthController {
 		MemberEmailSignupResponse signup = authService.signup(memberEmailSignupRequest.email(),
 			memberEmailSignupRequest.username(), memberEmailSignupRequest.password());
 
-		return ResponseEntity.ok().body(GenericResponse.of(signup));
+		return ResponseEntity.created(URI.create("/login")).body(GenericResponse.of(signup));
 	}
 
 	@PostMapping("/login")
