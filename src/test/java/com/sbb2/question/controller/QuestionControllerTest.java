@@ -1,5 +1,6 @@
 package com.sbb2.question.controller;
 
+import static com.sbb2.common.validation.ValidationGroups.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
@@ -233,7 +234,7 @@ public class QuestionControllerTest {
 
 		BindingResult bindingResult = new BeanPropertyBindingResult(questionForm, "questionForm");
 
-		validator.validate(questionForm).forEach(violation ->
+		validator.validate(questionForm, NotBlankGroup.class).forEach(violation ->
 			bindingResult.rejectValue(
 				violation.getPropertyPath().toString(),
 				"error",
@@ -266,7 +267,7 @@ public class QuestionControllerTest {
 
 		BindingResult bindingResult = new BeanPropertyBindingResult(questionForm, "questionForm");
 
-		validator.validate(questionForm).forEach(violation ->
+		validator.validate(questionForm, NotBlankGroup.class).forEach(violation ->
 			bindingResult.rejectValue(
 				violation.getPropertyPath().toString(),
 				"error",
@@ -353,7 +354,7 @@ public class QuestionControllerTest {
 
 		BindingResult bindingResult = new BeanPropertyBindingResult(givenQuestionForm, "questionForm");
 
-		validator.validate(givenQuestionForm).forEach(violation ->
+		validator.validate(givenQuestionForm, NotBlankGroup.class).forEach(violation ->
 			bindingResult.rejectValue(
 				violation.getPropertyPath().toString(),
 				"error",
@@ -393,7 +394,7 @@ public class QuestionControllerTest {
 
 		BindingResult bindingResult = new BeanPropertyBindingResult(givenQuestionForm, "questionForm");
 
-		validator.validate(givenQuestionForm).forEach(violation ->
+		validator.validate(givenQuestionForm, NotBlankGroup.class).forEach(violation ->
 			bindingResult.rejectValue(
 				violation.getPropertyPath().toString(),
 				"error",

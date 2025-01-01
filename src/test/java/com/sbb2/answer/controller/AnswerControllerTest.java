@@ -1,5 +1,6 @@
 package com.sbb2.answer.controller;
 
+import static com.sbb2.common.validation.ValidationGroups.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
@@ -23,6 +24,7 @@ import com.sbb2.answer.service.AnswerService;
 import com.sbb2.answer.service.response.AnswerCreateResponse;
 import com.sbb2.common.auth.userdetails.MemberUserDetails;
 import com.sbb2.common.response.GenericResponse;
+import com.sbb2.common.validation.ValidationGroups;
 import com.sbb2.member.domain.Member;
 
 import jakarta.validation.Validation;
@@ -112,7 +114,7 @@ public class AnswerControllerTest {
 			.build();
 
 		BindingResult bindingResult = new BeanPropertyBindingResult(answerForm, "answerForm");
-		validator.validate(answerForm).forEach(violation ->
+		validator.validate(answerForm, NotBlankGroup.class).forEach(violation ->
 			bindingResult.rejectValue(
 				violation.getPropertyPath().toString(),
 				"error",
