@@ -154,6 +154,7 @@ public class QuestionControllerTest {
 			.isVoter(question.voterSet().stream()
 				.anyMatch(v -> v.member().id().equals(givenMember.id())))
 			.answerList(List.of(answerDetailResponse))
+			.isAuthor(question.author().id().equals(givenMember.id()))
 			.createdAt(LocalDateTime.now())
 			.modifiedAt(LocalDateTime.now())
 			.build();

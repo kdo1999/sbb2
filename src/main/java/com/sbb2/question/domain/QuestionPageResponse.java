@@ -17,17 +17,4 @@ public record QuestionPageResponse(Long id, String subject, String content, Stri
 		this.modifiedAt = modifiedAt;
 		this.answerCount = answerCount;
 	}
-
-	@Override
-	public String toString() {
-		return "QuestionPageResponse{" +
-			"id=" + id +
-			", subject='" + subject + '\'' +
-			", content='" + content + '\'' +
-			", author='" + author + '\'' +
-			", createdAt=" + createdAt +
-			", modifiedAt=" + modifiedAt +
-			", answerCount=" + answerCount +
-			'}';
-	}
 }

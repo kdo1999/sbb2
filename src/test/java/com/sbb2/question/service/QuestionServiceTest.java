@@ -416,6 +416,7 @@ public class QuestionServiceTest {
 			.voterCount((long)question.voterSet().size())
 			.isVoter(question.voterSet().stream()
 				.anyMatch(v -> v.member().id().equals(givenMember.id())))
+			.isAuthor(question.author().id().equals(givenMember.id()))
 			.answerList(List.of(answerDetailResponse))
 			.createdAt(LocalDateTime.now())
 			.modifiedAt(LocalDateTime.now())

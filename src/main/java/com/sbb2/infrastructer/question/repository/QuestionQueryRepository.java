@@ -69,6 +69,7 @@ public class QuestionQueryRepository {
 				answerEntity.createdAt,
 				answerEntity.modifiedAt,
 				voterEntity.countDistinct(),
+				voterEntity.memberEntity.id.eq(memberId),
 				voterEntity.memberEntity.id.eq(memberId)
 			))
 			.from(answerEntity)
@@ -94,6 +95,7 @@ public class QuestionQueryRepository {
 				questionEntity.modifiedAt,
 				Expressions.asSimple(answerDetailResponses),
 				voterEntity.countDistinct(),
+				questionEntity.author.id.eq(memberId),
 				voterEntity.memberEntity.id.eq(memberId)
 			))
 			.from(questionEntity)
