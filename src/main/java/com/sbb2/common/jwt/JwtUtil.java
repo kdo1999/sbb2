@@ -21,6 +21,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -178,6 +179,8 @@ public class JwtUtil {
 				.before(toDate(createIssuedAt()));
 		} catch (ExpiredJwtException e) {
 			return false;
+		} catch (SignatureException e) {
+			throw new JwtTokenBusinessLogicException(JwtTokenErrorCode.SIGNATURE);
 		}
 		return true;
 	}
