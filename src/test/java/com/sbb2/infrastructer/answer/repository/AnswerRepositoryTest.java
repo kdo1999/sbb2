@@ -18,6 +18,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.test.annotation.DirtiesContext;
 
 import com.sbb2.answer.domain.Answer;
+import com.sbb2.answer.domain.AnswerDetailResponse;
 import com.sbb2.common.config.JpaAudtingConfig;
 import com.sbb2.common.config.QuerydslConfig;
 import com.sbb2.infrastructer.member.repository.MemberRepository;
@@ -214,5 +215,37 @@ public class AnswerRepositoryTest {
 
 		assertThat(findAnswerOptional.isEmpty()).isTrue();
 		assertThat(findVoterList.isEmpty()).isTrue();
+	}
+
+	@DisplayName("응답용 답변 조회 성공 테스트")
+	@Test
+	void find_answerDetailResponse_success() {
+		//given
+		String content = "testAnswerContent";
+		Member member = memberRepository.findById(1L).get();
+		Question question = questionRepository.findById(1L).get();
+
+		Answer givenAnswer = Answer.builder()
+			.content(content)
+			.author(member)
+			.question(question)
+			.build();
+
+		Answer savedAnswer = answerRepository.save(givenAnswer);
+
+		//when
+		AnswerDetailResponse answerDetailResponse = answerRepository.findAnswerDetailByIdAndMemberId(savedAnswer.id(),
+				savedAnswer.author().id()).get();
+
+		//then
+		assertThat(answerDetailResponse.id()).isEqualTo(savedAnswer.id());
+		assertThat(answerDetailResponse.content()).isEqualTo(savedAnswer.content());
+		assertThat(answerDetailResponse.createdAt()).isEqualTo(savedAnswer.createdAt());
+		assertThat(answerDetailResponse.modifiedAt()).isEqualTo(savedAnswer.modifiedAt());
+		assertThat(answerDetailResponse.questionId()).isEqualTo(savedAnswer.question().id());
+		assertThat(answerDetailResponse.isAuthor()).isEqualTo(savedAnswer.author().id().equals(member.id()));
+		assertThat(answerDetailResponse.isVoter()).isEqualTo(savedAnswer.voterSet().stream()
+			.anyMatch(voter -> voter.member().id().equals(member.id())));
+		assertThat(answerDetailResponse.voterCount()).isEqualTo(savedAnswer.voterSet().size());
 	}
 }
