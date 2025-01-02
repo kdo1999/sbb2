@@ -64,6 +64,7 @@ public class JwtFilter extends OncePerRequestFilter {
 				authenticateWithToken(request, response);
 				filterChain.doFilter(request, response);
 			} catch (JwtTokenBusinessLogicException | JwtException e) {
+				log.error(e.toString());
 				createErrorInfo(request, response, e);
 			}
 		} else {
@@ -103,7 +104,7 @@ public class JwtFilter extends OncePerRequestFilter {
 	private void createErrorInfo(
 		HttpServletRequest request, HttpServletResponse response, RuntimeException e)
 		throws IOException, ServletException {
-		String message = "JWT 처리중 오류가 발생했습니다.";
+		String message = e.getMessage();
 
 		HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
 
