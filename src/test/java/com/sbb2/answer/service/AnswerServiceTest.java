@@ -4,8 +4,10 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.sbb2.answer.domain.Answer;
+import com.sbb2.answer.domain.AnswerDetailResponse;
 import com.sbb2.answer.exception.AnswerBusinessLogicException;
 import com.sbb2.answer.exception.AnswerErrorCode;
 import com.sbb2.answer.service.response.AnswerCreateResponse;
@@ -354,7 +357,6 @@ public class AnswerServiceTest {
 					.build())
 				.toList();
 
-
 		given(answerRepository.findByQuestionId(any(Long.class))).willReturn(answerList);
 
 		//when
@@ -363,5 +365,58 @@ public class AnswerServiceTest {
 		//then
 		assertThat(findAnswerList).isEqualTo(answerList);
 		assertThat(findAnswerList.size()).isEqualTo(4);
+	}
+
+	@DisplayName("응답용 답변 조회 성공 테스트")
+	@Test
+	void find_answerDetailResponse_success() {
+		//given
+		Member member = Member.builder()
+			.id(1L)
+			.username("testUsername")
+			.password("testPassword")
+			.email("testEmail@naver.com")
+			.build();
+
+		Question question = Question.builder()
+			.id(1L)
+			.subject("testSubject")
+			.content("testContent")
+			.author(member)
+			.build();
+
+		String content = "saveAnswer";
+
+		Answer answer = Answer.builder()
+			.id(1L)
+			.content(content)
+			.author(member)
+			.question(question)
+			.voterSet(Set.of())
+			.createdAt(LocalDateTime.now())
+			.modifiedAt(LocalDateTime.now())
+			.build();
+
+		AnswerDetailResponse answerDetailResponse = AnswerDetailResponse.builder()
+			.id(answer.id())
+			.content(answer.content())
+			.username(answer.author().username())
+			.voterCount((long)answer.voterSet().size())
+			.createdAt(answer.createdAt())
+			.modifiedAt(answer.modifiedAt())
+			.isAuthor(answer.author().id().equals(member.id()))
+			.isVoter(answer.voterSet().stream().anyMatch(voter -> voter.member().id().equals(member.id())))
+			.questionId(answer.question().id())
+			.build();
+
+		given(answerRepository.findAnswerDetailByIdAndMemberId(answer.id(), member.id())).willReturn(
+			Optional.of(answerDetailResponse));
+
+		//when
+		AnswerDetailResponse findAnswerDetailResponse = answerService.findAnswerDetailByIdAndMemberId(answer.id(),
+			member.id());
+
+		//then
+		assertThat(findAnswerDetailResponse).isEqualTo(answerDetailResponse);
 	}
 }
