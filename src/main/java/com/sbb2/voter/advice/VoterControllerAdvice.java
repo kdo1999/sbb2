@@ -16,7 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@RestControllerAdvice(basePackages = "com/sbb2/voter/controller")
+@RestControllerAdvice(basePackages = "com.sbb2.voter.controller")
 public class VoterControllerAdvice {
 	@ExceptionHandler(QuestionBusinessLogicException.class)
 	public ResponseEntity<HttpErrorInfo> handlerQuestionBizLogicException(QuestionBusinessLogicException ex,

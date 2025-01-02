@@ -15,7 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@RestControllerAdvice(basePackages = "com/sbb2/answer/controller")
+@RestControllerAdvice(basePackages = "com.sbb2.answer.controller")
 public class AnswerControllerAdvice {
 
 	@ExceptionHandler(QuestionBusinessLogicException.class)
