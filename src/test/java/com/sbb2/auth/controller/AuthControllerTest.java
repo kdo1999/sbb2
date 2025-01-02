@@ -42,9 +42,10 @@ class AuthControllerTest {
 		String givenEmail = "testEmail@naver.com";
 		String givenUsername = "testUsername";
 		String givenPassword = "!testPassword1234";
+		String givenPasswordCheck = "!testPassword1234";
 		MemberRole memberRole = MemberRole.USER;
 
-		MemberEmailSignupRequest memberEmailSignupRequest = new MemberEmailSignupRequest(givenEmail, givenUsername, givenPassword);
+		MemberEmailSignupRequest memberEmailSignupRequest = new MemberEmailSignupRequest(givenEmail, givenUsername, givenPassword, givenPasswordCheck);
         MemberEmailSignupResponse memberEmailSignupResponse = new MemberEmailSignupResponse(givenEmail, givenUsername, memberRole);
 
         given(authService.signup(memberEmailSignupRequest.email(), memberEmailSignupRequest.username(), memberEmailSignupRequest.password())).willReturn(memberEmailSignupResponse);

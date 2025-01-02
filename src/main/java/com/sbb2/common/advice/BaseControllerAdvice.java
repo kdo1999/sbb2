@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -31,10 +32,20 @@ public class BaseControllerAdvice {
 		List<Error> errors = new ArrayList<>();
 
 		for (FieldError error : bindingResult.getFieldErrors()) {
-			Error customError = Error.of("global", error.getField(), error.getDefaultMessage(), "");
+			Error customError = Error.of("field", error.getField(), error.getDefaultMessage(), "");
 
 			errors.add(customError);
 		}
+
+    for (ObjectError globalError : bindingResult.getGlobalErrors()) {
+        Error customError = Error.of(
+                "global",
+                globalError.getObjectName(),
+                globalError.getDefaultMessage(),
+                ""
+        );
+        errors.add(customError);
+    }
 
 		return ResponseEntity.status(ex.getStatusCode().value())
 			.body(createHttpErrorInfo(ex.getStatusCode().value(), request.getRequestURI(), "유효하지 않은 값 입니다.",
