@@ -55,6 +55,10 @@ public class DevSecurityConfig {
             .permitAll()
             .requestMatchers("/", "/docs/**", "/error")
             .permitAll()
+			.requestMatchers(HttpMethod.GET, "/api/v1/question")
+			.permitAll()
+			.requestMatchers(HttpMethod.GET, "/api/v1/question/{id}")
+			.hasRole("USER")
 			.requestMatchers(HttpMethod.POST, "/api/v1/question", "/api/v1/answer", "/api/v1/voter/{id}")
 			.hasRole("USER")
 			.requestMatchers(HttpMethod.PATCH, "/api/v1/question/{id}", "/api/v1/answer/{id}")
@@ -111,7 +115,9 @@ public class DevSecurityConfig {
 	public OncePerRequestFilter jwtFilter() {
 		JwtFilter jwtFilter = new JwtFilter(jwtUtil, objectMapper, memberDetailsService, antPathMatcher());
 
-		jwtFilter.addUriPattern(HttpMethod.POST, "/api/v1/question", "/api/v1/answer", "/api/v1/voter/*")
+		jwtFilter
+			.addUriPattern(HttpMethod.GET, "/api/v1/question/*")
+			.addUriPattern(HttpMethod.POST, "/api/v1/question", "/api/v1/answer", "/api/v1/voter/*")
 			.addUriPattern(HttpMethod.PATCH, "/api/v1/question/*", "/api/v1/answer/*")
 			.addUriPattern(HttpMethod.DELETE, "/api/v1/question/*", "/api/v1/answer/*", "/api/v1/voter/*");
 		return jwtFilter;
