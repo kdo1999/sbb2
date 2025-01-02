@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sbb2.answer.controller.request.AnswerForm;
+import com.sbb2.answer.domain.AnswerDetailResponse;
 import com.sbb2.answer.service.AnswerService;
 import com.sbb2.answer.service.response.AnswerCreateResponse;
 import com.sbb2.common.auth.userdetails.MemberUserDetails;
@@ -27,6 +29,15 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/v1/answer")
 public class AnswerController {
 	private final AnswerService answerService;
+
+	@GetMapping("/{id}")
+	public ResponseEntity<GenericResponse<AnswerDetailResponse>> findByDetail(@PathVariable("id") Long answerId,
+		@AuthenticationPrincipal MemberUserDetails loginMember) {
+		AnswerDetailResponse answerDetailResponse = answerService.findAnswerDetailByIdAndMemberId(answerId,
+			loginMember.getMember().id());
+
+		return ResponseEntity.ok(GenericResponse.of(answerDetailResponse));
+	}
 
 	@PostMapping
 	public ResponseEntity<GenericResponse<AnswerCreateResponse>> save(
