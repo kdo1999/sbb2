@@ -78,6 +78,8 @@ public class QuestionEntity extends BaseEntity {
 			.subject(question.subject())
 			.content(question.content())
 			.author(MemberEntity.from(question.author()))
+			.createdAt(question.createdAt())
+			.modifiedAt(question.modifiedAt())
 			.answerEntityList(question.answerList().isEmpty() ? new ArrayList<>() :
 				question.answerList().stream().map(AnswerEntity::from).toList())
 			.build();
