@@ -4,6 +4,9 @@ import static com.sbb2.common.validation.ValidationGroups.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
+import java.time.LocalDateTime;
+import java.util.Set;
+
 import org.hibernate.validator.HibernateValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,12 +23,14 @@ import org.springframework.validation.BindingResult;
 
 import com.sbb2.answer.controller.request.AnswerForm;
 import com.sbb2.answer.domain.Answer;
+import com.sbb2.answer.domain.AnswerDetailResponse;
 import com.sbb2.answer.service.AnswerService;
 import com.sbb2.answer.service.response.AnswerCreateResponse;
 import com.sbb2.common.auth.userdetails.MemberUserDetails;
 import com.sbb2.common.response.GenericResponse;
 import com.sbb2.common.validation.ValidationGroups;
 import com.sbb2.member.domain.Member;
+import com.sbb2.question.domain.Question;
 
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -52,7 +57,7 @@ public class AnswerControllerTest {
 	@DisplayName("답변 저장 성공 테스트")
 	@Test
 	void save_answer_success() {
-	    //given
+		//given
 		AnswerForm answerForm = AnswerForm.builder()
 			.questionId(1L)
 			.content("testContent")
@@ -100,7 +105,7 @@ public class AnswerControllerTest {
 	@DisplayName("답변 저장시 내용이 비었을 때 실패 테스트")
 	@Test
 	void save_answer_content_empty_fail() {
-	    //given
+		//given
 		AnswerForm answerForm = AnswerForm.builder()
 			.questionId(1L)
 			.content("")
@@ -183,5 +188,62 @@ public class AnswerControllerTest {
 		assertThat(result.getBody().getData()).isNull();
 		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
 		verify(answerService, times(1)).deleteById(1L, givenMember);
+	}
+
+	@DisplayName("답변 상세 조회 성공 테스트")
+	@Test
+	void find_detail_success() {
+		//given
+		Member member = Member.builder()
+			.id(1L)
+			.username("testUsername")
+			.password("testPassword")
+			.email("testEmail@naver.com")
+			.build();
+
+		Question question = Question.builder()
+			.id(1L)
+			.subject("testSubject")
+			.content("testContent")
+			.author(member)
+			.build();
+
+		String content = "saveAnswer";
+
+		Answer answer = Answer.builder()
+			.id(1L)
+			.content(content)
+			.author(member)
+			.question(question)
+			.voterSet(Set.of())
+			.createdAt(LocalDateTime.now())
+			.modifiedAt(LocalDateTime.now())
+			.build();
+
+		AnswerDetailResponse answerDetailResponse = AnswerDetailResponse.builder()
+			.id(answer.id())
+			.content(answer.content())
+			.username(answer.author().username())
+			.voterCount((long)answer.voterSet().size())
+			.createdAt(answer.createdAt())
+			.modifiedAt(answer.modifiedAt())
+			.isAuthor(answer.author().id().equals(member.id()))
+			.isVoter(answer.voterSet().stream().anyMatch(voter -> voter.member().id().equals(member.id())))
+			.questionId(answer.question().id())
+			.build();
+
+		MemberUserDetails loginMember = new MemberUserDetails(member);
+
+		given(answerService.findAnswerDetailByIdAndMemberId(answer.id(), member.id()))
+			.willReturn(answerDetailResponse);
+
+		//when
+		ResponseEntity<GenericResponse<AnswerDetailResponse>> result = answerController.findByDetail(answer.id(),
+			loginMember);
+
+		//then
+		assertThat(result.getBody().getData()).isEqualTo(answerDetailResponse);
+		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+		verify(answerService, times(1)).findAnswerDetailByIdAndMemberId(answer.id(), member.id());
 	}
 }
