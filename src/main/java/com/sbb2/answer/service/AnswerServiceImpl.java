@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sbb2.answer.domain.Answer;
+import com.sbb2.answer.domain.AnswerDetailResponse;
 import com.sbb2.answer.exception.AnswerBusinessLogicException;
 import com.sbb2.answer.exception.AnswerErrorCode;
 import com.sbb2.answer.service.response.AnswerCreateResponse;
@@ -80,6 +81,12 @@ public class AnswerServiceImpl implements AnswerService {
 	@Transactional(readOnly = true)
 	public List<Answer> findByQuestionId(Long questionId) {
 		return answerRepository.findByQuestionId(questionId);
+	}
+
+	@Override
+	public AnswerDetailResponse findAnswerDetailByIdAndMemberId(Long answerId, Long memberId) {
+		return answerRepository.findAnswerDetailByIdAndMemberId(answerId, memberId)
+			.orElseThrow(() -> new AnswerBusinessLogicException(AnswerErrorCode.NOT_FOUND));
 	}
 
 	private void loginMemberEqualsAuthor(Member author, Answer findAnswer) {
