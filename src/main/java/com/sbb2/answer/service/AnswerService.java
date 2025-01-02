@@ -10,7 +10,7 @@ import com.sbb2.member.domain.Member;
 
 public interface AnswerService {
 
-	AnswerCreateResponse save(Long questionId, String content, Member author);
+	AnswerDetailResponse save(Long questionId, String content, Member author);
 
 	Answer findById(Long answerId);
 

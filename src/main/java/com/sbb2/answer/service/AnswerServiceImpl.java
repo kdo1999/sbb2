@@ -27,7 +27,7 @@ public class AnswerServiceImpl implements AnswerService {
 	private final AnswerRepository answerRepository;
 
 	@Override
-	public AnswerCreateResponse save(Long questionId, String content, Member author) {
+	public AnswerDetailResponse save(Long questionId, String content, Member author) {
 		Question findQuestion = questionRepository.findById(questionId)
 			.orElseThrow(() -> new QuestionBusinessLogicException(QuestionErrorCode.NOT_FOUND));
 
@@ -39,11 +39,16 @@ public class AnswerServiceImpl implements AnswerService {
 
 		Answer savedAnswer = answerRepository.save(answer);
 
-		return AnswerCreateResponse.builder()
+		return AnswerDetailResponse.builder()
+			.id(savedAnswer.id())
 			.questionId(savedAnswer.question().id())
-			.answerId(savedAnswer.id())
 			.content(savedAnswer.content())
 			.author(savedAnswer.author().username())
+			.isAuthor(savedAnswer.author().equals(author))
+			.isVoter(false)
+			.voterCount(0L)
+			.createdAt(answer.createdAt())
+			.modifiedAt(answer.modifiedAt())
 			.build();
 	}
 

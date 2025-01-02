@@ -21,7 +21,6 @@ import com.sbb2.answer.domain.Answer;
 import com.sbb2.answer.domain.AnswerDetailResponse;
 import com.sbb2.answer.exception.AnswerBusinessLogicException;
 import com.sbb2.answer.exception.AnswerErrorCode;
-import com.sbb2.answer.service.response.AnswerCreateResponse;
 import com.sbb2.infrastructer.answer.repository.AnswerRepository;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
 import com.sbb2.member.domain.Member;
@@ -73,12 +72,12 @@ public class AnswerServiceTest {
 				.build());
 
 		//when
-		AnswerCreateResponse savedAnswer = answerService.save(questionId, content, member);
+		AnswerDetailResponse answerDetailResponse = answerService.save(questionId, content, member);
 
 		//then
-		assertThat(savedAnswer.questionId()).isEqualTo(questionId);
-		assertThat(savedAnswer.content()).isEqualTo(content);
-		assertThat(savedAnswer.author()).isEqualTo(member.username());
+		assertThat(answerDetailResponse.questionId()).isEqualTo(questionId);
+		assertThat(answerDetailResponse.content()).isEqualTo(content);
+		assertThat(answerDetailResponse.author()).isEqualTo(member.username());
 	}
 
 	@DisplayName("답변 저장 질문 조회 실패 테스트")
@@ -400,7 +399,7 @@ public class AnswerServiceTest {
 		AnswerDetailResponse answerDetailResponse = AnswerDetailResponse.builder()
 			.id(answer.id())
 			.content(answer.content())
-			.username(answer.author().username())
+			.author(answer.author().username())
 			.voterCount((long)answer.voterSet().size())
 			.createdAt(answer.createdAt())
 			.modifiedAt(answer.modifiedAt())

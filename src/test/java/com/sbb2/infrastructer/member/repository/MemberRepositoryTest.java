@@ -138,7 +138,7 @@ public class MemberRepositoryTest {
 	}
 
 	@Test
-	@DisplayName("동일한 username 데이터가 존재하는 성공 테스트")
+	@DisplayName("동일한 author 데이터가 존재하는 성공 테스트")
 	void exists_username_success() {
 		//given
 		String username = "testUsername";

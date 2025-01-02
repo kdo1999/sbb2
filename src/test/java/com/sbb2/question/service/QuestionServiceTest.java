@@ -403,7 +403,7 @@ public class QuestionServiceTest {
 			.questionId(question.id())
 			.voterCount((long)question.answerList().get(0).voterSet().size())
 			.content(question.answerList().get(0).content())
-			.username(givenMember.username())
+			.author(givenMember.username())
 			.isVoter(false)
 			.createdAt(LocalDateTime.now())
 			.modifiedAt(LocalDateTime.now())

@@ -85,7 +85,7 @@ public class AuthServiceTest {
 			.hasMessage(MemberErrorCode.EXISTS_EMAIL.getMessage());
 	}
 
-	@DisplayName("회원가입시 username 중복 실패 테스트")
+	@DisplayName("회원가입시 author 중복 실패 테스트")
 	@Test
 	void signup_exists_username_fail() {
 	    //given

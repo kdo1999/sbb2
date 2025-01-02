@@ -81,23 +81,28 @@ public class AnswerControllerTest {
 			)
 		);
 
-		AnswerCreateResponse answerCreateResponse = AnswerCreateResponse.builder()
+		AnswerDetailResponse answerDetailResponse = AnswerDetailResponse.builder()
+			.id(1L)
 			.questionId(answerForm.questionId())
-			.answerId(1L)
 			.content(answerForm.content())
 			.author(givenMember.username())
+			.isAuthor(true)
+			.isVoter(false)
+			.voterCount(0L)
+			.createdAt(LocalDateTime.now())
+			.modifiedAt(LocalDateTime.now())
 			.build();
 
 		given(answerService.save(answerForm.questionId(), answerForm.content(), givenMember))
-			.willReturn(answerCreateResponse);
+			.willReturn(answerDetailResponse);
 
 		//when
-		ResponseEntity<GenericResponse<AnswerCreateResponse>> result = answerController.save(answerForm,
+		ResponseEntity<GenericResponse<AnswerDetailResponse>> result = answerController.save(answerForm,
 			member);
 
 		//then
-		AnswerCreateResponse data = result.getBody().getData();
-		assertThat(answerCreateResponse).isEqualTo(data);
+		AnswerDetailResponse data = result.getBody().getData();
+		assertThat(answerDetailResponse).isEqualTo(data);
 		assertThat(result.getHeaders().getLocation().getPath()).isEqualTo("/question/" + data.questionId());
 		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 	}
@@ -223,7 +228,7 @@ public class AnswerControllerTest {
 		AnswerDetailResponse answerDetailResponse = AnswerDetailResponse.builder()
 			.id(answer.id())
 			.content(answer.content())
-			.username(answer.author().username())
+			.author(answer.author().username())
 			.voterCount((long)answer.voterSet().size())
 			.createdAt(answer.createdAt())
 			.modifiedAt(answer.modifiedAt())

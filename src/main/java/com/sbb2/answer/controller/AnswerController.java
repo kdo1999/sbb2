@@ -40,14 +40,14 @@ public class AnswerController {
 	}
 
 	@PostMapping
-	public ResponseEntity<GenericResponse<AnswerCreateResponse>> save(
+	public ResponseEntity<GenericResponse<AnswerDetailResponse>> save(
 		@Validated(ValidationSequence.class) @RequestBody AnswerForm answerForm,
 		@AuthenticationPrincipal MemberUserDetails loginMember) {
-		AnswerCreateResponse answerCreateResponse = answerService.save(answerForm.questionId(), answerForm.content(),
+		AnswerDetailResponse answerDetailResponse = answerService.save(answerForm.questionId(), answerForm.content(),
 			loginMember.getMember());
 
-		return ResponseEntity.created(URI.create("/question/" + answerCreateResponse.questionId()))
-			.body(GenericResponse.of(answerCreateResponse));
+		return ResponseEntity.created(URI.create("/question/" + answerDetailResponse.questionId()))
+			.body(GenericResponse.of(answerDetailResponse));
 	}
 
 	@PatchMapping("/{id}")
