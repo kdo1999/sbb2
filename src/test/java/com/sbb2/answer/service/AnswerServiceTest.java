@@ -419,4 +419,43 @@ public class AnswerServiceTest {
 		//then
 		assertThat(findAnswerDetailResponse).isEqualTo(answerDetailResponse);
 	}
+
+	@DisplayName("응답용 답변 조회 실패 테스트")
+	@Test
+	void find_answerDetailResponse_fail() {
+		//given
+		Member member = Member.builder()
+			.id(1L)
+			.username("testUsername")
+			.password("testPassword")
+			.email("testEmail@naver.com")
+			.build();
+
+		Question question = Question.builder()
+			.id(1L)
+			.subject("testSubject")
+			.content("testContent")
+			.author(member)
+			.build();
+
+		String content = "saveAnswer";
+
+		Answer answer = Answer.builder()
+			.id(1L)
+			.content(content)
+			.author(member)
+			.question(question)
+			.voterSet(Set.of())
+			.createdAt(LocalDateTime.now())
+			.modifiedAt(LocalDateTime.now())
+			.build();
+
+		given(answerRepository.findAnswerDetailByIdAndMemberId(answer.id(), member.id())).willReturn(
+			Optional.empty());
+
+		//when & then
+		assertThatThrownBy(() -> answerService.findAnswerDetailByIdAndMemberId(answer.id(), member.id()))
+			.isInstanceOf(AnswerBusinessLogicException.class)
+			.hasMessage(AnswerErrorCode.NOT_FOUND.getMessage());
+	}
 }
