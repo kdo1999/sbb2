@@ -69,7 +69,7 @@ public class QuestionQueryRepository {
 				answerEntity.createdAt,
 				answerEntity.modifiedAt,
 				voterEntity.countDistinct(),
-				voterEntity.memberEntity.id.eq(memberId),
+				answerEntity.author.id.eq(memberId),
 				voterEntity.memberEntity.id.eq(memberId)
 			))
 			.from(answerEntity)
@@ -82,7 +82,8 @@ public class QuestionQueryRepository {
 				answerEntity.author.username,
 				answerEntity.questionEntity.id,
 				answerEntity.createdAt,
-				answerEntity.modifiedAt
+				answerEntity.modifiedAt,
+				voterEntity.memberEntity.id
 			)
 			.fetch();
 
@@ -107,7 +108,8 @@ public class QuestionQueryRepository {
 				questionEntity.content,
 				questionEntity.author.username,
 				questionEntity.createdAt,
-				questionEntity.modifiedAt
+				questionEntity.modifiedAt,
+				voterEntity.memberEntity.id
 			)
 			.fetchOne();
 
