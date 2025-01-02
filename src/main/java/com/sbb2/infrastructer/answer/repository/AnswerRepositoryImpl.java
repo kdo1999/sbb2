@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Repository;
 
 import com.sbb2.answer.domain.Answer;
+import com.sbb2.answer.domain.AnswerDetailResponse;
 import com.sbb2.infrastructer.answer.entity.AnswerEntity;
 
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AnswerRepositoryImpl implements AnswerRepository{
 	private final AnswerJpaRepository answerJpaRepository;
+	private final AnswerQueryRepository answerQueryRepository;
 
 	@Override
 	public Answer save(Answer answer) {
@@ -36,5 +38,10 @@ public class AnswerRepositoryImpl implements AnswerRepository{
 	@Override
 	public void deleteById(Long id) {
 		answerJpaRepository.deleteById(id);
+	}
+
+	@Override
+	public Optional<AnswerDetailResponse> findAnswerDetailByIdAndMemberId(Long id, Long memberId) {
+		return answerQueryRepository.findByAnswerId(id, memberId);
 	}
 }
