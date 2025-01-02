@@ -81,11 +81,7 @@ class AuthControllerTest {
         ResponseEntity<GenericResponse<MemberLoginResponse>> result = authController.login(memberLoginRequest);
 
         // Then
-        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(result.getBody().getData()).isEqualTo(memberLoginResponse);
-        assertThat(result.getHeaders().getFirst("Authorization")).isEqualTo("Bearer " + accessToken);
-
-        ResponseCookie cookie = ResponseCookie.from("refresh", refreshToken)
+		ResponseCookie cookie = ResponseCookie.from("refresh", refreshToken)
                 .domain("localhost")
                 .path("/")
                 .httpOnly(true)
@@ -94,6 +90,9 @@ class AuthControllerTest {
                 .sameSite("Strict")
                 .build();
 
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(result.getBody().getData()).isEqualTo(memberLoginResponse);
+        assertThat(result.getHeaders().getFirst("Authorization")).isEqualTo("Bearer " + accessToken);
         assertThat(result.getHeaders().get(HttpHeaders.SET_COOKIE)).containsExactly(cookie.toString());
     }
 }
