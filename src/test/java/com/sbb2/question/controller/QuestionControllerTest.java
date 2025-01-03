@@ -37,6 +37,7 @@ import com.sbb2.question.domain.QuestionDetailResponse;
 import com.sbb2.question.domain.QuestionPageResponse;
 import com.sbb2.question.service.QuestionService;
 import com.sbb2.question.service.response.QuestionCreateResponse;
+import com.sbb2.question.util.SearchCondition;
 import com.sbb2.voter.domain.Voter;
 
 import jakarta.validation.Validation;
@@ -88,15 +89,21 @@ public class QuestionControllerTest {
 					(long)i)
 			);
 		}
+
+		SearchCondition searchCondition = SearchCondition.builder()
+			.pageNum(page)
+			.kw(kw)
+			.build();
+
 		PageImpl<QuestionPageResponse> questionPageResponses = new PageImpl<>(
 			questionPageResponseList.subList(0, Math.min(10, questionPageResponseList.size())),
-			PageRequest.of(page, 10),
+			PageRequest.of(searchCondition.pageNum(), 10),
 			questionPageResponseList.size());
 
-		given(questionService.findAll(page, kw)).willReturn(questionPageResponses);
+		given(questionService.findAll(searchCondition)).willReturn(questionPageResponses);
 
 		//when
-		ResponseEntity<GenericResponse<Page<QuestionPageResponse>>> result = questionController.findAll(page, kw);
+		ResponseEntity<GenericResponse<Page<QuestionPageResponse>>> result = questionController.findAll(searchCondition);
 
 		//then
 		Page<QuestionPageResponse> data = result.getBody().getData();

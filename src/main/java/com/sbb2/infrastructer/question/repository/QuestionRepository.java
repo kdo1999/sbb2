@@ -9,11 +9,12 @@ import org.springframework.data.repository.query.Param;
 import com.sbb2.question.domain.QuestionDetailResponse;
 import com.sbb2.question.domain.QuestionPageResponse;
 import com.sbb2.question.domain.Question;
+import com.sbb2.question.util.SearchCondition;
 
 public interface QuestionRepository {
 	Question save(Question question);
 	Optional<Question> findById(@Param("id") Long id);
-	Page<QuestionPageResponse> findAll(String keyword, Pageable pageable);
+	Page<QuestionPageResponse> findAll(SearchCondition searchCondition, Pageable pageable);
 
 	void deleteById(Long targetId);
 	QuestionDetailResponse findDetailById(Long questionId, Long memberId);

@@ -32,6 +32,7 @@ import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
 import com.sbb2.question.domain.QuestionDetailResponse;
 import com.sbb2.question.domain.QuestionPageResponse;
+import com.sbb2.question.util.SearchCondition;
 import com.sbb2.voter.domain.Voter;
 
 import jakarta.persistence.EntityManager;
@@ -157,12 +158,18 @@ public class QuestionRepositoryTest {
 		String keyword = "search";
 		int page = 0;
 
+		SearchCondition searchCondition = SearchCondition.builder()
+			.kw(keyword)
+			.pageNum(page)
+			.sort("createdAt")
+			.order("desc")
+			.build();
+
 		//when
-		List<Sort.Order> sorts = new ArrayList<>();
-		sorts.add(Sort.Order.desc("createdAt"));
-		Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
-		Page<QuestionPageResponse> questionPage = questionRepository.findAll(keyword, pageable);
+		Pageable pageable = PageRequest.of(searchCondition.pageNum(), 10);
+		Page<QuestionPageResponse> questionPage = questionRepository.findAll(searchCondition, pageable);
 		questionPage.getContent().iterator().forEachRemaining(System.out::println);
+
 		//then
 		assertThat(questionPage.getTotalPages()).isEqualTo(1);
 		assertThat(questionPage.getContent().size()).isEqualTo(5);
@@ -175,12 +182,18 @@ public class QuestionRepositoryTest {
 		String keyword = "";
 		int page = 0;
 
+		SearchCondition searchCondition = SearchCondition.builder()
+			.kw(keyword)
+			.pageNum(page)
+			.sort("createdAt")
+			.order("desc")
+			.build();
+		Pageable pageable = PageRequest.of(searchCondition.pageNum(), 10);
+
 		//when
-		List<Sort.Order> sorts = new ArrayList<>();
-		sorts.add(Sort.Order.desc("createdAt"));
-		Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
-		Page<QuestionPageResponse> questionPage = questionRepository.findAll(keyword, pageable);
+		Page<QuestionPageResponse> questionPage = questionRepository.findAll(searchCondition, pageable);
 		questionPage.getContent().iterator().forEachRemaining(System.out::println);
+
 		//then
 		assertThat(questionPage.getTotalPages()).isEqualTo(3);
 		assertThat(questionPage.getContent().size()).isEqualTo(10);

@@ -10,6 +10,7 @@ import com.sbb2.infrastructer.question.entity.QuestionEntity;
 import com.sbb2.question.domain.QuestionDetailResponse;
 import com.sbb2.question.domain.QuestionPageResponse;
 import com.sbb2.question.domain.Question;
+import com.sbb2.question.util.SearchCondition;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,8 +31,8 @@ public class QuestionRepositoryImpl implements QuestionRepository {
 	}
 
 	@Override
-	public Page<QuestionPageResponse> findAll(String keyword, Pageable pageable) {
-		return questionQueryRepository.findAll(keyword, pageable);
+	public Page<QuestionPageResponse> findAll(SearchCondition searchCondition, Pageable pageable) {
+		return questionQueryRepository.findAll(searchCondition, pageable);
 	}
 
 	@Override

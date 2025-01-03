@@ -7,6 +7,7 @@ import com.sbb2.question.domain.Question;
 import com.sbb2.question.domain.QuestionDetailResponse;
 import com.sbb2.question.domain.QuestionPageResponse;
 import com.sbb2.question.service.response.QuestionCreateResponse;
+import com.sbb2.question.util.SearchCondition;
 
 public interface QuestionService {
 	QuestionCreateResponse save(String subject, String content, Member author);
@@ -18,7 +19,7 @@ public interface QuestionService {
 
 	void deleteById(Long id, Member author);
 
-	Page<QuestionPageResponse> findAll(int pageNum, String keyword);
+	Page<QuestionPageResponse> findAll(SearchCondition searchCondition);
 
 	QuestionDetailResponse findDetailById(Long id, Member loginMember);
 }

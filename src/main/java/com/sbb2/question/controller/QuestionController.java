@@ -24,6 +24,7 @@ import com.sbb2.question.domain.QuestionDetailResponse;
 import com.sbb2.question.domain.QuestionPageResponse;
 import com.sbb2.question.service.QuestionService;
 import com.sbb2.question.service.response.QuestionCreateResponse;
+import com.sbb2.question.util.SearchCondition;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,9 +36,8 @@ public class QuestionController {
 
 	@GetMapping
 	public ResponseEntity<GenericResponse<Page<QuestionPageResponse>>> findAll(
-		@RequestParam(value = "page", defaultValue = "0") int page
-		, @RequestParam(value = "kw", defaultValue = "") String kw) {
-		Page<QuestionPageResponse> findAllPage = questionService.findAll(page, kw);
+		SearchCondition searchCondition) {
+		Page<QuestionPageResponse> findAllPage = questionService.findAll(searchCondition);
 
 		return ResponseEntity.ok()
 			.body(GenericResponse.of(findAllPage));

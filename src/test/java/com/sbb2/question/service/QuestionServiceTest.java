@@ -32,6 +32,7 @@ import com.sbb2.question.domain.QuestionPageResponse;
 import com.sbb2.question.exception.QuestionBusinessLogicException;
 import com.sbb2.question.exception.QuestionErrorCode;
 import com.sbb2.question.service.response.QuestionCreateResponse;
+import com.sbb2.question.util.SearchCondition;
 import com.sbb2.voter.domain.Voter;
 
 @ExtendWith(MockitoExtension.class)
@@ -351,7 +352,12 @@ public class QuestionServiceTest {
 			);
 		}
 
-		given(questionRepository.findAll(any(String.class), any(Pageable.class))).willReturn(new PageImpl<>(
+		SearchCondition searchCondition = SearchCondition.builder()
+			.pageNum(1)
+			.kw("")
+			.build();
+
+		given(questionRepository.findAll(searchCondition, any(Pageable.class))).willReturn(new PageImpl<>(
 			questionPageResponseList.subList(0, Math.min(10, questionPageResponseList.size())),
 			PageRequest.of(0, 10),
 			questionPageResponseList.size()
@@ -359,7 +365,7 @@ public class QuestionServiceTest {
 		);
 
 		//when
-		Page<QuestionPageResponse> findAll = questionService.findAll(1, "");
+		Page<QuestionPageResponse> findAll = questionService.findAll(searchCondition);
 
 		//then
 		assertThat(findAll.getContent().size()).isEqualTo(10);
