@@ -47,8 +47,8 @@ public class AnswerServiceImpl implements AnswerService {
 			.isAuthor(savedAnswer.author().equals(author))
 			.isVoter(false)
 			.voterCount(0L)
-			.createdAt(answer.createdAt())
-			.modifiedAt(answer.modifiedAt())
+			.createdAt(savedAnswer.createdAt())
+			.modifiedAt(savedAnswer.modifiedAt())
 			.build();
 	}
 
