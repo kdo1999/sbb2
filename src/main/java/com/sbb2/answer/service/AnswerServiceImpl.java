@@ -106,7 +106,9 @@ public class AnswerServiceImpl implements AnswerService {
 		Question findQuestion = questionRepository.findById(questionId)
 			.orElseThrow(() -> new QuestionBusinessLogicException(QuestionErrorCode.NOT_FOUND));
 
-		Pageable pageable = PageRequest.of(searchCondition.pageNum(), PAGE_SIZE);
+		Pageable pageable = PageRequest.of(
+			searchCondition.pageNum() == null ? 0 : searchCondition.pageNum(), PAGE_SIZE
+		);
 
 		return answerRepository.findAnswerDetailPageByQuestionId(searchCondition, findQuestion.id(), memberId, pageable);
 	}
