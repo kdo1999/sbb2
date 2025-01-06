@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.sbb2.answer.domain.Answer;
-import com.sbb2.answer.domain.AnswerDetailResponse;
+import com.sbb2.answer.service.response.AnswerDetailResponse;
 import com.sbb2.common.util.SearchCondition;
 import com.sbb2.infrastructer.answer.entity.AnswerEntity;
 

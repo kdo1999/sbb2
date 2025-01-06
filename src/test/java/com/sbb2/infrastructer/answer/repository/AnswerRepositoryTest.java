@@ -21,7 +21,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.test.annotation.DirtiesContext;
 
 import com.sbb2.answer.domain.Answer;
-import com.sbb2.answer.domain.AnswerDetailResponse;
+import com.sbb2.answer.service.response.AnswerDetailResponse;
 import com.sbb2.common.config.JpaAudtingConfig;
 import com.sbb2.common.config.QuerydslConfig;
 import com.sbb2.common.util.SearchCondition;

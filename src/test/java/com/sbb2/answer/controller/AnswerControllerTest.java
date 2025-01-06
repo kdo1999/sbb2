@@ -30,13 +30,11 @@ import org.springframework.validation.BindingResult;
 
 import com.sbb2.answer.controller.request.AnswerForm;
 import com.sbb2.answer.domain.Answer;
-import com.sbb2.answer.domain.AnswerDetailResponse;
+import com.sbb2.answer.service.response.AnswerDetailResponse;
 import com.sbb2.answer.service.AnswerService;
-import com.sbb2.answer.service.response.AnswerCreateResponse;
 import com.sbb2.common.auth.userdetails.MemberUserDetails;
 import com.sbb2.common.response.GenericResponse;
 import com.sbb2.common.util.SearchCondition;
-import com.sbb2.common.validation.ValidationGroups;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
 

@@ -1,7 +1,6 @@
 package com.sbb2.infrastructer.answer.repository;
 
 import static com.sbb2.infrastructer.answer.entity.QAnswerEntity.*;
-import static com.sbb2.infrastructer.question.entity.QQuestionEntity.*;
 import static com.sbb2.infrastructer.voter.entity.QVoterEntity.*;
 
 import java.util.List;
@@ -20,12 +19,9 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sbb2.answer.domain.AnswerDetailResponse;
+import com.sbb2.answer.service.response.AnswerDetailResponse;
 import com.sbb2.answer.domain.QAnswerDetailResponse;
 import com.sbb2.common.util.SearchCondition;
-import com.sbb2.infrastructer.answer.entity.QAnswerEntity;
-import com.sbb2.question.domain.QQuestionPageResponse;
-import com.sbb2.question.domain.QuestionPageResponse;
 
 import lombok.RequiredArgsConstructor;
 

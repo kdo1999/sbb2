@@ -9,10 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sbb2.answer.domain.Answer;
-import com.sbb2.answer.domain.AnswerDetailResponse;
+import com.sbb2.answer.service.response.AnswerDetailResponse;
 import com.sbb2.answer.exception.AnswerBusinessLogicException;
 import com.sbb2.answer.exception.AnswerErrorCode;
-import com.sbb2.answer.service.response.AnswerCreateResponse;
 import com.sbb2.common.util.SearchCondition;
 import com.sbb2.infrastructer.answer.repository.AnswerRepository;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
