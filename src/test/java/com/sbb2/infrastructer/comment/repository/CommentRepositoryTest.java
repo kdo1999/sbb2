@@ -82,13 +82,21 @@ public class CommentRepositoryTest {
 
 		String answerContent = "testAnswerContent";
 
-		Answer answer = Answer.builder()
-			.content(answerContent)
+		Answer answer1 = Answer.builder()
+			.content(answerContent + 1)
 			.question(savedQuestion1)
 			.author(savedMember)
 			.build();
 
-		Answer savedAnswer = answerRepository.save(answer);
+		Answer answer2 = Answer.builder()
+			.content(answerContent + 2)
+			.question(savedQuestion1)
+			.author(savedMember)
+			.build();
+
+
+		Answer savedAnswer1 = answerRepository.save(answer1);
+		Answer savedAnswer2 = answerRepository.save(answer2);
 	}
 
 	@DisplayName("질문 댓글 저장 성공 테스트")
@@ -176,7 +184,7 @@ public class CommentRepositoryTest {
 
 	@DisplayName("질문 ID로 댓글 조회 성공 테스트")
 	@Test
-	void find_comment_success() {
+	void find_comment_questionId_success() {
 		//given
 		Question question1 = questionRepository.findById(1L).get();
 		Question question2 = questionRepository.findById(2L).get();
@@ -202,7 +210,41 @@ public class CommentRepositoryTest {
 		List<Comment> savedCommentList = List.of(savedComment2);
 
 		//when
-		List<Comment> findCommentList = commentRepository.findByQuestionId(savedComment2.id());
+		List<Comment> findCommentList = commentRepository.findByQuestionId(question2.id());
+
+		//then
+		assertThat(findCommentList).isEqualTo(savedCommentList);
+	}
+
+	@DisplayName("답변 ID로 댓글 조회 성공 테스트")
+	@Test
+	void find_comment_answerId_success() {
+		//given
+		Answer answer1 = answerRepository.findById(1L).get();
+		Answer answer2 = answerRepository.findById(2L).get();
+		Member member = memberRepository.findById(1L).get();
+
+		String commentContent = "testCommentContent";
+
+		Comment givenComment1 = Comment.builder()
+			.content(commentContent)
+			.answer(answer1)
+			.author(member)
+			.build();
+
+		Comment givenComment2 = Comment.builder()
+			.content(commentContent)
+			.answer(answer2)
+			.author(member)
+			.build();
+
+		Comment savedComment1 = commentRepository.save(givenComment1);
+		Comment savedComment2 = commentRepository.save(givenComment2);
+
+		List<Comment> savedCommentList = List.of(savedComment1);
+
+		//when
+		List<Comment> findCommentList = commentRepository.findByAnswerId(answer1.id());
 
 		//then
 		assertThat(findCommentList).isEqualTo(savedCommentList);
