@@ -515,4 +515,21 @@ public class AnswerServiceTest {
 		assertThat(result.getTotalPages()).isEqualTo(2);
 		assertThat(result.getContent()).isEqualTo(answerDetailResponseList.subList(0, 10));
 	}
+
+	@DisplayName("답변 페이징 조회시 질문이 존재하지 않는 실패 테스트")
+	@Test
+	void find_answerDetailPage_findQuestion_fail() {
+		//given
+		SearchCondition searchCondition = SearchCondition.builder()
+			.pageNum(0)
+			.build();
+
+		given(questionRepository.findById(1L))
+			.willReturn(Optional.empty());
+
+		//when & then
+		assertThatThrownBy(() -> answerService.findAnswerDetailPageByQuestionId(searchCondition, 1L, 1L))
+			.isInstanceOf(QuestionBusinessLogicException.class)
+			.hasMessage(QuestionErrorCode.NOT_FOUND.getMessage());
+	}
 }
