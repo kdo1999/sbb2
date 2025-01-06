@@ -13,7 +13,7 @@ import com.sbb2.question.domain.QuestionPageResponse;
 import com.sbb2.question.exception.QuestionBusinessLogicException;
 import com.sbb2.question.exception.QuestionErrorCode;
 import com.sbb2.question.service.response.QuestionCreateResponse;
-import com.sbb2.question.util.SearchCondition;
+import com.sbb2.common.util.SearchCondition;
 
 import lombok.RequiredArgsConstructor;
 

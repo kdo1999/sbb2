@@ -32,7 +32,7 @@ import com.sbb2.voter.domain.Voter;
 @Import({JpaAudtingConfig.class, QuerydslConfig.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DirtiesContext
-public class AnswerRepositoryTest {
+public class  AnswerRepositoryTest {
 	private final AnswerRepository answerRepository;
 	private final QuestionRepository questionRepository;
 	private final MemberRepository memberRepository;

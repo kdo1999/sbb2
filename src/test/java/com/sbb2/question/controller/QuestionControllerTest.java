@@ -37,7 +37,7 @@ import com.sbb2.question.domain.QuestionDetailResponse;
 import com.sbb2.question.domain.QuestionPageResponse;
 import com.sbb2.question.service.QuestionService;
 import com.sbb2.question.service.response.QuestionCreateResponse;
-import com.sbb2.question.util.SearchCondition;
+import com.sbb2.common.util.SearchCondition;
 import com.sbb2.voter.domain.Voter;
 
 import jakarta.validation.Validation;

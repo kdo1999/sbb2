@@ -27,7 +27,7 @@ import com.sbb2.question.domain.QQuestionDetailResponse;
 import com.sbb2.question.domain.QQuestionPageResponse;
 import com.sbb2.question.domain.QuestionDetailResponse;
 import com.sbb2.question.domain.QuestionPageResponse;
-import com.sbb2.question.util.SearchCondition;
+import com.sbb2.common.util.SearchCondition;
 
 import lombok.RequiredArgsConstructor;
 

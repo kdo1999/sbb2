@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sbb2.common.auth.userdetails.MemberUserDetails;
@@ -24,7 +23,7 @@ import com.sbb2.question.domain.QuestionDetailResponse;
 import com.sbb2.question.domain.QuestionPageResponse;
 import com.sbb2.question.service.QuestionService;
 import com.sbb2.question.service.response.QuestionCreateResponse;
-import com.sbb2.question.util.SearchCondition;
+import com.sbb2.common.util.SearchCondition;
 
 import lombok.RequiredArgsConstructor;
 

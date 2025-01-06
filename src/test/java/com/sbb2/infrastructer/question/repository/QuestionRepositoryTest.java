@@ -2,7 +2,6 @@ package com.sbb2.infrastructer.question.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,7 +17,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.test.annotation.DirtiesContext;
 
@@ -32,7 +30,7 @@ import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
 import com.sbb2.question.domain.QuestionDetailResponse;
 import com.sbb2.question.domain.QuestionPageResponse;
-import com.sbb2.question.util.SearchCondition;
+import com.sbb2.common.util.SearchCondition;
 import com.sbb2.voter.domain.Voter;
 
 import jakarta.persistence.EntityManager;

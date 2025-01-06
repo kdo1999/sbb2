@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import com.sbb2.question.domain.QuestionDetailResponse;
 import com.sbb2.question.domain.QuestionPageResponse;
 import com.sbb2.question.domain.Question;
-import com.sbb2.question.util.SearchCondition;
+import com.sbb2.common.util.SearchCondition;
 
 public interface QuestionRepository {
 	Question save(Question question);

@@ -1,4 +1,4 @@
-package com.sbb2.question.util;
+package com.sbb2.common.util;
 
 import lombok.Builder;
 

@@ -10,7 +10,7 @@ import com.sbb2.infrastructer.question.entity.QuestionEntity;
 import com.sbb2.question.domain.QuestionDetailResponse;
 import com.sbb2.question.domain.QuestionPageResponse;
 import com.sbb2.question.domain.Question;
-import com.sbb2.question.util.SearchCondition;
+import com.sbb2.common.util.SearchCondition;
 
 import lombok.RequiredArgsConstructor;
 
