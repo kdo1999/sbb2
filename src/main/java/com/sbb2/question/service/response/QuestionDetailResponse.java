@@ -1,11 +1,8 @@
-package com.sbb2.question.domain;
+package com.sbb2.question.service.response;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import com.querydsl.core.annotations.QueryProjection;
-import com.sbb2.answer.domain.AnswerDetailResponse;
 
 import lombok.Builder;
 

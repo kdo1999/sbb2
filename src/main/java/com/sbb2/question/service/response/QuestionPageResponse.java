@@ -1,4 +1,4 @@
-package com.sbb2.question.domain;
+package com.sbb2.question.service.response;
 
 import java.time.LocalDateTime;
 

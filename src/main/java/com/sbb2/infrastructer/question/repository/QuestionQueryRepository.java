@@ -1,6 +1,5 @@
 package com.sbb2.infrastructer.question.repository;
 
-import static com.sbb2.infrastructer.answer.entity.QAnswerEntity.*;
 import static com.sbb2.infrastructer.question.entity.QQuestionEntity.*;
 import static com.sbb2.infrastructer.voter.entity.QVoterEntity.*;
 
@@ -17,16 +16,13 @@ import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sbb2.answer.domain.AnswerDetailResponse;
-import com.sbb2.answer.domain.QAnswerDetailResponse;
 import com.sbb2.infrastructer.answer.entity.QAnswerEntity;
 import com.sbb2.question.domain.QQuestionDetailResponse;
 import com.sbb2.question.domain.QQuestionPageResponse;
-import com.sbb2.question.domain.QuestionDetailResponse;
-import com.sbb2.question.domain.QuestionPageResponse;
+import com.sbb2.question.service.response.QuestionDetailResponse;
+import com.sbb2.question.service.response.QuestionPageResponse;
 import com.sbb2.common.util.SearchCondition;
 
 import lombok.RequiredArgsConstructor;

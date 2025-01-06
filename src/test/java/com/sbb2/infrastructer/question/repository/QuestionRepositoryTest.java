@@ -28,8 +28,8 @@ import com.sbb2.infrastructer.member.repository.MemberRepository;
 import com.sbb2.infrastructer.voter.repository.VoterRepository;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
-import com.sbb2.question.domain.QuestionDetailResponse;
-import com.sbb2.question.domain.QuestionPageResponse;
+import com.sbb2.question.service.response.QuestionDetailResponse;
+import com.sbb2.question.service.response.QuestionPageResponse;
 import com.sbb2.common.util.SearchCondition;
 import com.sbb2.voter.domain.Voter;
 

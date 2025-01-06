@@ -22,13 +22,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import com.sbb2.answer.domain.Answer;
-import com.sbb2.answer.domain.AnswerDetailResponse;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.controller.request.QuestionForm;
 import com.sbb2.question.domain.Question;
-import com.sbb2.question.domain.QuestionDetailResponse;
-import com.sbb2.question.domain.QuestionPageResponse;
+import com.sbb2.question.service.response.QuestionDetailResponse;
+import com.sbb2.question.service.response.QuestionPageResponse;
 import com.sbb2.question.exception.QuestionBusinessLogicException;
 import com.sbb2.question.exception.QuestionErrorCode;
 import com.sbb2.question.service.response.QuestionCreateResponse;

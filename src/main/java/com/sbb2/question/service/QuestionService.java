@@ -4,8 +4,8 @@ import org.springframework.data.domain.Page;
 
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
-import com.sbb2.question.domain.QuestionDetailResponse;
-import com.sbb2.question.domain.QuestionPageResponse;
+import com.sbb2.question.service.response.QuestionDetailResponse;
+import com.sbb2.question.service.response.QuestionPageResponse;
 import com.sbb2.question.service.response.QuestionCreateResponse;
 import com.sbb2.common.util.SearchCondition;
 
