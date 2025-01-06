@@ -25,4 +25,11 @@ public class CommentRepositoryImpl implements CommentRepository{
 			.stream()
 			.map(CommentEntity::toModel).toList();
 	}
+
+	@Override
+	public List<Comment> findByAnswerId(Long answerId) {
+		return commentJpaRepository.findByAnswerId(answerId)
+			.stream()
+			.map(CommentEntity::toModel).toList();
+	}
 }

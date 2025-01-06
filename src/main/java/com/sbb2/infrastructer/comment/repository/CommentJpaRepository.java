@@ -11,4 +11,7 @@ import com.sbb2.infrastructer.comment.entity.CommentEntity;
 public interface CommentJpaRepository extends JpaRepository<CommentEntity, Long> {
 	@Query("select c from CommentEntity c where c.questionEntity.id = :questionId")
 	List<CommentEntity> findByQuestionId(@Param("questionId") Long questionId);
+
+	@Query("select c from CommentEntity c where c.answerEntity.id = :answerId")
+	List<CommentEntity> findByAnswerId(@Param("answerId") Long answerId);
 }

@@ -8,4 +8,6 @@ public interface CommentRepository {
 	Comment save(Comment comment);
 
 	List<Comment> findByQuestionId(Long questionId);
+
+	List<Comment> findByAnswerId(Long answerId);
 }
