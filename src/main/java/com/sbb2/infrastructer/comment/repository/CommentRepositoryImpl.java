@@ -38,4 +38,9 @@ public class CommentRepositoryImpl implements CommentRepository{
 	public Optional<Comment> findById(Long commentId) {
 		return commentJpaRepository.findById(commentId).map(CommentEntity::toModel);
 	}
+
+	@Override
+	public void deleteById(Long commentId) {
+		commentJpaRepository.deleteById(commentId);
+	}
 }

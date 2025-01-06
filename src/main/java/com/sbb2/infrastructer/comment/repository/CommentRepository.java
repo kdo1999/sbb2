@@ -13,4 +13,6 @@ public interface CommentRepository {
 	List<Comment> findByAnswerId(Long answerId);
 
 	Optional<Comment> findById(Long commentId);
+
+	void deleteById(Long commentId);
 }
