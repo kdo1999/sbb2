@@ -202,7 +202,7 @@ public class CommentRepositoryTest {
 		List<Comment> savedCommentList = List.of(savedComment2);
 
 		//when
-		List<Comment> findCommentList = commentRepository.findByQuestionId(savedComment2.id()).get();
+		List<Comment> findCommentList = commentRepository.findByQuestionId(savedComment2.id());
 
 		//then
 		assertThat(findCommentList).isEqualTo(savedCommentList);

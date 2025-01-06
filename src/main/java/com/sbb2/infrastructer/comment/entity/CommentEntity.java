@@ -37,7 +37,7 @@ public class CommentEntity extends BaseEntity {
 	private String content;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "qustion_id")
+	@JoinColumn(name = "question_id")
 	private QuestionEntity questionEntity;
 
 	@ManyToOne(fetch = FetchType.LAZY)
