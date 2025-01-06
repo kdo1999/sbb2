@@ -116,8 +116,7 @@ public class AnswerQueryRepository {
 
 	public BooleanExpression contentContains(SearchCondition searchCondition) {
 		return StringUtils.hasText(searchCondition.kw()) ?
-			questionEntity.subject.contains(searchCondition.kw())
-				.or(questionEntity.content.contains(searchCondition.kw())) :
+			answerEntity.content.contains(searchCondition.kw()) :
 			null;
 	}
 }
