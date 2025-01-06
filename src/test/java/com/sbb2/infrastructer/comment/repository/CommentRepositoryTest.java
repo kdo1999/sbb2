@@ -135,4 +135,34 @@ public class CommentRepositoryTest {
 		assertThat(savedComment.createdAt()).isNotNull();
 		assertThat(savedComment.modifiedAt()).isNotNull();
 	}
+
+	@DisplayName("댓글 수정 성공 테스트")
+	@Test
+	void update_comment_success() {
+		//given
+		Answer answer = answerRepository.findById(1L).get();
+		Member member = memberRepository.findById(1L).get();
+
+		String commentContent = "testCommentContent";
+		String updateContent = "updateCommentContent";
+
+		Comment givenComment = Comment.builder()
+			.content(commentContent)
+			.answer(answer)
+			.author(member)
+			.build();
+
+		Comment savedComment = commentRepository.save(givenComment);
+
+		//when
+		Comment fetchComment = savedComment.fetch(updateContent);
+		Comment updateComment = commentRepository.save(fetchComment);
+
+		//then
+		assertThat(updateComment.id()).isEqualTo(savedComment.id());
+		assertThat(updateComment.author().id()).isEqualTo(savedComment.author().id());
+		assertThat(updateComment.content()).isEqualTo(updateContent);
+		assertThat(updateComment.createdAt()).isEqualTo(savedComment.createdAt());
+		assertThat(updateComment.modifiedAt()).isNotEqualTo(savedComment.modifiedAt());
+	}
 }
