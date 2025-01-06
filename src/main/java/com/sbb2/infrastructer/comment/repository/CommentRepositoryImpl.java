@@ -1,6 +1,7 @@
 package com.sbb2.infrastructer.comment.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
@@ -31,5 +32,10 @@ public class CommentRepositoryImpl implements CommentRepository{
 		return commentJpaRepository.findByAnswerId(answerId)
 			.stream()
 			.map(CommentEntity::toModel).toList();
+	}
+
+	@Override
+	public Optional<Comment> findById(Long commentId) {
+		return commentJpaRepository.findById(commentId).map(CommentEntity::toModel);
 	}
 }
