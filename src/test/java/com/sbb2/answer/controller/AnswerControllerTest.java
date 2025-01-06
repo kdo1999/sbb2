@@ -5,7 +5,10 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.LongStream;
 
 import org.hibernate.validator.HibernateValidator;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +17,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.ConcurrentModel;
@@ -28,6 +35,7 @@ import com.sbb2.answer.service.AnswerService;
 import com.sbb2.answer.service.response.AnswerCreateResponse;
 import com.sbb2.common.auth.userdetails.MemberUserDetails;
 import com.sbb2.common.response.GenericResponse;
+import com.sbb2.common.util.SearchCondition;
 import com.sbb2.common.validation.ValidationGroups;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
@@ -250,5 +258,59 @@ public class AnswerControllerTest {
 		assertThat(result.getBody().getData()).isEqualTo(answerDetailResponse);
 		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
 		verify(answerService, times(1)).findAnswerDetailByIdAndMemberId(answer.id(), member.id());
+	}
+
+	@DisplayName("답변 페이징 조회 성공 테스트")
+	@Test
+	void findAll_success() {
+		//given
+		Long questionId = 1L;
+
+		Member member = Member.builder()
+			.id(1L)
+			.username("testUsername")
+			.password("testPassword")
+			.email("testEmail@naver.com")
+			.build();
+
+		MemberUserDetails loginMember = new MemberUserDetails(member);
+
+		List<AnswerDetailResponse> answerDetailResponseList = new ArrayList<>();
+		LongStream.range(0, 15)
+			.forEach((index) -> answerDetailResponseList.add(
+				AnswerDetailResponse.builder()
+					.id(index)
+					.content("testContent" + index)
+					.author(member.username())
+					.isAuthor(true)
+					.isVoter(false)
+					.voterCount(0L)
+					.createdAt(LocalDateTime.now())
+					.modifiedAt(LocalDateTime.now())
+					.questionId(1L)
+					.build()
+			));
+
+		SearchCondition searchCondition = SearchCondition.builder()
+			.pageNum(0)
+			.build();
+
+		Pageable pageable = PageRequest.of(searchCondition.pageNum(), 10);
+
+		Page<AnswerDetailResponse> answerDetailResponsePage = new PageImpl<>(
+			answerDetailResponseList.subList(0, Math.min(10, answerDetailResponseList.size())), pageable,
+			answerDetailResponseList.size());
+
+		given(answerService.findAnswerDetailPageByQuestionId(searchCondition, questionId, member.id()))
+			.willReturn(answerDetailResponsePage);
+
+	    //when
+		ResponseEntity<GenericResponse<Page<AnswerDetailResponse>>> result = answerController.findAll(questionId,
+			loginMember, searchCondition);
+
+		//then
+	    assertThat(result.getBody().getData()).isEqualTo(answerDetailResponsePage);
+		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+		verify(answerService, times(1)).findAnswerDetailPageByQuestionId(searchCondition, questionId, member.id());
 	}
 }
