@@ -357,7 +357,9 @@ public class QuestionServiceTest {
 			.kw("")
 			.build();
 
-		given(questionRepository.findAll(searchCondition, any(Pageable.class))).willReturn(new PageImpl<>(
+		Pageable pageable = PageRequest.of(searchCondition.pageNum(), 10);
+
+		given(questionRepository.findAll(searchCondition, pageable)).willReturn(new PageImpl<>(
 			questionPageResponseList.subList(0, Math.min(10, questionPageResponseList.size())),
 			PageRequest.of(0, 10),
 			questionPageResponseList.size()
