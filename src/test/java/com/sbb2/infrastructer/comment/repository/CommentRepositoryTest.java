@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.test.annotation.DirtiesContext;
 
 import com.sbb2.answer.domain.Answer;
+import com.sbb2.comment.Comment;
 import com.sbb2.common.config.JpaAudtingConfig;
 import com.sbb2.common.config.QuerydslConfig;
 import com.sbb2.infrastructer.answer.repository.AnswerRepository;
@@ -104,6 +105,33 @@ public class CommentRepositoryTest {
 		assertThat(savedComment.question().id()).isEqualTo(givenComment.question().id());
 		assertThat(savedComment.author()).isEqualTo(givenComment.author());
 		assertThat(savedComment.answer()).isNull();
+		assertThat(savedComment.createdAt()).isNotNull();
+		assertThat(savedComment.modifiedAt()).isNotNull();
+	}
+
+	@DisplayName("답변 댓글 저장 성공 테스트")
+	@Test
+	void save_answer_comment_success() {
+	    //given
+		Answer answer = answerRepository.findById(1L).get();
+		Member member = memberRepository.findById(1L).get();
+		String commentContent = "testCommentContent";
+
+		Comment givenComment = Comment.builder()
+			.content(commentContent)
+			.answer(answer)
+			.author(member)
+			.build();
+
+		//when
+		Comment savedComment = commentRepository.save(givenComment);
+
+	    //then
+		assertThat(savedComment.id()).isNotNull();
+		assertThat(savedComment.content()).isEqualTo(givenComment.content());
+		assertThat(savedComment.answer().id()).isEqualTo(givenComment.answer().id());
+		assertThat(savedComment.author()).isEqualTo(givenComment.author());
+		assertThat(savedComment.question()).isNull();
 		assertThat(savedComment.createdAt()).isNotNull();
 		assertThat(savedComment.modifiedAt()).isNotNull();
 	}
