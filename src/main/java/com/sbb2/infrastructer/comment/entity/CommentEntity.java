@@ -1,12 +1,13 @@
 package com.sbb2.infrastructer.comment.entity;
 
+import java.time.LocalDateTime;
+
 import com.sbb2.answer.domain.Answer;
 import com.sbb2.comment.Comment;
 import com.sbb2.common.util.BaseEntity;
 import com.sbb2.infrastructer.answer.entity.AnswerEntity;
 import com.sbb2.infrastructer.member.entity.MemberEntity;
 import com.sbb2.infrastructer.question.entity.QuestionEntity;
-import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
 
 import jakarta.persistence.Column;
@@ -49,41 +50,45 @@ public class CommentEntity extends BaseEntity {
 
 	@Builder
 	public CommentEntity(Long id, String content, QuestionEntity questionEntity, MemberEntity memberEntity,
-		AnswerEntity answerEntity) {
+		AnswerEntity answerEntity, LocalDateTime createdAt, LocalDateTime modifiedAt) {
 		this.id = id;
 		this.content = content;
 		this.questionEntity = questionEntity;
 		this.memberEntity = memberEntity;
 		this.answerEntity = answerEntity;
+		this.createdAt = createdAt;
+		this.modifiedAt = modifiedAt;
 	}
 
 	public static CommentEntity from(Comment comment) {
 		return CommentEntity.builder()
-				.id(comment.id())
-				.content(comment.content())
-				.questionEntity(comment.question() == null ? null : QuestionEntity.builder()
-					.id(comment.question().id())
-					.build())
-				.memberEntity(MemberEntity.from(comment.author()))
-				.answerEntity(comment.answer() == null ? null : AnswerEntity.builder()
-					.id(comment.answer().id())
-					.build())
-				.build();
+			.id(comment.id())
+			.content(comment.content())
+			.questionEntity(comment.question() == null ? null : QuestionEntity.builder()
+				.id(comment.question().id())
+				.build())
+			.memberEntity(MemberEntity.from(comment.author()))
+			.answerEntity(comment.answer() == null ? null : AnswerEntity.builder()
+				.id(comment.answer().id())
+				.build())
+			.createdAt(comment.createdAt())
+			.modifiedAt(comment.modifiedAt())
+			.build();
 	}
 
 	public Comment toModel() {
 		return Comment.builder()
-				.id(id)
-				.content(content)
-				.question(questionEntity == null ? null : Question.builder()
-					.id(questionEntity.getId())
-					.build())
-				.author(memberEntity.toModel())
-				.answer(answerEntity == null ? null : Answer.builder()
-					.id(answerEntity.getId())
-					.build())
+			.id(id)
+			.content(content)
+			.question(questionEntity == null ? null : Question.builder()
+				.id(questionEntity.getId())
+				.build())
+			.author(memberEntity.toModel())
+			.answer(answerEntity == null ? null : Answer.builder()
+				.id(answerEntity.getId())
+				.build())
 			.createdAt(createdAt)
 			.modifiedAt(modifiedAt)
-				.build();
+			.build();
 	}
 }

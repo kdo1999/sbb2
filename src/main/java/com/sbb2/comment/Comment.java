@@ -22,4 +22,20 @@ public record Comment(Long id, String content, Member author, Question question,
 		this.createdAt = createdAt;
 		this.modifiedAt = modifiedAt;
 	}
+
+	public Comment fetch(String updateContent) {
+		if (this.content != updateContent) {
+			return Comment.builder()
+				.id(this.id)
+				.content(updateContent)
+				.author(this.author)
+				.question(this.question)
+				.answer(this.answer)
+				.createdAt(this.createdAt)
+				.modifiedAt(this.modifiedAt)
+				.build();
+		} else {
+			return this;
+		}
+	}
 }

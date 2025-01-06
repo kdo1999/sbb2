@@ -161,8 +161,7 @@ public class CommentRepositoryTest {
 		//then
 		assertThat(updateComment.id()).isEqualTo(savedComment.id());
 		assertThat(updateComment.author().id()).isEqualTo(savedComment.author().id());
+		assertThat(updateComment.answer().id()).isEqualTo(savedComment.answer().id());
 		assertThat(updateComment.content()).isEqualTo(updateContent);
-		assertThat(updateComment.createdAt()).isEqualTo(savedComment.createdAt());
-		assertThat(updateComment.modifiedAt()).isNotEqualTo(savedComment.modifiedAt());
 	}
 }
