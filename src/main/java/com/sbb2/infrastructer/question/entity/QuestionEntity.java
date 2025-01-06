@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import com.sbb2.common.util.BaseEntity;
 import com.sbb2.infrastructer.answer.entity.AnswerEntity;
+import com.sbb2.infrastructer.comment.entity.CommentEntity;
 import com.sbb2.infrastructer.member.entity.MemberEntity;
 import com.sbb2.infrastructer.voter.entity.VoterEntity;
 import com.sbb2.question.domain.Question;
@@ -55,9 +56,12 @@ public class QuestionEntity extends BaseEntity {
 	@OneToMany(mappedBy = "questionEntity", cascade = CascadeType.ALL)
 	private Set<VoterEntity> voterEntitySet = new HashSet<>();
 
+	@OneToMany(mappedBy = "questionEntity", cascade = CascadeType.ALL)
+	private List<CommentEntity> commentEntityList = new ArrayList<>();
+
 	@Builder
 	public QuestionEntity(Long id, String subject, String content, MemberEntity author, LocalDateTime createdAt,
-		LocalDateTime modifiedAt, List<AnswerEntity> answerEntityList) {
+		LocalDateTime modifiedAt, List<AnswerEntity> answerEntityList, List<CommentEntity> commentEntityList) {
 		this.id = id;
 		this.subject = subject;
 		this.content = content;
@@ -65,6 +69,7 @@ public class QuestionEntity extends BaseEntity {
 		this.createdAt = createdAt;
 		this.modifiedAt = modifiedAt;
 		this.answerEntityList = answerEntityList;
+		this.commentEntityList = commentEntityList;
 	}
 
 	private void setVoterEntitySet(Set<VoterEntity> voterEntitySet) {

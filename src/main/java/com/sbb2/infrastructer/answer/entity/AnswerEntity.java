@@ -1,12 +1,15 @@
 package com.sbb2.infrastructer.answer.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.sbb2.answer.domain.Answer;
 import com.sbb2.common.util.BaseEntity;
+import com.sbb2.infrastructer.comment.entity.CommentEntity;
 import com.sbb2.infrastructer.member.entity.MemberEntity;
 import com.sbb2.infrastructer.question.entity.QuestionEntity;
 import com.sbb2.infrastructer.voter.entity.VoterEntity;
@@ -49,19 +52,24 @@ public class AnswerEntity extends BaseEntity {
 	@JoinColumn(name = "question_id")
 	private QuestionEntity questionEntity;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "answerEntity")
+	@OneToMany(mappedBy = "answerEntity", cascade = CascadeType.ALL)
 	private Set<VoterEntity> voterEntitySet = new HashSet<>();
+
+	@OneToMany(mappedBy = "answerEntity", cascade = CascadeType.ALL)
+	private List<CommentEntity> commentEntityList = new ArrayList<>();
 
 	@Builder
 	private AnswerEntity(Long id, String content, MemberEntity author, QuestionEntity questionEntity,
-		LocalDateTime createdAt,
-		LocalDateTime modifiedAt) {
+		LocalDateTime createdAt, LocalDateTime modifiedAt,
+		Set<VoterEntity> voterEntitySet, List<CommentEntity> commentEntityList) {
 		this.id = id;
 		this.content = content;
 		this.author = author;
 		this.questionEntity = questionEntity;
 		this.createdAt = createdAt;
 		this.modifiedAt = modifiedAt;
+		this.voterEntitySet = voterEntitySet;
+		this.commentEntityList = commentEntityList;
 	}
 
 	public void setVoterEntitySet(Set<VoterEntity> voterEntitySet) {
