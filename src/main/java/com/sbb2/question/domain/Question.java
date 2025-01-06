@@ -14,18 +14,17 @@ import com.sbb2.voter.domain.Voter;
 import lombok.Builder;
 
 public record Question(Long id, String subject, String content, Member author, LocalDateTime createdAt,
-					   LocalDateTime modifiedAt, List<Answer> answerList, Set<Voter> voterSet) {
+					   LocalDateTime modifiedAt, Set<Voter> voterSet) {
 
 	@Builder
 	public Question(Long id, String subject, String content, Member author, LocalDateTime createdAt,
-		LocalDateTime modifiedAt, List<Answer> answerList, Set<Voter> voterSet) {
+		LocalDateTime modifiedAt, Set<Voter> voterSet) {
 		this.id = id;
 		this.subject = subject;
 		this.content = content;
 		this.author = author;
 		this.createdAt = createdAt;
 		this.modifiedAt = modifiedAt;
-		this.answerList = answerList == null ? new ArrayList<>() : answerList;
 		this.voterSet = voterSet == null ? new HashSet<>() : voterSet;
 	}
 
@@ -37,7 +36,6 @@ public record Question(Long id, String subject, String content, Member author, L
 			.author(this.author)
 			.createdAt(this.createdAt)
 			.modifiedAt(this.modifiedAt)
-			.answerList(this.answerList)
 			.voterSet(this.voterSet)
 			.build();
 	}

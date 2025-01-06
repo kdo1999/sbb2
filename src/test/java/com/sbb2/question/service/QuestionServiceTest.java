@@ -402,7 +402,6 @@ public class QuestionServiceTest {
 			.subject("subject")
 			.content("content")
 			.author(givenMember)
-			.answerList(List.of(answer))
 			.voterSet(Set.of(voter))
 			.build();
 

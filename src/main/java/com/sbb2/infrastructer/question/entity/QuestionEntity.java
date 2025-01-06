@@ -80,8 +80,6 @@ public class QuestionEntity extends BaseEntity {
 			.author(MemberEntity.from(question.author()))
 			.createdAt(question.createdAt())
 			.modifiedAt(question.modifiedAt())
-			.answerEntityList(question.answerList().isEmpty() ? new ArrayList<>() :
-				question.answerList().stream().map(AnswerEntity::from).toList())
 			.build();
 		buildQuestion.setVoterEntitySet(question.voterSet().stream().map(voter -> VoterEntity.from(voter)).collect(
 			Collectors.toSet()));
@@ -94,10 +92,6 @@ public class QuestionEntity extends BaseEntity {
 			.subject(this.subject)
 			.content(this.content)
 			.author(this.author.toModel())
-			.answerList(answerEntityList.isEmpty() ? new ArrayList<>() : answerEntityList.stream()
-				.map(AnswerEntity::toModel)
-				.toList()
-			)
 			.createdAt(this.createdAt)
 			.modifiedAt(this.modifiedAt)
 			.build();
