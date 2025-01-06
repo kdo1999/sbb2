@@ -3,6 +3,7 @@ package com.sbb2.infrastructer.comment.repository;
 import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -271,5 +272,29 @@ public class CommentRepositoryTest {
 
 	    //then
 		assertThat(findComment).isEqualTo(savedComment);
+	}
+
+	@DisplayName("댓글 삭제 성공 테스트")
+	@Test
+	void delete_comment_success() {
+	    //given
+		Answer answer = answerRepository.findById(1L).get();
+		Member member = memberRepository.findById(1L).get();
+		String commentContent = "testCommentContent";
+
+		Comment givenComment = Comment.builder()
+			.content(commentContent)
+			.answer(answer)
+			.author(member)
+			.build();
+
+		Comment savedComment = commentRepository.save(givenComment);
+
+		//when
+		commentRepository.deleteById(savedComment.id());
+
+	    //then
+		Optional<Comment> findComment = commentRepository.findById(savedComment.id());
+		assertThat(findComment).isEmpty();
 	}
 }
