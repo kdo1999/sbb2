@@ -249,4 +249,27 @@ public class CommentRepositoryTest {
 		//then
 		assertThat(findCommentList).isEqualTo(savedCommentList);
 	}
+
+	@DisplayName("댓글 조회 성공 테스트")
+	@Test
+	void find_comment_success() {
+	    //given
+		Answer answer = answerRepository.findById(1L).get();
+		Member member = memberRepository.findById(1L).get();
+		String commentContent = "testCommentContent";
+
+		Comment givenComment = Comment.builder()
+			.content(commentContent)
+			.answer(answer)
+			.author(member)
+			.build();
+
+		Comment savedComment = commentRepository.save(givenComment);
+
+		//when
+		Comment findComment = commentRepository.findById(savedComment.id()).get();
+
+	    //then
+		assertThat(findComment).isEqualTo(savedComment);
+	}
 }
