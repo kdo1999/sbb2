@@ -190,7 +190,6 @@ public class QuestionRepositoryTest {
 
 		//when
 		Page<QuestionPageResponse> questionPage = questionRepository.findAll(searchCondition, pageable);
-		questionPage.getContent().iterator().forEachRemaining(System.out::println);
 
 		//then
 		assertThat(questionPage.getTotalPages()).isEqualTo(3);

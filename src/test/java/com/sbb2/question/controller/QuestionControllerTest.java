@@ -142,17 +142,6 @@ public class QuestionControllerTest {
 			.voterSet(Set.of(voter))
 			.build();
 
-		AnswerDetailResponse answerDetailResponse = AnswerDetailResponse.builder()
-			.id(1L)
-			.questionId(question.id())
-			.voterCount((long)question.answerList().get(0).voterSet().size())
-			.content(question.answerList().get(0).content())
-			.author(givenMember.username())
-			.isVoter(false)
-			.createdAt(LocalDateTime.now())
-			.modifiedAt(LocalDateTime.now())
-			.build();
-
 		QuestionDetailResponse questionDetailResponse = QuestionDetailResponse.builder()
 			.id(question.id())
 			.subject(question.subject())
@@ -160,7 +149,6 @@ public class QuestionControllerTest {
 			.voterCount((long)question.voterSet().size())
 			.isVoter(question.voterSet().stream()
 				.anyMatch(v -> v.member().id().equals(givenMember.id())))
-			.answerList(List.of(answerDetailResponse))
 			.isAuthor(question.author().id().equals(givenMember.id()))
 			.createdAt(LocalDateTime.now())
 			.modifiedAt(LocalDateTime.now())

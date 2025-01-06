@@ -406,17 +406,6 @@ public class QuestionServiceTest {
 			.voterSet(Set.of(voter))
 			.build();
 
-		AnswerDetailResponse answerDetailResponse = AnswerDetailResponse.builder()
-			.id(1L)
-			.questionId(question.id())
-			.voterCount((long)question.answerList().get(0).voterSet().size())
-			.content(question.answerList().get(0).content())
-			.author(givenMember.username())
-			.isVoter(false)
-			.createdAt(LocalDateTime.now())
-			.modifiedAt(LocalDateTime.now())
-			.build();
-
 		QuestionDetailResponse questionDetailResponse = QuestionDetailResponse.builder()
 			.id(question.id())
 			.subject(question.subject())
@@ -425,7 +414,6 @@ public class QuestionServiceTest {
 			.isVoter(question.voterSet().stream()
 				.anyMatch(v -> v.member().id().equals(givenMember.id())))
 			.isAuthor(question.author().id().equals(givenMember.id()))
-			.answerList(List.of(answerDetailResponse))
 			.createdAt(LocalDateTime.now())
 			.modifiedAt(LocalDateTime.now())
 			.build();

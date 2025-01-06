@@ -10,13 +10,13 @@ import com.sbb2.answer.domain.AnswerDetailResponse;
 import lombok.Builder;
 
 public record QuestionDetailResponse(Long id, String subject, String content, String author, LocalDateTime createdAt,
-									 LocalDateTime modifiedAt, List<AnswerDetailResponse> answerList, Long voterCount,
+									 LocalDateTime modifiedAt, Long voterCount,
 									 boolean isAuthor, boolean isVoter) {
 
 	@QueryProjection
 	@Builder
 	public QuestionDetailResponse(Long id, String subject, String content, String author, LocalDateTime createdAt,
-		LocalDateTime modifiedAt, List<AnswerDetailResponse> answerList, Long voterCount, boolean isAuthor,
+		LocalDateTime modifiedAt, Long voterCount, boolean isAuthor,
 		boolean isVoter) {
 		this.id = id;
 		this.subject = subject;
@@ -24,7 +24,6 @@ public record QuestionDetailResponse(Long id, String subject, String content, St
 		this.author = author;
 		this.createdAt = createdAt;
 		this.modifiedAt = modifiedAt;
-		this.answerList = answerList == null ? new ArrayList<>() : answerList;
 		this.voterCount = voterCount;
 		this.isAuthor = isAuthor;
 		this.isVoter = isVoter;

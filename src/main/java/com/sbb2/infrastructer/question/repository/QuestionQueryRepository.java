@@ -66,33 +66,6 @@ public class QuestionQueryRepository {
 	}
 
 	public QuestionDetailResponse findById(Long questionId, Long memberId) {
-		QAnswerEntity subAnswerEntity = new QAnswerEntity("subAnswerEntity");
-		List<AnswerDetailResponse> answerDetailResponses = queryFactory.select(new QAnswerDetailResponse(
-				answerEntity.id,
-				answerEntity.content,
-				answerEntity.author.username,
-				answerEntity.questionEntity.id,
-				answerEntity.createdAt,
-				answerEntity.modifiedAt,
-				voterEntity.countDistinct(),
-				answerEntity.author.id.eq(memberId),
-				voterEntity.memberEntity.id.eq(memberId)
-			))
-			.from(answerEntity)
-			.leftJoin(answerEntity.voterEntitySet, voterEntity)
-			.leftJoin(answerEntity.author)
-			.where(answerEntity.questionEntity.id.eq(questionId))
-			.groupBy(
-				answerEntity.id,
-				answerEntity.content,
-				answerEntity.author.username,
-				answerEntity.questionEntity.id,
-				answerEntity.createdAt,
-				answerEntity.modifiedAt,
-				voterEntity.memberEntity.id
-			)
-			.fetch();
-
 		QuestionDetailResponse questionDetailResponse = queryFactory.select(new QQuestionDetailResponse(
 				questionEntity.id,
 				questionEntity.subject,
@@ -100,7 +73,6 @@ public class QuestionQueryRepository {
 				questionEntity.author.username,
 				questionEntity.createdAt,
 				questionEntity.modifiedAt,
-				Expressions.asSimple(answerDetailResponses),
 				voterEntity.countDistinct(),
 				questionEntity.author.id.eq(memberId),
 				voterEntity.memberEntity.id.eq(memberId)
