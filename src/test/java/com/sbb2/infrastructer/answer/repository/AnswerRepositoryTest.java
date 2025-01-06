@@ -38,6 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 @Import({JpaAudtingConfig.class, QuerydslConfig.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DirtiesContext
+@Slf4j
 public class AnswerRepositoryTest {
 	private final AnswerRepository answerRepository;
 	private final QuestionRepository questionRepository;
@@ -302,9 +303,30 @@ public class AnswerRepositoryTest {
 			givenSearchCondition, questionId, loginMemberId, pageable);
 
 		//then
-		List<AnswerDetailResponse> content = answerDetailResponsePage.getContent();
-
 		assertThat(answerDetailResponsePage.getTotalPages()).isEqualTo(4);
 		assertThat(answerDetailResponsePage.getContent().size()).isEqualTo(10);
+	}
+
+	@DisplayName("답변 페이징 키워드 조회 성공 테스트")
+	@Test
+	void find_answerDetailPage_kw_success() {
+		//given
+		SearchCondition givenSearchCondition = SearchCondition.builder()
+			.pageNum(0)
+			.kw("1")
+			.build();
+		Long questionId = 1L;
+		Long loginMemberId = 1L;
+
+		Pageable pageable = PageRequest.of(givenSearchCondition.pageNum(), 10);
+
+		//when
+		Page<AnswerDetailResponse> answerDetailResponsePage = answerRepository.findAnswerDetailPageByQuestionId(
+			givenSearchCondition, questionId, loginMemberId, pageable);
+
+		//then
+		assertThat(answerDetailResponsePage.getTotalPages()).isEqualTo(2);
+		assertThat(answerDetailResponsePage.getContent().size()).isEqualTo(10);
+		assertThat(answerDetailResponsePage.getTotalElements()).isEqualTo(12);
 	}
 }
