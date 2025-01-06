@@ -20,7 +20,7 @@ import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sbb2.answer.service.response.AnswerDetailResponse;
-import com.sbb2.answer.domain.QAnswerDetailResponse;
+import com.sbb2.answer.service.response.QAnswerDetailResponse;
 import com.sbb2.common.util.SearchCondition;
 
 import lombok.RequiredArgsConstructor;
