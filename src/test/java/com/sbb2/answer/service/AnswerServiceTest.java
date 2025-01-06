@@ -5,10 +5,12 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,17 +18,24 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.cglib.core.Local;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import com.sbb2.answer.domain.Answer;
 import com.sbb2.answer.domain.AnswerDetailResponse;
 import com.sbb2.answer.exception.AnswerBusinessLogicException;
 import com.sbb2.answer.exception.AnswerErrorCode;
+import com.sbb2.common.util.SearchCondition;
 import com.sbb2.infrastructer.answer.repository.AnswerRepository;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
 import com.sbb2.question.exception.QuestionBusinessLogicException;
 import com.sbb2.question.exception.QuestionErrorCode;
+import com.sbb2.voter.domain.Voter;
 
 @ExtendWith(MockitoExtension.class)
 public class AnswerServiceTest {
@@ -456,5 +465,54 @@ public class AnswerServiceTest {
 		assertThatThrownBy(() -> answerService.findAnswerDetailByIdAndMemberId(answer.id(), member.id()))
 			.isInstanceOf(AnswerBusinessLogicException.class)
 			.hasMessage(AnswerErrorCode.NOT_FOUND.getMessage());
+	}
+
+	@DisplayName("답변 페이징 조회 성공 테스트")
+	@Test
+	void find_answerDetailPage_success() {
+		//given
+		List<AnswerDetailResponse> answerDetailResponseList = new ArrayList<>();
+		LongStream.range(0, 15)
+			.forEach((index) -> answerDetailResponseList.add(
+				AnswerDetailResponse.builder()
+					.id(index)
+					.content("testContent" + index)
+					.author("testUser")
+					.isAuthor(true)
+					.isVoter(false)
+					.voterCount(0L)
+					.createdAt(LocalDateTime.now())
+					.modifiedAt(LocalDateTime.now())
+					.questionId(1L)
+					.build()
+			));
+
+		SearchCondition searchCondition = SearchCondition.builder()
+			.pageNum(0)
+			.build();
+
+		Pageable pageable = PageRequest.of(searchCondition.pageNum(), 10);
+
+		Page<AnswerDetailResponse> answerDetailResponsePage = new PageImpl<>(
+			answerDetailResponseList.subList(0, Math.min(10, answerDetailResponseList.size())), pageable,
+			answerDetailResponseList.size());
+		given(questionRepository.findById(1L))
+			.willReturn(
+				Optional.of(Question.builder()
+					.id(1L)
+					.build())
+			);
+
+		given(answerRepository.findAnswerDetailPageByQuestionId(searchCondition, 1L, 1L, pageable))
+			.willReturn(answerDetailResponsePage);
+
+		//when
+		Page<AnswerDetailResponse> result = answerService.findAnswerDetailPageByQuestionId(
+			searchCondition, 1L, 1L);
+
+		//then
+		assertThat(result.getTotalElements()).isEqualTo(answerDetailResponseList.size());
+		assertThat(result.getTotalPages()).isEqualTo(2);
+		assertThat(result.getContent()).isEqualTo(answerDetailResponseList.subList(0, 10));
 	}
 }
