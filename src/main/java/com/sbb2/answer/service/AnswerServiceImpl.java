@@ -2,6 +2,9 @@ package com.sbb2.answer.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,6 +13,7 @@ import com.sbb2.answer.domain.AnswerDetailResponse;
 import com.sbb2.answer.exception.AnswerBusinessLogicException;
 import com.sbb2.answer.exception.AnswerErrorCode;
 import com.sbb2.answer.service.response.AnswerCreateResponse;
+import com.sbb2.common.util.SearchCondition;
 import com.sbb2.infrastructer.answer.repository.AnswerRepository;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
 import com.sbb2.member.domain.Member;
@@ -25,6 +29,8 @@ import lombok.RequiredArgsConstructor;
 public class AnswerServiceImpl implements AnswerService {
 	private final QuestionRepository questionRepository;
 	private final AnswerRepository answerRepository;
+
+	private static final int PAGE_SIZE = 10;
 
 	@Override
 	public AnswerDetailResponse save(Long questionId, String content, Member author) {
@@ -92,6 +98,17 @@ public class AnswerServiceImpl implements AnswerService {
 	public AnswerDetailResponse findAnswerDetailByIdAndMemberId(Long answerId, Long memberId) {
 		return answerRepository.findAnswerDetailByIdAndMemberId(answerId, memberId)
 			.orElseThrow(() -> new AnswerBusinessLogicException(AnswerErrorCode.NOT_FOUND));
+	}
+
+	@Override
+	public Page<AnswerDetailResponse> findAnswerDetailPageByQuestionId(SearchCondition searchCondition, Long questionId,
+		Long memberId) {
+		Question findQuestion = questionRepository.findById(questionId)
+			.orElseThrow(() -> new QuestionBusinessLogicException(QuestionErrorCode.NOT_FOUND));
+
+		Pageable pageable = PageRequest.of(searchCondition.pageNum(), PAGE_SIZE);
+
+		return answerRepository.findAnswerDetailPageByQuestionId(searchCondition, findQuestion.id(), memberId, pageable);
 	}
 
 	private void loginMemberEqualsAuthor(Member author, Answer findAnswer) {

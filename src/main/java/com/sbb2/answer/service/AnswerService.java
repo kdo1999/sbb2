@@ -3,9 +3,12 @@ package com.sbb2.answer.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+
 import com.sbb2.answer.domain.Answer;
 import com.sbb2.answer.domain.AnswerDetailResponse;
 import com.sbb2.answer.service.response.AnswerCreateResponse;
+import com.sbb2.common.util.SearchCondition;
 import com.sbb2.member.domain.Member;
 
 public interface AnswerService {
@@ -22,4 +25,5 @@ public interface AnswerService {
 
 	AnswerDetailResponse findAnswerDetailByIdAndMemberId(Long answerId, Long memberId);
 
+	Page<AnswerDetailResponse> findAnswerDetailPageByQuestionId(SearchCondition searchCondition, Long questionId, Long memberId);
 }
