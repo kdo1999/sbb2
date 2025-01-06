@@ -64,7 +64,8 @@ public class AnswerQueryRepository {
 		return Optional.ofNullable(answerDetailResponses);
 	}
 
-	public Page<AnswerDetailResponse> findAnswerDetailPageByQuestionId(SearchCondition searchCondition, Long questionId, Long memberId, Pageable pageable) {
+	public Page<AnswerDetailResponse> findAnswerDetailPageByQuestionId(SearchCondition searchCondition, Long questionId,
+		Long memberId, Pageable pageable) {
 		List<AnswerDetailResponse> content = queryFactory
 			.select(new QAnswerDetailResponse(
 				answerEntity.id,
@@ -80,9 +81,8 @@ public class AnswerQueryRepository {
 			.from(answerEntity)
 			.leftJoin(answerEntity.author)
 			.leftJoin(answerEntity.questionEntity)
-			.on(answerEntity.questionEntity.id.eq(questionId))
 			.leftJoin(answerEntity.voterEntitySet, voterEntity)
-			.where(contentContains(searchCondition))
+			.where(contentContains(searchCondition), answerEntity.questionEntity.id.eq(questionId))
 			.orderBy(getOrderBy(searchCondition))
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
@@ -91,7 +91,7 @@ public class AnswerQueryRepository {
 		JPAQuery<Long> countQuery = queryFactory
 			.select(answerEntity.count())
 			.from(answerEntity)
-			.where(contentContains(searchCondition));
+			.where(contentContains(searchCondition), answerEntity.questionEntity.id.eq(questionId));
 
 		return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
 	}
