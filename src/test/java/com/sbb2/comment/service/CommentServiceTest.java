@@ -61,7 +61,6 @@ public class CommentServiceTest {
 
 		String givenContent = "testContent";
 
-
 		ParentType givenParentType = ParentType.QUESTION;
 
 		Comment givenComment = Comment.builder()
@@ -87,6 +86,8 @@ public class CommentServiceTest {
 		//then
 		assertThat(commentResponse.commentId()).isEqualTo(1L);
 		assertThat(commentResponse.parentId()).isEqualTo(1L);
+		assertThat(commentResponse.author()).isEqualTo(givenMember.username());
+		assertThat(commentResponse.isAuthor()).isTrue();
 		assertThat(commentResponse.parentType()).isEqualTo(givenParentType);
 		assertThat(commentResponse.content()).isEqualTo(givenContent);
 		assertThat(commentResponse.createdAt()).isNotNull();
@@ -135,6 +136,8 @@ public class CommentServiceTest {
 		//then
 		assertThat(commentResponse.commentId()).isEqualTo(1L);
 		assertThat(commentResponse.parentId()).isEqualTo(1L);
+		assertThat(commentResponse.author()).isEqualTo(givenMember.username());
+		assertThat(commentResponse.isAuthor()).isTrue();
 		assertThat(commentResponse.parentType()).isEqualTo(givenParentType);
 		assertThat(commentResponse.content()).isEqualTo(givenContent);
 		assertThat(commentResponse.createdAt()).isNotNull();
@@ -258,6 +261,8 @@ public class CommentServiceTest {
 		//then
 		assertThat(commentResponse.commentId()).isEqualTo(1L);
 		assertThat(commentResponse.parentId()).isEqualTo(1L);
+		assertThat(commentResponse.author()).isEqualTo(givenMember.username());
+		assertThat(commentResponse.isAuthor()).isTrue();
 		assertThat(commentResponse.parentType()).isEqualTo(givenParentType);
 		assertThat(commentResponse.content()).isEqualTo(givenUpdateContent);
 		assertThat(commentResponse.createdAt()).isNotNull();
@@ -309,6 +314,8 @@ public class CommentServiceTest {
 		//then
 		assertThat(commentResponse.commentId()).isEqualTo(1L);
 		assertThat(commentResponse.parentId()).isEqualTo(1L);
+		assertThat(commentResponse.author()).isEqualTo(givenMember.username());
+		assertThat(commentResponse.isAuthor()).isTrue();
 		assertThat(commentResponse.parentType()).isEqualTo(givenParentType);
 		assertThat(commentResponse.content()).isEqualTo(givenUpdateContent);
 		assertThat(commentResponse.createdAt()).isNotNull();

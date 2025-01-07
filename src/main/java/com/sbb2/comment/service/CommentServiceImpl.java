@@ -61,6 +61,7 @@ public class CommentServiceImpl implements CommentService {
 			.parentType(parentType)
 			.content(savedComment.content())
 			.author(savedComment.author().username())
+			.isAuthor(true)
 			.createdAt(savedComment.createdAt())
 			.modifiedAt(savedComment.modifiedAt())
 			.build();
@@ -97,6 +98,7 @@ public class CommentServiceImpl implements CommentService {
 			.parentType(parentType)
 			.content(updatedComment.content())
 			.author(updatedComment.author().username())
+			.isAuthor(true)
 			.createdAt(updatedComment.createdAt())
 			.modifiedAt(updatedComment.modifiedAt())
 			.build();
