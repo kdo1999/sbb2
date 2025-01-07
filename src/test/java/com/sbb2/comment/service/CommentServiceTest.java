@@ -4,7 +4,10 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.LongStream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,6 +15,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import com.sbb2.answer.domain.Answer;
 import com.sbb2.answer.exception.AnswerBusinessLogicException;
@@ -21,6 +28,7 @@ import com.sbb2.comment.domain.ParentType;
 import com.sbb2.comment.exception.CommentBusinessLogicException;
 import com.sbb2.comment.exception.CommentErrorCode;
 import com.sbb2.comment.service.response.CommentResponse;
+import com.sbb2.common.util.SearchCondition;
 import com.sbb2.infrastructer.answer.repository.AnswerRepository;
 import com.sbb2.infrastructer.comment.repository.CommentRepository;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
@@ -528,5 +536,61 @@ public class CommentServiceTest {
 		assertThatThrownBy(() -> commentService.deleteById(givenComment.id(), givenLoginMember))
 			.isInstanceOf(CommentBusinessLogicException.class)
 			.hasMessage(CommentErrorCode.UNAUTHORIZED.getMessage());
+	}
+
+	@DisplayName("질문 ID로 댓글 페이징 조회 성공 테스트")
+	@Test
+	void findAll_questionId_success() {
+		//given
+		Long givenQuestionId = 1L;
+
+		Long givenMemberId = 1L;
+
+		ParentType givenParentType = ParentType.QUESTION;
+
+		SearchCondition givenSearchCondition = SearchCondition.builder()
+			.pageNum(0)
+			.build();
+
+		List<CommentResponse> commentResponseList = new ArrayList<>();
+
+		LongStream.range(0, 26)
+			.forEach((index) -> {
+				commentResponseList.add(CommentResponse.builder()
+					.commentId(index + 1)
+					.parentId(givenQuestionId)
+					.parentType(givenParentType)
+					.author("testUsername")
+					.isAuthor(true)
+					.content("testContent" + index)
+					.createdAt(LocalDateTime.now())
+					.modifiedAt(LocalDateTime.now())
+					.build());
+			});
+
+		Pageable givenPageable = PageRequest.of(0, 10);
+
+		int startIndex = givenPageable.getPageSize() * givenPageable.getPageNumber();
+
+		List<CommentResponse> commentResponseSubList = commentResponseList.subList(startIndex,
+			Math.min(startIndex + givenPageable.getPageSize(), commentResponseList.size()));
+
+		Page<CommentResponse> commentResponsePage = new PageImpl<>(
+			commentResponseList.subList(startIndex,
+				Math.min(startIndex + givenPageable.getPageSize(), commentResponseList.size())), givenPageable,
+			commentResponseList.size());
+
+		given(commentRepository.findAll(givenQuestionId, givenMemberId, givenParentType, givenPageable,
+			givenSearchCondition))
+			.willReturn(commentResponsePage);
+
+		//when
+		Page<CommentResponse> result = commentService.findAll(givenQuestionId, givenMemberId, givenParentType,
+			givenSearchCondition);
+
+		//then
+		assertThat(result.getTotalElements()).isEqualTo(commentResponseList.size());
+		assertThat(result.getTotalPages()).isEqualTo((int)Math.ceil(commentResponseList.size() / 10.0));
+		assertThat(result.getContent()).isEqualTo(commentResponseSubList);
 	}
 }
