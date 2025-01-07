@@ -10,7 +10,7 @@ import com.sbb2.comment.domain.Comment;
 import com.sbb2.comment.domain.ParentType;
 import com.sbb2.comment.exception.CommentBusinessLogicException;
 import com.sbb2.comment.exception.CommentErrorCode;
-import com.sbb2.comment.service.response.CreateCommentResponse;
+import com.sbb2.comment.service.response.CommentResponse;
 import com.sbb2.infrastructer.answer.repository.AnswerRepository;
 import com.sbb2.infrastructer.comment.repository.CommentRepository;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
@@ -30,7 +30,7 @@ public class CommentServiceImpl implements CommentService {
 	private final AnswerRepository answerRepository;
 
 	@Override
-	public CreateCommentResponse save(Long parentId, String content, ParentType parentType, Member author) {
+	public CommentResponse save(Long parentId, String content, ParentType parentType, Member author) {
 		if (parentType == null) {
 			throw new CommentBusinessLogicException(CommentErrorCode.NOT_SUPPORT);
 		}
@@ -55,7 +55,7 @@ public class CommentServiceImpl implements CommentService {
 
 		Comment savedComment = commentRepository.save(commentBuilder.build());
 
-		return CreateCommentResponse.builder()
+		return CommentResponse.builder()
 			.commentId(savedComment.id())
 			.parentId(parentId)
 			.parentType(parentType)

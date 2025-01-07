@@ -6,11 +6,11 @@ import com.sbb2.comment.domain.ParentType;
 
 import lombok.Builder;
 
-public record CreateCommentResponse(Long commentId, Long parentId, String content, String author,
-									ParentType parentType, LocalDateTime createdAt, LocalDateTime modifiedAt) {
+public record CommentResponse(Long commentId, Long parentId, String content, String author,
+							  ParentType parentType, LocalDateTime createdAt, LocalDateTime modifiedAt) {
 
 	@Builder
-	public CreateCommentResponse(Long commentId, Long parentId, String content, String author, ParentType parentType,
+	public CommentResponse(Long commentId, Long parentId, String content, String author, ParentType parentType,
 		LocalDateTime createdAt, LocalDateTime modifiedAt) {
 		this.commentId = commentId;
 		this.parentId = parentId;

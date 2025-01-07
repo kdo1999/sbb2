@@ -20,7 +20,7 @@ import com.sbb2.comment.domain.Comment;
 import com.sbb2.comment.domain.ParentType;
 import com.sbb2.comment.exception.CommentBusinessLogicException;
 import com.sbb2.comment.exception.CommentErrorCode;
-import com.sbb2.comment.service.response.CreateCommentResponse;
+import com.sbb2.comment.service.response.CommentResponse;
 import com.sbb2.infrastructer.answer.repository.AnswerRepository;
 import com.sbb2.infrastructer.comment.repository.CommentRepository;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
@@ -80,17 +80,17 @@ public class CommentServiceTest {
 			.willReturn(givenComment);
 
 		//when
-		CreateCommentResponse createCommentResponse = commentService.save(
+		CommentResponse commentResponse = commentService.save(
 			givenQuestion.id(), givenContent, givenParentType, givenMember
 		);
 
 		//then
-		assertThat(createCommentResponse.commentId()).isEqualTo(1L);
-		assertThat(createCommentResponse.parentId()).isEqualTo(1L);
-		assertThat(createCommentResponse.parentType()).isEqualTo(givenParentType);
-		assertThat(createCommentResponse.content()).isEqualTo(givenContent);
-		assertThat(createCommentResponse.createdAt()).isNotNull();
-		assertThat(createCommentResponse.modifiedAt()).isNotNull();
+		assertThat(commentResponse.commentId()).isEqualTo(1L);
+		assertThat(commentResponse.parentId()).isEqualTo(1L);
+		assertThat(commentResponse.parentType()).isEqualTo(givenParentType);
+		assertThat(commentResponse.content()).isEqualTo(givenContent);
+		assertThat(commentResponse.createdAt()).isNotNull();
+		assertThat(commentResponse.modifiedAt()).isNotNull();
 
 		verify(commentRepository, times(1)).save(any(Comment.class));
 		verify(questionRepository, times(1)).findById(givenQuestion.id());
@@ -128,17 +128,17 @@ public class CommentServiceTest {
 			.willReturn(givenComment);
 
 		//when
-		CreateCommentResponse createCommentResponse = commentService.save(
+		CommentResponse commentResponse = commentService.save(
 			givenAnswer.id(), givenContent, givenParentType, givenMember
 		);
 
 		//then
-		assertThat(createCommentResponse.commentId()).isEqualTo(1L);
-		assertThat(createCommentResponse.parentId()).isEqualTo(1L);
-		assertThat(createCommentResponse.parentType()).isEqualTo(givenParentType);
-		assertThat(createCommentResponse.content()).isEqualTo(givenContent);
-		assertThat(createCommentResponse.createdAt()).isNotNull();
-		assertThat(createCommentResponse.modifiedAt()).isNotNull();
+		assertThat(commentResponse.commentId()).isEqualTo(1L);
+		assertThat(commentResponse.parentId()).isEqualTo(1L);
+		assertThat(commentResponse.parentType()).isEqualTo(givenParentType);
+		assertThat(commentResponse.content()).isEqualTo(givenContent);
+		assertThat(commentResponse.createdAt()).isNotNull();
+		assertThat(commentResponse.modifiedAt()).isNotNull();
 
 		verify(commentRepository, times(1)).save(any(Comment.class));
 		verify(answerRepository, times(1)).findById(givenAnswer.id());
