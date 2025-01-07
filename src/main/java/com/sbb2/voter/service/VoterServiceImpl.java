@@ -35,7 +35,7 @@ public class VoterServiceImpl implements VoterService {
 		VoterCreateResponse voterCreateResponse = null;
 		
 		if (voterType == null) {
-				throw new VoterBusinessLogicException(VoterErrorCode.NOT_VOTER_TYPE);
+				throw new VoterBusinessLogicException(VoterErrorCode.NOT_SUPPORT);
 		}
 		
 		switch (voterType) {
@@ -67,7 +67,7 @@ public class VoterServiceImpl implements VoterService {
 	@Override
 	public void delete(Long targetId, VoterType voterType, Member member) {
 		if (voterType == null) {
-			throw new VoterBusinessLogicException(VoterErrorCode.NOT_VOTER_TYPE);
+			throw new VoterBusinessLogicException(VoterErrorCode.NOT_SUPPORT);
 		}
 
 		switch (voterType) {

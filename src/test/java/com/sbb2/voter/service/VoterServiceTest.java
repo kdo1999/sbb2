@@ -378,7 +378,7 @@ public class VoterServiceTest {
 	    //then
 		assertThatThrownBy(() -> voterService.save(question.id(), voterType, member))
 			.isInstanceOf(VoterBusinessLogicException.class)
-			.hasMessage(VoterErrorCode.NOT_VOTER_TYPE.getMessage());
+			.hasMessage(VoterErrorCode.NOT_SUPPORT.getMessage());
 	}
 
 	@DisplayName("추천 삭제시 타입이 일치하는게 없을 때 실패 테스트")
@@ -409,6 +409,6 @@ public class VoterServiceTest {
 	    //then
 		assertThatThrownBy(() -> voterService.delete(question.id(), voterType, member))
 			.isInstanceOf(VoterBusinessLogicException.class)
-			.hasMessage(VoterErrorCode.NOT_VOTER_TYPE.getMessage());
+			.hasMessage(VoterErrorCode.NOT_SUPPORT.getMessage());
 	}
 }
