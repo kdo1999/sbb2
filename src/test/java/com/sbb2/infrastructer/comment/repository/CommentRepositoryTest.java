@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -14,18 +16,25 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.test.annotation.DirtiesContext;
 
 import com.sbb2.answer.domain.Answer;
 import com.sbb2.comment.domain.Comment;
+import com.sbb2.comment.domain.ParentType;
+import com.sbb2.comment.service.response.CommentResponse;
 import com.sbb2.common.config.JpaAudtingConfig;
 import com.sbb2.common.config.QuerydslConfig;
+import com.sbb2.common.util.SearchCondition;
 import com.sbb2.infrastructer.answer.repository.AnswerRepository;
 import com.sbb2.infrastructer.member.repository.MemberRepository;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
+import com.sbb2.question.service.response.QuestionPageResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -98,6 +107,26 @@ public class CommentRepositoryTest {
 
 		Answer savedAnswer1 = answerRepository.save(answer1);
 		Answer savedAnswer2 = answerRepository.save(answer2);
+
+		LongStream.range(0, 26).forEach(i -> {
+			Comment comment = Comment.builder()
+				.content("testCommentContent" + i)
+				.question(savedQuestion1)
+				.author(savedMember)
+				.build();
+
+			commentRepository.save(comment);
+		});
+
+		LongStream.range(0, 26).forEach(i -> {
+			Comment comment = Comment.builder()
+				.content("testCommentContent" + i)
+				.answer(savedAnswer1)
+				.author(savedMember)
+				.build();
+
+			commentRepository.save(comment);
+		});
 	}
 
 	@DisplayName("질문 댓글 저장 성공 테스트")
@@ -296,5 +325,33 @@ public class CommentRepositoryTest {
 	    //then
 		Optional<Comment> findComment = commentRepository.findById(savedComment.id());
 		assertThat(findComment).isEmpty();
+	}
+
+	@DisplayName("질문 ID로 댓글 전체 조회 테스트")
+	@Test
+	void findAll_questionId() {
+		//given
+		Member findMember = memberRepository.findById(1L).get();
+		Question findQuestion = questionRepository.findById(1L).get();
+
+		int page = 0;
+
+		ParentType givenParentType = ParentType.QUESTION;
+
+		SearchCondition givenSearchCondition = SearchCondition.builder()
+			.pageNum(page)
+			.sort("createdAt")
+			.order("desc")
+			.build();
+
+		Pageable givenPageable = PageRequest.of(givenSearchCondition.pageNum(), 10);
+
+		//when
+		Page<CommentResponse> commentResponsePage = commentRepository.findAll(findQuestion.id(), findMember.id(), givenParentType, givenSearchCondition, pageable);
+
+		//then
+		assertThat(commentResponsePage.getTotalPages()).isEqualTo(3);
+		assertThat(commentResponsePage.getContent().size()).isEqualTo(10);
+		assertThat(commentResponsePage.getTotalElements()).isEqualTo(26);
 	}
 }
