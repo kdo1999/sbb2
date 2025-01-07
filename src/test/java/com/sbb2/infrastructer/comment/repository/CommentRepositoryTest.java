@@ -352,4 +352,33 @@ public class CommentRepositoryTest {
 		assertThat(commentResponsePage.getContent().size()).isEqualTo(10);
 		assertThat(commentResponsePage.getTotalElements()).isEqualTo(26);
 	}
+
+	@DisplayName("답변 ID로 댓글 전체 조회 테스트")
+	@Test
+	void findAll_answerId() {
+		//given
+		Member findMember = memberRepository.findById(1L).get();
+		Answer findAnswer = answerRepository.findById(1L).get();
+
+		int page = 0;
+
+		ParentType givenParentType = ParentType.ANSWER;
+
+		SearchCondition givenSearchCondition = SearchCondition.builder()
+			.pageNum(page)
+			.sort("createdAt")
+			.order("desc")
+			.build();
+
+		Pageable givenPageable = PageRequest.of(givenSearchCondition.pageNum(), 10);
+
+		//when
+		Page<CommentResponse> commentResponsePage = commentRepository.findAll(findAnswer.id(), findMember.id(),
+			givenParentType, givenPageable, givenSearchCondition);
+
+		//then
+		assertThat(commentResponsePage.getTotalPages()).isEqualTo(3);
+		assertThat(commentResponsePage.getContent().size()).isEqualTo(10);
+		assertThat(commentResponsePage.getTotalElements()).isEqualTo(26);
+	}
 }
