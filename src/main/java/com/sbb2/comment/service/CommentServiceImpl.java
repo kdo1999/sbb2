@@ -101,4 +101,16 @@ public class CommentServiceImpl implements CommentService {
 			.modifiedAt(updatedComment.modifiedAt())
 			.build();
 	}
+
+	@Override
+	public void deleteById(Long commentId, Member author) {
+		Comment findComment = commentRepository.findById(commentId)
+			.orElseThrow(() -> new CommentBusinessLogicException(CommentErrorCode.NOT_FOUND));
+
+		if (!findComment.author().equals(author)) {
+			throw new CommentBusinessLogicException(CommentErrorCode.UNAUTHORIZED);
+		}
+
+		commentRepository.deleteById(findComment.id());
+	}
 }
