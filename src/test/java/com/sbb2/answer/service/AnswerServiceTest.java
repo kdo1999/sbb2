@@ -491,6 +491,7 @@ public class AnswerServiceTest {
 
 		Pageable pageable = PageRequest.of(searchCondition.pageNum(), 10);
 
+		//TODO 페이지 자르는 부분 로직 변경할 것 (CommentServiceTest 참고)
 		Page<AnswerDetailResponse> answerDetailResponsePage = new PageImpl<>(
 			answerDetailResponseList.subList(0, Math.min(10, answerDetailResponseList.size())), pageable,
 			answerDetailResponseList.size());

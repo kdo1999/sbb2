@@ -358,6 +358,7 @@ public class QuestionServiceTest {
 
 		Pageable pageable = PageRequest.of(searchCondition.pageNum(), 10);
 
+		//TODO 페이지 자르는 부분 로직 변경할 것 (CommentServiceTest 참고)
 		given(questionRepository.findAll(searchCondition, pageable)).willReturn(new PageImpl<>(
 			questionPageResponseList.subList(0, Math.min(10, questionPageResponseList.size())),
 			PageRequest.of(0, 10),
