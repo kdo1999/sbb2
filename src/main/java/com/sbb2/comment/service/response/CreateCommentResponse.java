@@ -2,6 +2,8 @@ package com.sbb2.comment.service.response;
 
 import java.time.LocalDateTime;
 
+import com.sbb2.comment.domain.ParentType;
+
 import lombok.Builder;
 
 public record CreateCommentResponse(Long commentId, Long parentId, String content, String author,
