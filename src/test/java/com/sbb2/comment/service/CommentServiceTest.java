@@ -22,6 +22,8 @@ import com.sbb2.infrastructer.comment.repository.CommentRepository;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
+import com.sbb2.question.exception.QuestionBusinessLogicException;
+import com.sbb2.question.exception.QuestionErrorCode;
 
 @ExtendWith(MockitoExtension.class)
 public class CommentServiceTest {
@@ -104,7 +106,6 @@ public class CommentServiceTest {
 
 		String givenContent = "testContent";
 
-
 		ParentType givenParentType = ParentType.ANSWER;
 
 		Comment givenComment = Comment.builder()
@@ -137,5 +138,30 @@ public class CommentServiceTest {
 
 		verify(commentRepository, times(1)).save(any(Comment.class));
 		verify(answerRepository, times(1)).findById(givenAnswer.id());
+	}
+
+	@DisplayName("댓글 저장시 질문이 존재하지 않는 경우 실패 테스트")
+	@Test
+	void save_comment_question_not_found_fail() {
+		//given
+		Member givenMember = Member.builder()
+			.id(1L)
+			.email("testEmail@naver.com")
+			.username("testUsername")
+			.build();
+
+		Long givenQuestionId = 1L;
+
+		String givenContent = "testContent";
+
+		ParentType givenParentType = ParentType.QUESTION;
+
+		given(questionRepository.findById(givenQuestionId))
+			.willReturn(Optional.empty());
+
+		//when & then
+		assertThatThrownBy(() -> commentService.save(givenQuestionId, givenContent, givenParentType, givenMember))
+			.isInstanceOf(QuestionBusinessLogicException.class)
+			.hasMessage(QuestionErrorCode.NOT_FOUND.getMessage());
 	}
 }
