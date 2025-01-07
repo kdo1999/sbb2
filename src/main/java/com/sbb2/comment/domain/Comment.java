@@ -1,4 +1,4 @@
-package com.sbb2.comment;
+package com.sbb2.comment.domain;
 
 import java.time.LocalDateTime;
 

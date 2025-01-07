@@ -3,7 +3,7 @@ package com.sbb2.infrastructer.comment.repository;
 import java.util.List;
 import java.util.Optional;
 
-import com.sbb2.comment.Comment;
+import com.sbb2.comment.domain.Comment;
 
 public interface CommentRepository {
 	Comment save(Comment comment);

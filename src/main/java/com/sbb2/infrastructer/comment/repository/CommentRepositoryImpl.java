@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
-import com.sbb2.comment.Comment;
+import com.sbb2.comment.domain.Comment;
 import com.sbb2.infrastructer.comment.entity.CommentEntity;
 
 import lombok.RequiredArgsConstructor;

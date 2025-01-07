@@ -3,7 +3,7 @@ package com.sbb2.infrastructer.comment.entity;
 import java.time.LocalDateTime;
 
 import com.sbb2.answer.domain.Answer;
-import com.sbb2.comment.Comment;
+import com.sbb2.comment.domain.Comment;
 import com.sbb2.common.util.BaseEntity;
 import com.sbb2.infrastructer.answer.entity.AnswerEntity;
 import com.sbb2.infrastructer.member.entity.MemberEntity;

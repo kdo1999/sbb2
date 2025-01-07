@@ -18,7 +18,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.test.annotation.DirtiesContext;
 
 import com.sbb2.answer.domain.Answer;
-import com.sbb2.comment.Comment;
+import com.sbb2.comment.domain.Comment;
 import com.sbb2.common.config.JpaAudtingConfig;
 import com.sbb2.common.config.QuerydslConfig;
 import com.sbb2.infrastructer.answer.repository.AnswerRepository;
