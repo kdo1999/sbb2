@@ -318,9 +318,9 @@ public class CommentServiceTest {
 		verify(commentRepository, times(1)).findById(givenFindComment.id());
 	}
 
-	@DisplayName("댓글시 작성자가 아닐 경우 실패 테스트")
+	@DisplayName("댓글 수정시 작성자가 아닐 경우 실패 테스트")
 	@Test
-	void update_comment_author_not_match_success() {
+	void update_comment_author_not_match_fail() {
 		//given
 		Member givenMember = Member.builder()
 			.id(1L)
@@ -359,5 +359,56 @@ public class CommentServiceTest {
 			.hasMessage(CommentErrorCode.UNAUTHORIZED.getMessage());
 
 		verify(commentRepository, times(1)).findById(givenFindComment.id());
+	}
+
+	@DisplayName("댓글 수정시 question, answer가 null일 때 실패 테스트")
+	@Test
+	void update_comment_question_and_answer_isNull_fail() {
+		//given
+		Member givenMember = Member.builder()
+			.id(1L)
+			.email("testEmail@naver.com")
+			.username("testUsername")
+			.build();
+
+		Question givenQuestion = Question.builder().id(1L).build();
+
+		String givenContent = "testContent";
+		String givenUpdateContent = "updateContent";
+
+		ParentType givenParentType = ParentType.QUESTION;
+
+		Comment givenFindComment = Comment.builder()
+			.id(1L)
+			.content(givenContent)
+			.author(givenMember)
+			.question(givenQuestion)
+			.createdAt(LocalDateTime.now())
+			.modifiedAt(LocalDateTime.now())
+			.build();
+
+		Comment givenFetchComment = givenFindComment.fetch(givenUpdateContent);
+
+		Comment givenResponsehComment = Comment.builder()
+			.id(1L)
+			.content(givenUpdateContent)
+			.author(givenMember)
+			.createdAt(givenFindComment.createdAt())
+			.modifiedAt(givenFindComment.modifiedAt())
+			.build();
+
+		given(commentRepository.findById(givenFindComment.id()))
+			.willReturn(Optional.of(givenFindComment));
+
+		given(commentRepository.save(givenFetchComment))
+			.willReturn(givenResponsehComment);
+
+		//when & then
+		assertThatThrownBy(() -> commentService.update(givenFindComment.id(), givenUpdateContent, givenMember))
+			.isInstanceOf(CommentBusinessLogicException.class)
+			.hasMessage(CommentErrorCode.UNKNOWN_SERVER.getMessage());
+
+		verify(commentRepository, times(1)).findById(givenFindComment.id());
+		verify(commentRepository, times(1)).save(givenFetchComment);
 	}
 }
