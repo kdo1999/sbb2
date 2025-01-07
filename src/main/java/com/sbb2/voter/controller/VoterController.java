@@ -33,7 +33,7 @@ public class VoterController {
 	@PostMapping("/{id}")
 	public ResponseEntity<GenericResponse<VoterCreateResponse>> save(@PathVariable("id") Long id,
 		@RequestParam("voterType")
-		@ValidStringEnum(enumClass = VoterType.class, message = "지원하지 않는 VoterType 입니다.", groups = ValidEnumGroup.class)
+		@ValidStringEnum(enumClass = VoterType.class, groups = ValidEnumGroup.class)
 		String voterType,
 		@AuthenticationPrincipal MemberUserDetails loginMember) {
 		VoterType valueOf = VoterType.valueOf(voterType.toUpperCase());
@@ -45,7 +45,7 @@ public class VoterController {
 	@DeleteMapping("/{id}")
 	public ResponseEntity<GenericResponse<Void>> delete(@PathVariable("id") Long id,
 		@RequestParam("voterType")
-		@ValidStringEnum(enumClass = VoterType.class, message = "지원하지 않는 VoterType 입니다.", groups = ValidEnumGroup.class)
+		@ValidStringEnum(enumClass = VoterType.class, groups = ValidEnumGroup.class)
 		String voterType,
 		@AuthenticationPrincipal MemberUserDetails loginMember) {
 		VoterType valueOf = VoterType.valueOf(voterType.toUpperCase());

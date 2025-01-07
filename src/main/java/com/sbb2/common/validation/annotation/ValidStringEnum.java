@@ -14,7 +14,7 @@ import jakarta.validation.Payload;
 @Target({ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidStringEnum {
-	String message() default "요청 값이 유효하지 않습니다.";
+	String message() default "지원하지 않는 타입입니다..";
 
 	Class<?>[] groups() default {};
 
