@@ -411,4 +411,41 @@ public class CommentServiceTest {
 		verify(commentRepository, times(1)).findById(givenFindComment.id());
 		verify(commentRepository, times(1)).save(givenFetchComment);
 	}
+
+	@DisplayName("댓글 삭제 성공 테스트")
+	@Test
+	void delete_comment_success() {
+		//given
+		Member givenMember = Member.builder()
+			.id(1L)
+			.email("testEmail@naver.com")
+			.username("testUsername")
+			.build();
+
+		Answer givenAnswer = Answer.builder().id(1L).build();
+
+		String givenContent = "testContent";
+
+		ParentType givenParentType = ParentType.ANSWER;
+
+		Comment givenComment = Comment.builder()
+			.id(1L)
+			.content(givenContent)
+			.author(givenMember)
+			.answer(givenAnswer)
+			.createdAt(LocalDateTime.now())
+			.modifiedAt(LocalDateTime.now())
+			.build();
+
+		given(commentRepository.findById(1L))
+			.willReturn(Optional.of(givenComment));
+
+		doNothing().when(commentRepository).deleteById(givenComment.id());
+		//when
+		commentService.deleteById(givenComment.id(), givenMember);
+
+		//then
+		verify(commentRepository, times(1)).findById(givenComment.id());
+		verify(commentRepository, times(1)).deleteById(givenComment.id());
+	}
 }
