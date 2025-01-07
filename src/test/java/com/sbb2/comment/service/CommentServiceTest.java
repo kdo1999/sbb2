@@ -14,6 +14,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.sbb2.answer.domain.Answer;
+import com.sbb2.answer.exception.AnswerBusinessLogicException;
+import com.sbb2.answer.exception.AnswerErrorCode;
 import com.sbb2.comment.domain.Comment;
 import com.sbb2.comment.domain.ParentType;
 import com.sbb2.comment.service.response.CreateCommentResponse;
@@ -163,5 +165,30 @@ public class CommentServiceTest {
 		assertThatThrownBy(() -> commentService.save(givenQuestionId, givenContent, givenParentType, givenMember))
 			.isInstanceOf(QuestionBusinessLogicException.class)
 			.hasMessage(QuestionErrorCode.NOT_FOUND.getMessage());
+	}
+
+	@DisplayName("댓글 저장시 답변이 존재하지 않는 경우 실패 테스트")
+	@Test
+	void save_comment_answer_not_found_fail() {
+		//given
+		Member givenMember = Member.builder()
+			.id(1L)
+			.email("testEmail@naver.com")
+			.username("testUsername")
+			.build();
+
+		Long givenAnswerId = 1L;
+
+		String givenContent = "testContent";
+
+		ParentType givenParentType = ParentType.ANSWER;
+
+		given(answerRepository.findById(givenAnswerId))
+			.willReturn(Optional.empty());
+
+		//when & then
+		assertThatThrownBy(() -> commentService.save(givenAnswerId, givenContent, givenParentType, givenMember))
+			.isInstanceOf(AnswerBusinessLogicException.class)
+			.hasMessage(AnswerErrorCode.NOT_FOUND.getMessage());
 	}
 }
