@@ -65,4 +65,40 @@ public class CommentServiceImpl implements CommentService {
 			.modifiedAt(savedComment.modifiedAt())
 			.build();
 	}
+
+	@Override
+	public CommentResponse update(Long commentId, String updateContent, Member author) {
+		Comment findComment = commentRepository.findById(commentId)
+			.orElseThrow(() -> new CommentBusinessLogicException(CommentErrorCode.NOT_FOUND));
+
+		if (!findComment.author().equals(author)) {
+			throw new CommentBusinessLogicException(CommentErrorCode.UNAUTHORIZED);
+		}
+
+		Comment fetchComment = findComment.fetch(updateContent);
+		Comment updatedComment = commentRepository.save(fetchComment);
+
+		ParentType parentType;
+		Long parentId;
+
+		if (updatedComment.question() != null) {
+			parentType = ParentType.QUESTION;
+			parentId = updatedComment.question().id();
+		} else if (updatedComment.answer() != null) {
+			parentType = ParentType.ANSWER;
+			parentId = updatedComment.answer().id();
+		} else {
+			throw new CommentBusinessLogicException(CommentErrorCode.UNKNOWN_SERVER);
+		}
+
+		return CommentResponse.builder()
+			.commentId(updatedComment.id())
+			.parentId(parentId)
+			.parentType(parentType)
+			.content(updatedComment.content())
+			.author(updatedComment.author().username())
+			.createdAt(updatedComment.createdAt())
+			.modifiedAt(updatedComment.modifiedAt())
+			.build();
+	}
 }

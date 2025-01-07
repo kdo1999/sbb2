@@ -216,9 +216,9 @@ public class CommentServiceTest {
 			.hasMessage(CommentErrorCode.NOT_SUPPORT.getMessage());
 	}
 
-	@DisplayName("댓글 수정 성공 테스트")
+	@DisplayName("답변 댓글 수정 성공 테스트")
 	@Test
-	void update_comment_success() {
+	void update_comment_answer_success() {
 		//given
 		Member givenMember = Member.builder()
 			.id(1L)
@@ -242,14 +242,7 @@ public class CommentServiceTest {
 			.modifiedAt(LocalDateTime.now())
 			.build();
 
-		Comment givenUpdateComment = Comment.builder()
-			.id(1L)
-			.content(givenUpdateContent)
-			.author(givenMember)
-			.answer(givenAnswer)
-			.createdAt(LocalDateTime.now())
-			.modifiedAt(LocalDateTime.now())
-			.build();
+		Comment givenUpdateComment = givenFindComment.fetch(givenUpdateContent);
 
 		given(commentRepository.findById(givenFindComment.id()))
 			.willReturn(Optional.of(givenFindComment));

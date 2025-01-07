@@ -6,4 +6,5 @@ import com.sbb2.member.domain.Member;
 
 public interface CommentService {
 	CommentResponse save(Long parentId, String content, ParentType parentType, Member author);
+	CommentResponse update(Long commentId, String updateContent, Member author);
 }
