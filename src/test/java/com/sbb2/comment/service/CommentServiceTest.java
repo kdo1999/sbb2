@@ -317,4 +317,47 @@ public class CommentServiceTest {
 		verify(commentRepository, times(1)).save(givenUpdateComment);
 		verify(commentRepository, times(1)).findById(givenFindComment.id());
 	}
+
+	@DisplayName("댓글시 작성자가 아닐 경우 실패 테스트")
+	@Test
+	void update_comment_author_not_match_success() {
+		//given
+		Member givenMember = Member.builder()
+			.id(1L)
+			.email("testEmail@naver.com")
+			.username("testUsername")
+			.build();
+
+		Member givenLoginMember = Member.builder()
+			.id(2L)
+			.email("testEmail2@naver.com")
+			.username("testUsername2")
+			.build();
+
+		Question givenQuestion = Question.builder().id(1L).build();
+
+		String givenContent = "testContent";
+		String givenUpdateContent = "updateContent";
+
+		ParentType givenParentType = ParentType.QUESTION;
+
+		Comment givenFindComment = Comment.builder()
+			.id(1L)
+			.content(givenContent)
+			.author(givenMember)
+			.question(givenQuestion)
+			.createdAt(LocalDateTime.now())
+			.modifiedAt(LocalDateTime.now())
+			.build();
+
+		given(commentRepository.findById(givenFindComment.id()))
+			.willReturn(Optional.of(givenFindComment));
+
+		//when & then
+		assertThatThrownBy(() -> commentService.update(givenFindComment.id(), givenUpdateContent, givenLoginMember))
+			.isInstanceOf(CommentBusinessLogicException.class)
+			.hasMessage(CommentErrorCode.UNAUTHORIZED.getMessage());
+
+		verify(commentRepository, times(1)).findById(givenFindComment.id());
+	}
 }
