@@ -593,4 +593,60 @@ public class CommentServiceTest {
 		assertThat(result.getTotalPages()).isEqualTo((int)Math.ceil(commentResponseList.size() / 10.0));
 		assertThat(result.getContent()).isEqualTo(commentResponseSubList);
 	}
+
+	@DisplayName("답변 ID로 댓글 페이징 조회 성공 테스트")
+	@Test
+	void findAll_answerId_success() {
+		//given
+		Long givenAnswerId = 1L;
+
+		Long givenMemberId = 1L;
+
+		ParentType givenParentType = ParentType.ANSWER;
+
+		SearchCondition givenSearchCondition = SearchCondition.builder()
+			.pageNum(0)
+			.build();
+
+		List<CommentResponse> commentResponseList = new ArrayList<>();
+
+		LongStream.range(0, 26)
+			.forEach((index) -> {
+				commentResponseList.add(CommentResponse.builder()
+					.commentId(index + 1)
+					.parentId(givenAnswerId)
+					.parentType(givenParentType)
+					.author("testUsername")
+					.isAuthor(true)
+					.content("testContent" + index)
+					.createdAt(LocalDateTime.now())
+					.modifiedAt(LocalDateTime.now())
+					.build());
+			});
+
+		Pageable givenPageable = PageRequest.of(0, 10);
+
+		int startIndex = givenPageable.getPageSize() * givenPageable.getPageNumber();
+
+		List<CommentResponse> commentResponseSubList = commentResponseList.subList(startIndex,
+			Math.min(startIndex + givenPageable.getPageSize(), commentResponseList.size()));
+
+		Page<CommentResponse> commentResponsePage = new PageImpl<>(
+			commentResponseList.subList(startIndex,
+				Math.min(startIndex + givenPageable.getPageSize(), commentResponseList.size())), givenPageable,
+			commentResponseList.size());
+
+		given(commentRepository.findAll(givenAnswerId, givenMemberId, givenParentType, givenPageable,
+			givenSearchCondition))
+			.willReturn(commentResponsePage);
+
+		//when
+		Page<CommentResponse> result = commentService.findAll(givenAnswerId, givenMemberId, givenParentType,
+			givenSearchCondition);
+
+		//then
+		assertThat(result.getTotalElements()).isEqualTo(commentResponseList.size());
+		assertThat(result.getTotalPages()).isEqualTo((int)Math.ceil(commentResponseList.size() / 10.0));
+		assertThat(result.getContent()).isEqualTo(commentResponseSubList);
+	}
 }
