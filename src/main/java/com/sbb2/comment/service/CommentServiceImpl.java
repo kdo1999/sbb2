@@ -36,6 +36,7 @@ public class CommentServiceImpl implements CommentService {
 	private final AnswerRepository answerRepository;
 
 	@Override
+	@Transactional(readOnly = true)
 	public Page<CommentResponse> findAll(Long parentId, Long memberId, ParentType parentType,
 		SearchCondition searchCondition) {
 		Pageable pageable = PageRequest.of(
