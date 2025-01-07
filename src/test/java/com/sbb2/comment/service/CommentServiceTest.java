@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.sbb2.answer.domain.Answer;
 import com.sbb2.comment.domain.Comment;
 import com.sbb2.comment.domain.ParentType;
 import com.sbb2.comment.service.response.CreateCommentResponse;
@@ -37,7 +38,7 @@ public class CommentServiceTest {
 
 	@BeforeEach
 	void setUp() {
-		commentService = new CommentServiceImpl(commentRepository, questionRepository);
+		commentService = new CommentServiceImpl(commentRepository, questionRepository, answerRepository);
 	}
 
 	@DisplayName("질문 댓글 저장 성공 테스트")
@@ -87,5 +88,54 @@ public class CommentServiceTest {
 
 		verify(commentRepository, times(1)).save(any(Comment.class));
 		verify(questionRepository, times(1)).findById(givenQuestion.id());
+	}
+
+	@DisplayName("답변 댓글 저장 성공 테스트")
+	@Test
+	void save_comment_answer_success() {
+		//given
+		Member givenMember = Member.builder()
+			.id(1L)
+			.email("testEmail@naver.com")
+			.username("testUsername")
+			.build();
+
+		Answer givenAnswer = Answer.builder().id(1L).build();
+
+		String givenContent = "testContent";
+
+
+		ParentType givenParentType = ParentType.ANSWER;
+
+		Comment givenComment = Comment.builder()
+			.id(1L)
+			.content(givenContent)
+			.author(givenMember)
+			.answer(givenAnswer)
+			.createdAt(LocalDateTime.now())
+			.modifiedAt(LocalDateTime.now())
+			.build();
+
+		given(answerRepository.findById(1L))
+			.willReturn(Optional.of(givenAnswer));
+
+		given(commentRepository.save(any(Comment.class)))
+			.willReturn(givenComment);
+
+		//when
+		CreateCommentResponse createCommentResponse = commentService.save(
+			givenAnswer.id(), givenContent, givenParentType, givenMember
+		);
+
+		//then
+		assertThat(createCommentResponse.commentId()).isEqualTo(1L);
+		assertThat(createCommentResponse.parentId()).isEqualTo(1L);
+		assertThat(createCommentResponse.parentType()).isEqualTo(givenParentType);
+		assertThat(createCommentResponse.content()).isEqualTo(givenContent);
+		assertThat(createCommentResponse.createdAt()).isNotNull();
+		assertThat(createCommentResponse.modifiedAt()).isNotNull();
+
+		verify(commentRepository, times(1)).save(any(Comment.class));
+		verify(answerRepository, times(1)).findById(givenAnswer.id());
 	}
 }
