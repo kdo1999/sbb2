@@ -3,9 +3,13 @@ package com.sbb2.comment.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sbb2.answer.domain.Answer;
+import com.sbb2.answer.exception.AnswerBusinessLogicException;
+import com.sbb2.answer.exception.AnswerErrorCode;
 import com.sbb2.comment.domain.Comment;
 import com.sbb2.comment.domain.ParentType;
 import com.sbb2.comment.service.response.CreateCommentResponse;
+import com.sbb2.infrastructer.answer.repository.AnswerRepository;
 import com.sbb2.infrastructer.comment.repository.CommentRepository;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
 import com.sbb2.member.domain.Member;
@@ -21,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class CommentServiceImpl implements CommentService {
 	private final CommentRepository commentRepository;
 	private final QuestionRepository questionRepository;
+	private final AnswerRepository answerRepository;
 
 	@Override
 	public CreateCommentResponse save(Long parentId, String content, ParentType parentType, Member author) {
@@ -28,22 +33,26 @@ public class CommentServiceImpl implements CommentService {
 			//TODO 추후 예외 처리
 			throw new RuntimeException();
 		}
-		Comment comment = null;
+		Comment.CommentBuilder commentBuilder = Comment.builder()
+			.content(content)
+			.author(author);
 
 		switch (parentType) {
 			case QUESTION:
 				Question findQuestion = questionRepository.findById(parentId)
 					.orElseThrow(() -> new QuestionBusinessLogicException(QuestionErrorCode.NOT_FOUND));
 
-				comment = Comment.builder()
-					.question(findQuestion)
-					.author(author)
-					.content(content).build();
+				commentBuilder.question(findQuestion);
 
 				break;
+			case ANSWER:
+				Answer findAnswer = answerRepository.findById(parentId)
+					.orElseThrow(() -> new AnswerBusinessLogicException(AnswerErrorCode.NOT_FOUND));
+
+				commentBuilder.answer(findAnswer);
 		}
 
-		Comment savedComment = commentRepository.save(comment);
+		Comment savedComment = commentRepository.save(commentBuilder.build());
 
 		return CreateCommentResponse.builder()
 			.commentId(savedComment.id())
