@@ -6,16 +6,16 @@ import static org.mockito.BDDMockito.*;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.BDDMockito;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.sbb2.comment.domain.Comment;
+import com.sbb2.comment.domain.ParentType;
+import com.sbb2.comment.service.response.CreateCommentResponse;
 import com.sbb2.infrastructer.answer.repository.AnswerRepository;
 import com.sbb2.infrastructer.comment.repository.CommentRepository;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
@@ -37,7 +37,7 @@ public class CommentServiceTest {
 
 	@BeforeEach
 	void setUp() {
-		commentService = new CommentServiceImpl(commentRepository);
+		commentService = new CommentServiceImpl(commentRepository, questionRepository);
 	}
 
 	@DisplayName("질문 댓글 저장 성공 테스트")
@@ -74,7 +74,7 @@ public class CommentServiceTest {
 
 		//when
 		CreateCommentResponse createCommentResponse = commentService.save(
-			givenQuestionId, givenMember, givenContent, givenParentType
+			givenQuestion.id(), givenContent, givenParentType, givenMember
 		);
 
 		//then
