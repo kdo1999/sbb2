@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -34,7 +33,6 @@ import com.sbb2.infrastructer.member.repository.MemberRepository;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
-import com.sbb2.question.service.response.QuestionPageResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -104,7 +102,6 @@ public class CommentRepositoryTest {
 			.author(savedMember)
 			.build();
 
-
 		Answer savedAnswer1 = answerRepository.save(answer1);
 		Answer savedAnswer2 = answerRepository.save(answer2);
 
@@ -132,7 +129,7 @@ public class CommentRepositoryTest {
 	@DisplayName("질문 댓글 저장 성공 테스트")
 	@Test
 	void save_question_comment_success() {
-	    //given
+		//given
 		Question question = questionRepository.findById(1L).get();
 		Member member = memberRepository.findById(1L).get();
 		String commentContent = "testCommentContent";
@@ -146,7 +143,7 @@ public class CommentRepositoryTest {
 		//when
 		Comment savedComment = commentRepository.save(givenComment);
 
-	    //then
+		//then
 		assertThat(savedComment.id()).isNotNull();
 		assertThat(savedComment.content()).isEqualTo(givenComment.content());
 		assertThat(savedComment.question().id()).isEqualTo(givenComment.question().id());
@@ -159,7 +156,7 @@ public class CommentRepositoryTest {
 	@DisplayName("답변 댓글 저장 성공 테스트")
 	@Test
 	void save_answer_comment_success() {
-	    //given
+		//given
 		Answer answer = answerRepository.findById(1L).get();
 		Member member = memberRepository.findById(1L).get();
 		String commentContent = "testCommentContent";
@@ -173,7 +170,7 @@ public class CommentRepositoryTest {
 		//when
 		Comment savedComment = commentRepository.save(givenComment);
 
-	    //then
+		//then
 		assertThat(savedComment.id()).isNotNull();
 		assertThat(savedComment.content()).isEqualTo(givenComment.content());
 		assertThat(savedComment.answer().id()).isEqualTo(givenComment.answer().id());
@@ -283,7 +280,7 @@ public class CommentRepositoryTest {
 	@DisplayName("댓글 조회 성공 테스트")
 	@Test
 	void find_comment_success() {
-	    //given
+		//given
 		Answer answer = answerRepository.findById(1L).get();
 		Member member = memberRepository.findById(1L).get();
 		String commentContent = "testCommentContent";
@@ -299,14 +296,14 @@ public class CommentRepositoryTest {
 		//when
 		Comment findComment = commentRepository.findById(savedComment.id()).get();
 
-	    //then
+		//then
 		assertThat(findComment).isEqualTo(savedComment);
 	}
 
 	@DisplayName("댓글 삭제 성공 테스트")
 	@Test
 	void delete_comment_success() {
-	    //given
+		//given
 		Answer answer = answerRepository.findById(1L).get();
 		Member member = memberRepository.findById(1L).get();
 		String commentContent = "testCommentContent";
@@ -322,7 +319,7 @@ public class CommentRepositoryTest {
 		//when
 		commentRepository.deleteById(savedComment.id());
 
-	    //then
+		//then
 		Optional<Comment> findComment = commentRepository.findById(savedComment.id());
 		assertThat(findComment).isEmpty();
 	}
@@ -347,7 +344,8 @@ public class CommentRepositoryTest {
 		Pageable givenPageable = PageRequest.of(givenSearchCondition.pageNum(), 10);
 
 		//when
-		Page<CommentResponse> commentResponsePage = commentRepository.findAll(findQuestion.id(), findMember.id(), givenParentType, givenSearchCondition, pageable);
+		Page<CommentResponse> commentResponsePage = commentRepository.findAll(findQuestion.id(), findMember.id(),
+			givenParentType, givenPageable, givenSearchCondition);
 
 		//then
 		assertThat(commentResponsePage.getTotalPages()).isEqualTo(3);
