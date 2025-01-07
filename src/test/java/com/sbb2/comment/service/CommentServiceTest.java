@@ -266,4 +266,55 @@ public class CommentServiceTest {
 		verify(commentRepository, times(1)).save(givenUpdateComment);
 		verify(commentRepository, times(1)).findById(givenFindComment.id());
 	}
+
+	@DisplayName("질문 댓글 수정 성공 테스트")
+	@Test
+	void update_comment_question_success() {
+		//given
+		Member givenMember = Member.builder()
+			.id(1L)
+			.email("testEmail@naver.com")
+			.username("testUsername")
+			.build();
+
+		Question givenQuestion = Question.builder().id(1L).build();
+
+		String givenContent = "testContent";
+		String givenUpdateContent = "updateContent";
+
+		ParentType givenParentType = ParentType.QUESTION;
+
+		Comment givenFindComment = Comment.builder()
+			.id(1L)
+			.content(givenContent)
+			.author(givenMember)
+			.question(givenQuestion)
+			.createdAt(LocalDateTime.now())
+			.modifiedAt(LocalDateTime.now())
+			.build();
+
+		Comment givenUpdateComment = givenFindComment.fetch(givenUpdateContent);
+
+		given(commentRepository.findById(givenFindComment.id()))
+			.willReturn(Optional.of(givenFindComment));
+
+		given(commentRepository.save(givenUpdateComment))
+			.willReturn(givenUpdateComment);
+
+		//when
+		CommentResponse commentResponse = commentService.update(
+			givenQuestion.id(), givenUpdateContent, givenMember
+		);
+
+		//then
+		assertThat(commentResponse.commentId()).isEqualTo(1L);
+		assertThat(commentResponse.parentId()).isEqualTo(1L);
+		assertThat(commentResponse.parentType()).isEqualTo(givenParentType);
+		assertThat(commentResponse.content()).isEqualTo(givenUpdateContent);
+		assertThat(commentResponse.createdAt()).isNotNull();
+		assertThat(commentResponse.modifiedAt()).isNotNull();
+
+		verify(commentRepository, times(1)).save(givenUpdateComment);
+		verify(commentRepository, times(1)).findById(givenFindComment.id());
+	}
 }
