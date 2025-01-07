@@ -1,5 +1,8 @@
 package com.sbb2.comment.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,6 +14,7 @@ import com.sbb2.comment.domain.ParentType;
 import com.sbb2.comment.exception.CommentBusinessLogicException;
 import com.sbb2.comment.exception.CommentErrorCode;
 import com.sbb2.comment.service.response.CommentResponse;
+import com.sbb2.common.util.SearchCondition;
 import com.sbb2.infrastructer.answer.repository.AnswerRepository;
 import com.sbb2.infrastructer.comment.repository.CommentRepository;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
@@ -25,9 +29,22 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional
 public class CommentServiceImpl implements CommentService {
+	private static final int PAGE_SIZE = 10;
+
 	private final CommentRepository commentRepository;
 	private final QuestionRepository questionRepository;
 	private final AnswerRepository answerRepository;
+
+	@Override
+	public Page<CommentResponse> findAll(Long parentId, Long memberId, ParentType parentType,
+		SearchCondition searchCondition) {
+		Pageable pageable = PageRequest.of(
+			searchCondition.pageNum() == null ? 0 : searchCondition.pageNum(),
+			PAGE_SIZE
+		);
+
+		return commentRepository.findAll(parentId, memberId, parentType, pageable, searchCondition);
+	}
 
 	@Override
 	public CommentResponse save(Long parentId, String content, ParentType parentType, Member author) {
