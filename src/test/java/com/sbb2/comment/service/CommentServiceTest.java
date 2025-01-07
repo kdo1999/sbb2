@@ -482,4 +482,44 @@ public class CommentServiceTest {
 			.isInstanceOf(CommentBusinessLogicException.class)
 			.hasMessage(CommentErrorCode.NOT_FOUND.getMessage());
 	}
+
+	@DisplayName("댓글 삭제시 작성자가 아닐 때 실패 테스트")
+	@Test
+	void delete_comment_author_not_match_fail() {
+		//given
+		Member givenMember = Member.builder()
+			.id(1L)
+			.email("testEmail@naver.com")
+			.username("testUsername")
+			.build();
+
+		Member givenLoginMember = Member.builder()
+			.id(2L)
+			.email("testEmail2@naver.com")
+			.username("testUsername2")
+			.build();
+
+		Answer givenAnswer = Answer.builder().id(1L).build();
+
+		String givenContent = "testContent";
+
+		ParentType givenParentType = ParentType.ANSWER;
+
+		Comment givenComment = Comment.builder()
+			.id(1L)
+			.content(givenContent)
+			.author(givenMember)
+			.answer(givenAnswer)
+			.createdAt(LocalDateTime.now())
+			.modifiedAt(LocalDateTime.now())
+			.build();
+
+		given(commentRepository.findById(1L))
+			.willReturn(Optional.of(givenComment));
+
+		//when & then
+		assertThatThrownBy(() -> commentService.deleteById(givenComment.id(), givenLoginMember))
+			.isInstanceOf(CommentBusinessLogicException.class)
+			.hasMessage(CommentErrorCode.UNAUTHORIZED.getMessage());
+	}
 }
