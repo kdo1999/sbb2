@@ -18,6 +18,8 @@ import com.sbb2.answer.exception.AnswerBusinessLogicException;
 import com.sbb2.answer.exception.AnswerErrorCode;
 import com.sbb2.comment.domain.Comment;
 import com.sbb2.comment.domain.ParentType;
+import com.sbb2.comment.exception.CommentBusinessLogicException;
+import com.sbb2.comment.exception.CommentErrorCode;
 import com.sbb2.comment.service.response.CreateCommentResponse;
 import com.sbb2.infrastructer.answer.repository.AnswerRepository;
 import com.sbb2.infrastructer.comment.repository.CommentRepository;

@@ -8,6 +8,8 @@ import com.sbb2.answer.exception.AnswerBusinessLogicException;
 import com.sbb2.answer.exception.AnswerErrorCode;
 import com.sbb2.comment.domain.Comment;
 import com.sbb2.comment.domain.ParentType;
+import com.sbb2.comment.exception.CommentBusinessLogicException;
+import com.sbb2.comment.exception.CommentErrorCode;
 import com.sbb2.comment.service.response.CreateCommentResponse;
 import com.sbb2.infrastructer.answer.repository.AnswerRepository;
 import com.sbb2.infrastructer.comment.repository.CommentRepository;
@@ -30,8 +32,7 @@ public class CommentServiceImpl implements CommentService {
 	@Override
 	public CreateCommentResponse save(Long parentId, String content, ParentType parentType, Member author) {
 		if (parentType == null) {
-			//TODO 추후 예외 처리
-			throw new RuntimeException();
+			throw new CommentBusinessLogicException(CommentErrorCode.NOT_SUPPORT);
 		}
 		Comment.CommentBuilder commentBuilder = Comment.builder()
 			.content(content)
