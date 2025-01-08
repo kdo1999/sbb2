@@ -105,4 +105,68 @@ public class CommentControllerTest {
 		verify(commentService, times(1))
 			.findAll(givenQuestionId, givenMemberUserDetails.getMember().id(), givenParentType, givenSearchCondition);
 	}
+
+	@DisplayName("답변 댓글 조회 성공 테스트")
+	@Test
+	void findAll_answerId() {
+		//given
+		Long givenAnswerId = 1L;
+
+		Member givenMember = Member.builder()
+			.id(1L)
+			.email("testEmail@naver.com")
+			.username("testUsername")
+			.password("testPassword1234!")
+			.build();
+
+		MemberUserDetails givenMemberUserDetails = new MemberUserDetails(givenMember);
+
+		ParentType givenParentType = ParentType.ANSWER;
+
+		SearchCondition givenSearchCondition = SearchCondition.builder()
+			.pageNum(0)
+			.build();
+
+		List<CommentResponse> commentResponseList = new ArrayList<>();
+
+		LongStream.range(0, 26)
+			.forEach((index) -> {
+				commentResponseList.add(CommentResponse.builder()
+					.commentId(index + 1)
+					.parentId(givenAnswerId)
+					.parentType(givenParentType)
+					.author("testUsername")
+					.isAuthor(true)
+					.content("testContent" + index)
+					.createdAt(LocalDateTime.now())
+					.modifiedAt(LocalDateTime.now())
+					.build());
+			});
+
+		Pageable givenPageable = PageRequest.of(0, 10);
+
+		int startIndex = givenPageable.getPageSize() * givenPageable.getPageNumber();
+
+		List<CommentResponse> commentResponseSubList = commentResponseList.subList(startIndex,
+			Math.min(startIndex + givenPageable.getPageSize(), commentResponseList.size()));
+
+		Page<CommentResponse> commentResponsePage = new PageImpl<>(
+			commentResponseList.subList(startIndex,
+				Math.min(startIndex + givenPageable.getPageSize(), commentResponseList.size())), givenPageable,
+			commentResponseList.size());
+
+		given(commentService.findAll(givenAnswerId, givenMemberUserDetails.getMember().id(), givenParentType,
+			givenSearchCondition))
+			.willReturn(commentResponsePage);
+
+		//when
+		ResponseEntity<GenericResponse<Page<CommentResponse>>> result =
+			commentController.findAll(givenAnswerId, givenParentType, givenSearchCondition, givenMemberUserDetails);
+
+		//then
+		assertThat(result.getBody().getData()).isEqualTo(commentResponsePage);
+		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+		verify(commentService, times(1))
+			.findAll(givenAnswerId, givenMemberUserDetails.getMember().id(), givenParentType, givenSearchCondition);
+	}
 }
