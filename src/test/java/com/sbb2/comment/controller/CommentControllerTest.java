@@ -354,6 +354,34 @@ public class CommentControllerTest {
 		assertThat(bindingResult.getFieldError("content").getDefaultMessage()).isEqualTo("댓글 내용은 필수 항목입니다.");
 	}
 
+	@DisplayName("댓글 저장시 content가 200자 이상일 때 실패 테스트")
+	@Test
+	void save_comment_content_size_over_fail() {
+		//given
+		StringBuilder sb = new StringBuilder();
+		sb.repeat('a', 210);
+
+		CommentCreateForm givenCommentCreateForm = CommentCreateForm.builder()
+			.parentId(1L)
+			.parentType("answer")
+			.content(sb.toString())
+			.build();
+
+		BindingResult bindingResult = new BeanPropertyBindingResult(givenCommentCreateForm, "givenCommentCreateForm");
+		validator.validate(givenCommentCreateForm, ValidationGroups.SizeGroup.class).forEach(violation ->
+			bindingResult.rejectValue(
+				violation.getPropertyPath().toString(),
+				"error",
+				violation.getMessage()
+			)
+		);
+
+		//then
+		assertThat(bindingResult.hasErrors()).isTrue();
+		assertThat(bindingResult.getErrorCount()).isEqualTo(1);
+		assertThat(bindingResult.getFieldError("content").getDefaultMessage()).isEqualTo("최대 200자까지만 입력 가능합니다.");
+	}
+
 	private static class ParentTypeValid {
         @ValidStringEnum(enumClass = ParentType.class, groups = ValidationGroups.ValidEnumGroup.class)
         private String parentType;
