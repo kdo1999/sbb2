@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Repository;
 import org.springframework.test.annotation.DirtiesContext;
 
+import com.sbb2.category.domain.Category;
 import com.sbb2.common.config.QuerydslConfig;
 
 import lombok.extern.slf4j.Slf4j;
