@@ -1,5 +1,7 @@
 package com.sbb2.infrastructer.category.repository;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Repository;
 
 import com.sbb2.category.domain.Category;
@@ -15,6 +17,11 @@ public class CategoryRepositoryImpl implements CategoryRepository {
 	@Override
 	public Category save(Category category) {
 		return categoryJpaRepository.save(CategoryEntity.from(category)).toModel();
+	}
+
+	@Override
+	public Optional<Category> findById(Long categoryId) {
+		return categoryJpaRepository.findById(categoryId).map(CategoryEntity::toModel);
 	}
 }
 
