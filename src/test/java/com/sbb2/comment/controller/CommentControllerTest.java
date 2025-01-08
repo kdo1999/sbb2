@@ -24,7 +24,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 
-import com.sbb2.comment.controller.request.CommentForm;
+import com.sbb2.comment.controller.request.CommentCreateForm;
+import com.sbb2.comment.controller.request.CommentUpdateForm;
 import com.sbb2.comment.domain.ParentType;
 import com.sbb2.comment.service.CommentService;
 import com.sbb2.comment.service.response.CommentResponse;
@@ -215,7 +216,9 @@ public class CommentControllerTest {
 			.modifiedAt(LocalDateTime.now())
 			.build();
 
-		CommentForm givenCommentForm = CommentForm.builder()
+		CommentCreateForm givenCommentCreateForm = CommentCreateForm.builder()
+			.parentId(givenParentId)
+			.parentType(givenParentType.toString())
 			.content(givenContent)
 			.build();
 
@@ -225,7 +228,7 @@ public class CommentControllerTest {
 
 	    //when
 		ResponseEntity<GenericResponse<CommentResponse>> result = commentController
-			.save(givenParentId, givenCommentForm, givenParentType, givenMemberUserDetails);
+			.save(givenCommentCreateForm, givenMemberUserDetails);
 
 	    //then
 	    assertThat(result.getBody().getData()).isEqualTo(givenCommentResponse);
@@ -263,7 +266,7 @@ public class CommentControllerTest {
 			.modifiedAt(LocalDateTime.now())
 			.build();
 
-		CommentForm givenCommentForm = CommentForm.builder()
+		CommentUpdateForm givenCommentUpdateForm = CommentUpdateForm.builder()
 			.content(updateContent)
 			.build();
 
@@ -272,7 +275,7 @@ public class CommentControllerTest {
 
 	    //when
 		ResponseEntity<GenericResponse<CommentResponse>> result = commentController
-			.update(commentId, givenCommentForm, givenMemberUserDetails);
+			.update(commentId, givenCommentUpdateForm, givenMemberUserDetails);
 
 	    //then
 	    assertThat(result.getBody().getData()).isEqualTo(givenCommentResponse);
