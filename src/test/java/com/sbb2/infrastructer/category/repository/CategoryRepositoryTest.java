@@ -86,4 +86,23 @@ public class CategoryRepositoryTest {
 		//then
 		Assertions.assertThat(savedCategory).isEqualTo(givenCategory);
 	}
+
+	@DisplayName("카테고리 이름으로 조회 성공 테스트")
+	@Test
+	void find_category_categoryName_success() {
+		//given
+		Long givenId = 1L;
+		String categoryName = "question_board";
+
+		Category givenCategory = Category.builder()
+			.id(givenId)
+			.categoryName(categoryName)
+			.build();
+
+		//when
+		Category savedCategory = categoryRepository.findByCategoryName(categoryName).get();
+
+		//then
+		Assertions.assertThat(savedCategory).isEqualTo(givenCategory);
+	}
 }
