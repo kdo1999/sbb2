@@ -1,6 +1,7 @@
 package com.sbb2.infrastructer.answer.repository;
 
 import static com.sbb2.infrastructer.answer.entity.QAnswerEntity.*;
+import static com.sbb2.infrastructer.comment.entity.QCommentEntity.*;
 import static com.sbb2.infrastructer.voter.entity.QVoterEntity.*;
 
 import java.util.List;
@@ -31,7 +32,7 @@ public class AnswerQueryRepository {
 	private final JPAQueryFactory queryFactory;
 
 	public Optional<AnswerDetailResponse> findByAnswerId(Long answerId, Long memberId) {
-		AnswerDetailResponse answerDetailResponses = queryFactory.select(new QAnswerDetailResponse(
+		AnswerDetailResponse answerDetailResponses = queryFactory.selectDistinct(new QAnswerDetailResponse(
 				answerEntity.id,
 				answerEntity.content,
 				answerEntity.author.username,
@@ -39,12 +40,14 @@ public class AnswerQueryRepository {
 				answerEntity.createdAt,
 				answerEntity.modifiedAt,
 				voterEntity.countDistinct(),
+				answerEntity.commentEntityList.size().longValue(),
 				answerEntity.author.id.eq(memberId),
 				voterEntity.memberEntity.id.eq(memberId)
 			))
 			.from(answerEntity)
 			.leftJoin(answerEntity.voterEntitySet, voterEntity)
 			.leftJoin(answerEntity.author)
+			.leftJoin(answerEntity.commentEntityList, commentEntity)
 			.where(answerEntity.id.eq(answerId))
 			.groupBy(
 				answerEntity.id,
@@ -63,7 +66,7 @@ public class AnswerQueryRepository {
 	public Page<AnswerDetailResponse> findAnswerDetailPageByQuestionId(SearchCondition searchCondition, Long questionId,
 		Long memberId, Pageable pageable) {
 		List<AnswerDetailResponse> content = queryFactory
-			.select(new QAnswerDetailResponse(
+			.selectDistinct(new QAnswerDetailResponse(
 				answerEntity.id,
 				answerEntity.content,
 				answerEntity.author.username,
@@ -71,6 +74,7 @@ public class AnswerQueryRepository {
 				answerEntity.createdAt,
 				answerEntity.modifiedAt,
 				answerEntity.voterEntitySet.size().longValue(),
+				answerEntity.commentEntityList.size().longValue(),
 				answerEntity.author.id.eq(memberId),
 				voterEntity.memberEntity.id.eq(memberId)
 			))
@@ -78,6 +82,7 @@ public class AnswerQueryRepository {
 			.leftJoin(answerEntity.author)
 			.leftJoin(answerEntity.questionEntity)
 			.leftJoin(answerEntity.voterEntitySet, voterEntity)
+			.leftJoin(answerEntity.commentEntityList, commentEntity)
 			.where(contentContains(searchCondition), answerEntity.questionEntity.id.eq(questionId))
 			.orderBy(getOrderBy(searchCondition))
 			.offset(pageable.getOffset())

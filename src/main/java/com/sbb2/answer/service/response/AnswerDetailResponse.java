@@ -7,11 +7,12 @@ import com.querydsl.core.annotations.QueryProjection;
 import lombok.Builder;
 
 public record AnswerDetailResponse(Long id, String content, String author, Long questionId, LocalDateTime createdAt,
-								   LocalDateTime modifiedAt, Long voterCount, boolean isAuthor, boolean isVoter) {
+								   LocalDateTime modifiedAt, Long voterCount, Long commentCount, boolean isAuthor, boolean isVoter) {
 	@Builder
 	@QueryProjection
+
 	public AnswerDetailResponse(Long id, String content, String author, Long questionId, LocalDateTime createdAt,
-		LocalDateTime modifiedAt, Long voterCount, boolean isAuthor, boolean isVoter) {
+		LocalDateTime modifiedAt, Long voterCount, Long commentCount, boolean isAuthor, boolean isVoter) {
 		this.id = id;
 		this.content = content;
 		this.author = author;
@@ -19,6 +20,7 @@ public record AnswerDetailResponse(Long id, String content, String author, Long 
 		this.createdAt = createdAt;
 		this.modifiedAt = modifiedAt;
 		this.voterCount = voterCount;
+		this.commentCount = commentCount;
 		this.isAuthor = isAuthor;
 		this.isVoter = isVoter;
 	}
