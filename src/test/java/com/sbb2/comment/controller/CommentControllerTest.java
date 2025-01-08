@@ -183,6 +183,53 @@ public class CommentControllerTest {
 			.findAll(givenAnswerId, givenMemberUserDetails.getMember().id(), givenParentType, givenSearchCondition);
 	}
 
+	@DisplayName("댓글 수정 성공 테스트")
+	@Test
+	void update_comment_success() {
+	    //given
+	    Member givenMember = Member.builder()
+			.id(1L)
+			.email("testEmail@naver.com")
+			.username("testUsername")
+			.password("testPassword1234!")
+			.build();
+
+		MemberUserDetails givenMemberUserDetails = new MemberUserDetails(givenMember);
+
+		String updateContent = "updateContent";
+
+		Long commentId = 1L;
+
+		CommentResponse givenCommentResponse = CommentResponse.builder()
+			.commentId(commentId)
+			.parentId(1L)
+			.parentType(ParentType.QUESTION)
+			.author(givenMemberUserDetails.getMember().username())
+			.isAuthor(true)
+			.content(updateContent)
+			.createdAt(LocalDateTime.now())
+			.modifiedAt(LocalDateTime.now())
+			.build();
+
+		CommentForm givenCommentForm = CommentForm.builder()
+			.content(updateContent)
+			.build();
+
+		given(commentService.update(commentId, updateContent, givenMemberUserDetails.getMember()))
+			.willReturn(givenCommentResponse);
+
+	    //when
+		ResponseEntity<GenericResponse<CommentResponse>> result = commentController
+			.update(commentId, givenCommentForm, givenMemberUserDetails);
+
+	    //then
+	    assertThat(result.getBody().getData()).isEqualTo(givenCommentResponse);
+		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+		verify(commentService, times(1))
+			.update(commentId, updateContent, givenMemberUserDetails.getMember());
+
+	}
+
 	@DisplayName("댓글 페이징 조회시 ParentType가 일치하는게 없을 때 실패 테스트")
 	@Test
 	void findAll_parentType_not_match_fail() {
