@@ -1,5 +1,7 @@
 package com.sbb2.infrastructer.category.repository;
 
+import java.util.Optional;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -104,5 +106,25 @@ public class CategoryRepositoryTest {
 
 		//then
 		Assertions.assertThat(savedCategory).isEqualTo(givenCategory);
+	}
+
+	@DisplayName("카테고리 ID로 삭제 성공 테스트")
+	@Test
+	void delete_category_id_success() {
+		//given
+		String categoryName = "test2_board";
+
+		Category givenCategory = Category.builder()
+			.categoryName(categoryName)
+			.build();
+
+		Category savedCategory = categoryRepository.save(givenCategory);
+
+		//when
+		categoryRepository.deleteById(savedCategory.id());
+
+		//then
+		Optional<Category> findCategory = categoryRepository.findById(savedCategory.id());
+		Assertions.assertThat(findCategory).isEmpty();
 	}
 }
