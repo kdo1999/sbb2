@@ -40,7 +40,7 @@ public class AnswerQueryRepository {
 				answerEntity.createdAt,
 				answerEntity.modifiedAt,
 				voterEntity.countDistinct(),
-				answerEntity.commentEntityList.size().longValue(),
+				commentEntity.countDistinct(),
 				answerEntity.author.id.eq(memberId),
 				voterEntity.memberEntity.id.eq(memberId)
 			))
