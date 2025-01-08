@@ -184,6 +184,57 @@ public class CommentControllerTest {
 			.findAll(givenAnswerId, givenMemberUserDetails.getMember().id(), givenParentType, givenSearchCondition);
 	}
 
+	@DisplayName("댓글 저장 성공 테스트")
+	@Test
+	void save_comment_success() {
+	    //given
+	    Member givenMember = Member.builder()
+			.id(1L)
+			.email("testEmail@naver.com")
+			.username("testUsername")
+			.password("testPassword1234!")
+			.build();
+
+		MemberUserDetails givenMemberUserDetails = new MemberUserDetails(givenMember);
+
+		String givenContent = "createContent";
+
+		Long givenParentId = 1L;
+		Long commentId = 1L;
+
+		ParentType givenParentType = ParentType.QUESTION;
+
+		CommentResponse givenCommentResponse = CommentResponse.builder()
+			.commentId(commentId)
+			.parentId(givenParentId)
+			.parentType(ParentType.QUESTION)
+			.author(givenMemberUserDetails.getMember().username())
+			.isAuthor(true)
+			.content(givenContent)
+			.createdAt(LocalDateTime.now())
+			.modifiedAt(LocalDateTime.now())
+			.build();
+
+		CommentForm givenCommentForm = CommentForm.builder()
+			.content(givenContent)
+			.build();
+
+
+		given(commentService.save(givenParentId, givenContent, givenParentType, givenMemberUserDetails.getMember()))
+			.willReturn(givenCommentResponse);
+
+	    //when
+		ResponseEntity<GenericResponse<CommentResponse>> result = commentController
+			.save(givenParentId, givenCommentForm, givenParentType, givenMemberUserDetails);
+
+	    //then
+	    assertThat(result.getBody().getData()).isEqualTo(givenCommentResponse);
+		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+		verify(commentService, times(1))
+			.save(givenParentId, givenContent, givenParentType, givenMemberUserDetails.getMember());
+
+	}
+
 	@DisplayName("댓글 수정 성공 테스트")
 	@Test
 	void update_comment_success() {
