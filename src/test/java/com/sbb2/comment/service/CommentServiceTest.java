@@ -376,6 +376,43 @@ public class CommentServiceTest {
 		verify(commentRepository, times(1)).findById(givenFindComment.id());
 	}
 
+	@DisplayName("댓글 수정시 댓글이 존재하지 않을 때 실패 테스트")
+	@Test
+	void update_comment_not_found_fail() {
+		//given
+		Member givenMember = Member.builder()
+			.id(1L)
+			.email("testEmail@naver.com")
+			.username("testUsername")
+			.build();
+
+		Question givenQuestion = Question.builder().id(1L).build();
+
+		String givenContent = "testContent";
+		String givenUpdateContent = "updateContent";
+
+		ParentType givenParentType = ParentType.QUESTION;
+
+		Comment givenComment = Comment.builder()
+			.id(1L)
+			.content(givenContent)
+			.author(givenMember)
+			.question(givenQuestion)
+			.createdAt(LocalDateTime.now())
+			.modifiedAt(LocalDateTime.now())
+			.build();
+
+		given(commentRepository.findById(givenComment.id()))
+			.willReturn(Optional.empty());
+
+		//when & then
+		assertThatThrownBy(() -> commentService.update(givenComment.id(), givenUpdateContent, givenMember))
+			.isInstanceOf(CommentBusinessLogicException.class)
+			.hasMessage(CommentErrorCode.NOT_FOUND.getMessage());
+
+		verify(commentRepository, times(1)).findById(givenComment.id());
+	}
+
 	@DisplayName("댓글 수정시 question, answer가 null일 때 실패 테스트")
 	@Test
 	void update_comment_question_and_answer_isNull_fail() {
