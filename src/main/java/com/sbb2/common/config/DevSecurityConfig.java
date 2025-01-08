@@ -48,31 +48,35 @@ public class DevSecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 		//경로별 인가 작업
 		httpSecurity
-        .csrf(AbstractHttpConfigurer::disable)
-        .cors(cors -> cors.configurationSource(devCorsConfigurationSource()))
-        .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/v1/auth/**")
-            .permitAll()
-            .requestMatchers("/", "/docs/**", "/error")
-            .permitAll()
-			.requestMatchers(HttpMethod.GET, "/api/v1/question")
-			.permitAll()
-			.requestMatchers(HttpMethod.GET, "/api/v1/question/{id}", "/api/v1/answer/{id}", "/api/v1/answer", "/api/v1/comment")
-			.hasRole("USER")
-			.requestMatchers(HttpMethod.POST, "/api/v1/question", "/api/v1/answer", "/api/v1/voter/{id}", "/api/v1/comment")
-			.hasRole("USER")
-			.requestMatchers(HttpMethod.PATCH, "/api/v1/question/{id}", "/api/v1/answer/{id}", "/api/v1/comment/{id}")
-			.hasRole("USER")
-			.requestMatchers(HttpMethod.DELETE, "/api/v1/question/{id}", "/api/v1/answer/{id}", "/api/v1/voter/{id}", "/api/v1/comment/{id}")
-			.hasRole("USER")
-            .anyRequest()
-            .authenticated()
-        )
-        .formLogin(AbstractHttpConfigurer::disable)
-        .httpBasic(AbstractHttpConfigurer::disable)
-        .sessionManagement(
-            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        );
+			.csrf(AbstractHttpConfigurer::disable)
+			.cors(cors -> cors.configurationSource(devCorsConfigurationSource()))
+			.authorizeHttpRequests(auth -> auth
+				.requestMatchers("/api/v1/auth/**")
+				.permitAll()
+				.requestMatchers("/", "/docs/**", "/error")
+				.permitAll()
+				.requestMatchers(HttpMethod.GET, "/api/v1/question")
+				.permitAll()
+				.requestMatchers(HttpMethod.GET, "/api/v1/question/{id}", "/api/v1/answer/{id}", "/api/v1/answer",
+					"/api/v1/comment")
+				.hasRole("USER")
+				.requestMatchers(HttpMethod.POST, "/api/v1/question", "/api/v1/answer", "/api/v1/voter/{id}",
+					"/api/v1/comment")
+				.hasRole("USER")
+				.requestMatchers(HttpMethod.PATCH, "/api/v1/question/{id}", "/api/v1/answer/{id}",
+					"/api/v1/comment/{id}")
+				.hasRole("USER")
+				.requestMatchers(HttpMethod.DELETE, "/api/v1/question/{id}", "/api/v1/answer/{id}",
+					"/api/v1/voter/{id}", "/api/v1/comment/{id}")
+				.hasRole("USER")
+				.anyRequest()
+				.authenticated()
+			)
+			.formLogin(AbstractHttpConfigurer::disable)
+			.httpBasic(AbstractHttpConfigurer::disable)
+			.sessionManagement(
+				session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+			);
 		httpSecurity
 			.addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class);
 		return httpSecurity.build();
@@ -116,10 +120,12 @@ public class DevSecurityConfig {
 		JwtFilter jwtFilter = new JwtFilter(jwtUtil, objectMapper, memberDetailsService, antPathMatcher());
 
 		jwtFilter
-			.addUriPattern(HttpMethod.GET, "/api/v1/question/*", "/api/v1/answer/*", "/api/v1/answer", "/api/v1/comment")
+			.addUriPattern(HttpMethod.GET, "/api/v1/question/*", "/api/v1/answer/*", "/api/v1/answer",
+				"/api/v1/comment")
 			.addUriPattern(HttpMethod.POST, "/api/v1/question", "/api/v1/answer", "/api/v1/voter/*", "/api/v1/comment")
 			.addUriPattern(HttpMethod.PATCH, "/api/v1/question/*", "/api/v1/answer/*", "/api/v1/comment/*")
-			.addUriPattern(HttpMethod.DELETE, "/api/v1/question/*", "/api/v1/answer/*", "/api/v1/voter/*", "/api/v1/comment/*");
+			.addUriPattern(HttpMethod.DELETE, "/api/v1/question/*", "/api/v1/answer/*", "/api/v1/voter/*",
+				"/api/v1/comment/*");
 		return jwtFilter;
 	}
 }
