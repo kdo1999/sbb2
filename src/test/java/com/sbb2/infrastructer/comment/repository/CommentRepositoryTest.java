@@ -268,10 +268,10 @@ public class CommentRepositoryTest {
 		Comment savedComment1 = commentRepository.save(givenComment1);
 		Comment savedComment2 = commentRepository.save(givenComment2);
 
-		List<Comment> savedCommentList = List.of(savedComment1);
+		List<Comment> savedCommentList = List.of(savedComment2);
 
 		//when
-		List<Comment> findCommentList = commentRepository.findByAnswerId(answer1.id());
+		List<Comment> findCommentList = commentRepository.findByAnswerId(answer2.id());
 
 		//then
 		assertThat(findCommentList).isEqualTo(savedCommentList);
