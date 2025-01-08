@@ -43,7 +43,6 @@ public class CommentController {
 		@RequestParam("parentType") String parentType,
 		SearchCondition searchCondition, @AuthenticationPrincipal MemberUserDetails memberUserDetails) {
 
-		log.info("===================");
 		Page<CommentResponse> commentResponsePage = commentService
 			.findAll(parentId, memberUserDetails.getMember().id(), ParentType.from(parentType), searchCondition);
 
