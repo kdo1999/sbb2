@@ -112,7 +112,7 @@ public class CommentControllerTest {
 
 		//when
 		ResponseEntity<GenericResponse<Page<CommentResponse>>> result =
-			commentController.findAll(givenQuestionId, givenParentType, givenSearchCondition, givenMemberUserDetails);
+			commentController.findAll(givenQuestionId, givenParentType.toString(), givenSearchCondition, givenMemberUserDetails);
 
 		//then
 		assertThat(result.getBody().getData()).isEqualTo(commentResponsePage);
@@ -176,7 +176,7 @@ public class CommentControllerTest {
 
 		//when
 		ResponseEntity<GenericResponse<Page<CommentResponse>>> result =
-			commentController.findAll(givenAnswerId, givenParentType, givenSearchCondition, givenMemberUserDetails);
+			commentController.findAll(givenAnswerId, givenParentType.toString(), givenSearchCondition, givenMemberUserDetails);
 
 		//then
 		assertThat(result.getBody().getData()).isEqualTo(commentResponsePage);

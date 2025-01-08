@@ -28,21 +28,24 @@ import com.sbb2.common.validation.ValidationSequence;
 import com.sbb2.common.validation.annotation.ValidStringEnum;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/comment")
+@Slf4j
 public class CommentController {
 	private final CommentService commentService;
 
 	@GetMapping
 	public ResponseEntity<GenericResponse<Page<CommentResponse>>> findAll(@RequestParam("parentId") Long parentId,
 		@ValidStringEnum(enumClass = ParentType.class, groups = ValidationGroups.ValidEnumGroup.class)
-		ParentType parentType,
+		@RequestParam("parentType") String parentType,
 		SearchCondition searchCondition, @AuthenticationPrincipal MemberUserDetails memberUserDetails) {
 
+		log.info("===================");
 		Page<CommentResponse> commentResponsePage = commentService
-			.findAll(parentId, memberUserDetails.getMember().id(), parentType, searchCondition);
+			.findAll(parentId, memberUserDetails.getMember().id(), ParentType.from(parentType), searchCondition);
 
 		return ResponseEntity.ok()
 			.body(GenericResponse.of(commentResponsePage));
@@ -52,8 +55,7 @@ public class CommentController {
 	public ResponseEntity<GenericResponse<CommentResponse>> save(
 		@Validated(ValidationSequence.class) @RequestBody CommentCreateForm commentCreateForm,
 		@AuthenticationPrincipal MemberUserDetails memberUserDetails) {
-
-		ParentType parentType = ParentType.valueOf(commentCreateForm.parentType());
+		ParentType parentType = ParentType.from(commentCreateForm.parentType());
 
 		CommentResponse savedCommentResponse = commentService.save(
 			commentCreateForm.parentId(), commentCreateForm.content(), parentType, memberUserDetails.getMember()
