@@ -40,7 +40,6 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 
-//TODO 01/08 컨트롤러 테스트부터 작성하고 로직 구현할 것
 @ExtendWith(MockitoExtension.class)
 public class CommentControllerTest {
 	@Mock
