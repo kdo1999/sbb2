@@ -8,4 +8,6 @@ public interface CategoryRepository {
 	Category save(Category category);
 
 	Optional<Category> findById(Long categoryId);
+
+	Optional<Category> findByCategoryName(String categoryName);
 }

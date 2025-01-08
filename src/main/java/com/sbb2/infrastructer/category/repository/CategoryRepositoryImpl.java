@@ -23,5 +23,10 @@ public class CategoryRepositoryImpl implements CategoryRepository {
 	public Optional<Category> findById(Long categoryId) {
 		return categoryJpaRepository.findById(categoryId).map(CategoryEntity::toModel);
 	}
+
+	@Override
+	public Optional<Category> findByCategoryName(String categoryName) {
+		return categoryJpaRepository.findByCategoryName(categoryName).map(CategoryEntity::toModel);
+	}
 }
 
