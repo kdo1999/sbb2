@@ -22,7 +22,7 @@ public class CategoryEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "category_name", nullable = false)
+	@Column(name = "category_name", nullable = false, unique = true)
 	private String categoryName;
 
 	@Builder
