@@ -357,11 +357,17 @@ public class QuestionServiceTest {
 			.build();
 
 		Pageable pageable = PageRequest.of(searchCondition.pageNum(), 10);
+		int startIndex = pageable.getPageSize() * pageable.getPageNumber();
 
-		//TODO 페이지 자르는 부분 로직 변경할 것 (CommentServiceTest 참고)
+		List<QuestionPageResponse> questionPageResponseSubList = questionPageResponseList.subList(
+			startIndex, Math.min(startIndex + pageable.getPageSize(), questionPageResponseList.size())
+		);
+
 		given(questionRepository.findAll(searchCondition, pageable)).willReturn(new PageImpl<>(
-			questionPageResponseList.subList(0, Math.min(10, questionPageResponseList.size())),
-			PageRequest.of(0, 10),
+			questionPageResponseList.subList(
+				startIndex, Math.min(startIndex + pageable.getPageSize(), questionPageResponseList.size())
+			),
+			pageable,
 			questionPageResponseList.size()
 			)
 		);
@@ -370,7 +376,7 @@ public class QuestionServiceTest {
 		Page<QuestionPageResponse> findAll = questionService.findAll(searchCondition);
 
 		//then
-		assertThat(findAll.getContent().size()).isEqualTo(10);
+		assertThat(findAll.getContent()).isEqualTo(questionPageResponseSubList);
 		assertThat(findAll.getTotalElements()).isEqualTo(15);
 		assertThat(findAll.getTotalPages()).isEqualTo(2);
 	}
