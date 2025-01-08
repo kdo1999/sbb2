@@ -235,7 +235,6 @@ public class CommentControllerTest {
 		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 		verify(commentService, times(1))
 			.save(givenParentId, givenContent, givenParentType, givenMemberUserDetails.getMember());
-
 	}
 
 	@DisplayName("댓글 수정 성공 테스트")
@@ -304,6 +303,30 @@ public class CommentControllerTest {
 		assertThat(bindingResult.hasErrors()).isTrue();
 		assertThat(bindingResult.getErrorCount()).isEqualTo(1);
 		assertThat(bindingResult.getFieldError("parentType").getDefaultMessage()).isEqualTo("지원하지 않는 타입입니다.");
+	}
+
+	@DisplayName("댓글 저장시 parentId가 없을 때 실패 테스트")
+	@Test
+	void save_comment_parentId_is_null_fail() {
+		//given
+		CommentCreateForm givenCommentCreateForm = CommentCreateForm.builder()
+			.parentType("answer")
+			.content("givenContent")
+			.build();
+
+		BindingResult bindingResult = new BeanPropertyBindingResult(givenCommentCreateForm, "givenCommentCreateForm");
+		validator.validate(givenCommentCreateForm, ValidationGroups.NotNullGroup.class).forEach(violation ->
+			bindingResult.rejectValue(
+				violation.getPropertyPath().toString(),
+				"error",
+				violation.getMessage()
+			)
+		);
+
+		//then
+		assertThat(bindingResult.hasErrors()).isTrue();
+		assertThat(bindingResult.getErrorCount()).isEqualTo(1);
+		assertThat(bindingResult.getFieldError("parentId").getDefaultMessage()).isEqualTo("부모 ID는 필수 항목입니다.");
 	}
 
 	private static class ParentTypeValid {
