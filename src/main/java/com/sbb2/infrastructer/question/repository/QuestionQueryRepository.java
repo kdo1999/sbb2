@@ -1,5 +1,6 @@
 package com.sbb2.infrastructer.question.repository;
 
+import static com.sbb2.infrastructer.comment.entity.QCommentEntity.*;
 import static com.sbb2.infrastructer.question.entity.QQuestionEntity.*;
 import static com.sbb2.infrastructer.voter.entity.QVoterEntity.*;
 
@@ -18,12 +19,12 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sbb2.common.util.SearchCondition;
 import com.sbb2.infrastructer.answer.entity.QAnswerEntity;
 import com.sbb2.question.service.response.QQuestionDetailResponse;
 import com.sbb2.question.service.response.QQuestionPageResponse;
 import com.sbb2.question.service.response.QuestionDetailResponse;
 import com.sbb2.question.service.response.QuestionPageResponse;
-import com.sbb2.common.util.SearchCondition;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,7 +36,7 @@ public class QuestionQueryRepository {
 
 	public Page<QuestionPageResponse> findAll(SearchCondition searchCondition, Pageable pageable) {
 		List<QuestionPageResponse> content = queryFactory
-			.select(new QQuestionPageResponse(
+			.selectDistinct(new QQuestionPageResponse(
 				questionEntity.id,
 				questionEntity.subject,
 				questionEntity.content,
@@ -62,7 +63,7 @@ public class QuestionQueryRepository {
 	}
 
 	public QuestionDetailResponse findById(Long questionId, Long memberId) {
-		QuestionDetailResponse questionDetailResponse = queryFactory.select(new QQuestionDetailResponse(
+		QuestionDetailResponse questionDetailResponse = queryFactory.selectDistinct(new QQuestionDetailResponse(
 				questionEntity.id,
 				questionEntity.subject,
 				questionEntity.content,
@@ -70,12 +71,14 @@ public class QuestionQueryRepository {
 				questionEntity.createdAt,
 				questionEntity.modifiedAt,
 				voterEntity.countDistinct(),
+				commentEntity.countDistinct(),
 				questionEntity.author.id.eq(memberId),
 				voterEntity.memberEntity.id.eq(memberId)
 			))
 			.from(questionEntity)
 			.leftJoin(questionEntity.author)
 			.leftJoin(questionEntity.voterEntitySet, voterEntity)
+			.leftJoin(questionEntity.commentEntityList, commentEntity)
 			.where(questionEntity.id.eq(questionId))
 			.groupBy(
 				questionEntity.id,
