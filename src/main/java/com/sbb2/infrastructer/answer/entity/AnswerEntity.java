@@ -90,6 +90,8 @@ public class AnswerEntity extends BaseEntity {
 				.modifiedAt(answer.question().modifiedAt())
 				.author(MemberEntity.from(answer.author()))
 				.build())
+			.modifiedAt(answer.modifiedAt())
+			.createdAt(answer.createdAt())
 			.build();
 		buildAnswerEntity.setVoterEntitySet(answer.voterSet().stream().map(voter -> VoterEntity.from(voter)).collect(
 			Collectors.toSet()));
