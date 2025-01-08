@@ -490,10 +490,17 @@ public class AnswerServiceTest {
 			.build();
 
 		Pageable pageable = PageRequest.of(searchCondition.pageNum(), 10);
+		int startIndex = pageable.getPageSize() * pageable.getPageNumber();
 
-		//TODO 페이지 자르는 부분 로직 변경할 것 (CommentServiceTest 참고)
+		List<AnswerDetailResponse> answerDetailResponseSubList = answerDetailResponseList.subList(
+			startIndex, Math.min(startIndex + pageable.getPageSize(), answerDetailResponseList.size())
+		);
+
 		Page<AnswerDetailResponse> answerDetailResponsePage = new PageImpl<>(
-			answerDetailResponseList.subList(0, Math.min(10, answerDetailResponseList.size())), pageable,
+			answerDetailResponseList.subList(
+				startIndex, Math.min(startIndex + pageable.getPageSize(), answerDetailResponseList.size())
+			),
+			pageable,
 			answerDetailResponseList.size());
 		given(questionRepository.findById(1L))
 			.willReturn(
@@ -512,7 +519,7 @@ public class AnswerServiceTest {
 		//then
 		assertThat(result.getTotalElements()).isEqualTo(answerDetailResponseList.size());
 		assertThat(result.getTotalPages()).isEqualTo(2);
-		assertThat(result.getContent()).isEqualTo(answerDetailResponseList.subList(0, 10));
+		assertThat(result.getContent()).isEqualTo(answerDetailResponseSubList);
 	}
 
 	@DisplayName("답변 페이징 조회시 질문이 존재하지 않는 실패 테스트")
