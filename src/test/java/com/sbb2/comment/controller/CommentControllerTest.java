@@ -329,6 +329,31 @@ public class CommentControllerTest {
 		assertThat(bindingResult.getFieldError("parentId").getDefaultMessage()).isEqualTo("부모 ID는 필수 항목입니다.");
 	}
 
+	@DisplayName("댓글 저장시 content가 비었을 때 실패 테스트")
+	@Test
+	void save_comment_content_is_null_fail() {
+		//given
+		CommentCreateForm givenCommentCreateForm = CommentCreateForm.builder()
+			.parentId(1L)
+			.parentType("answer")
+			.content("")
+			.build();
+
+		BindingResult bindingResult = new BeanPropertyBindingResult(givenCommentCreateForm, "givenCommentCreateForm");
+		validator.validate(givenCommentCreateForm, ValidationGroups.NotBlankGroup.class).forEach(violation ->
+			bindingResult.rejectValue(
+				violation.getPropertyPath().toString(),
+				"error",
+				violation.getMessage()
+			)
+		);
+
+		//then
+		assertThat(bindingResult.hasErrors()).isTrue();
+		assertThat(bindingResult.getErrorCount()).isEqualTo(1);
+		assertThat(bindingResult.getFieldError("content").getDefaultMessage()).isEqualTo("댓글 내용은 필수 항목입니다.");
+	}
+
 	private static class ParentTypeValid {
         @ValidStringEnum(enumClass = ParentType.class, groups = ValidationGroups.ValidEnumGroup.class)
         private String parentType;
