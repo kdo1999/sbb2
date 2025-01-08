@@ -77,7 +77,7 @@ public class QuestionServiceImpl implements QuestionService {
 	@Transactional(readOnly = true)
 	@Override
 	public Page<QuestionPageResponse> findAll(SearchCondition searchCondition) {
-		//TODO 정렬 기능 추가할 것 (Sort.Order 사용하면 메모리에서 정렬하기 때문에 Enum으로 정렬 값 받고 QuestionQueeryRepository에 넘겨줄 것)
+
 		PageRequest pageRequest = PageRequest.of(searchCondition.pageNum() == null ? 0 : searchCondition.pageNum(),
 			PAGE_SIZE);
 		return questionRepository.findAll(searchCondition, pageRequest);
