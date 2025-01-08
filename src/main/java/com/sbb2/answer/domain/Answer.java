@@ -55,18 +55,6 @@ public record Answer(Long id, String content, Member author, Question question, 
 		return Objects.hash(id, content, author, question, createdAt, modifiedAt);
 	}
 
-	@Override
-	public String toString() {
-		return "Answer{" +
-			"id=" + id +
-			", content='" + content + '\'' +
-			", author=" + author +
-			", question=" + question +
-			", createdAt=" + createdAt +
-			", modifiedAt=" + modifiedAt +
-			'}';
-	}
-
 	public void addVoter(Voter voter) {
 		this.voterSet.add(voter);
 	}
