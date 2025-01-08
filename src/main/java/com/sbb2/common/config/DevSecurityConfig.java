@@ -57,13 +57,13 @@ public class DevSecurityConfig {
             .permitAll()
 			.requestMatchers(HttpMethod.GET, "/api/v1/question")
 			.permitAll()
-			.requestMatchers(HttpMethod.GET, "/api/v1/question/{id}", "/api/v1/answer/{id}", "/api/v1/answer")
+			.requestMatchers(HttpMethod.GET, "/api/v1/question/{id}", "/api/v1/answer/{id}", "/api/v1/answer", "/api/v1/comment")
 			.hasRole("USER")
-			.requestMatchers(HttpMethod.POST, "/api/v1/question", "/api/v1/answer", "/api/v1/voter/{id}")
+			.requestMatchers(HttpMethod.POST, "/api/v1/question", "/api/v1/answer", "/api/v1/voter/{id}", "/api/v1/comment")
 			.hasRole("USER")
-			.requestMatchers(HttpMethod.PATCH, "/api/v1/question/{id}", "/api/v1/answer/{id}")
+			.requestMatchers(HttpMethod.PATCH, "/api/v1/question/{id}", "/api/v1/answer/{id}", "/api/v1/comment/{id}")
 			.hasRole("USER")
-			.requestMatchers(HttpMethod.DELETE, "/api/v1/question/{id}", "/api/v1/answer/{id}", "/api/v1/voter/{id}")
+			.requestMatchers(HttpMethod.DELETE, "/api/v1/question/{id}", "/api/v1/answer/{id}", "/api/v1/voter/{id}", "/api/v1/comment/{id}")
 			.hasRole("USER")
             .anyRequest()
             .authenticated()
@@ -116,10 +116,10 @@ public class DevSecurityConfig {
 		JwtFilter jwtFilter = new JwtFilter(jwtUtil, objectMapper, memberDetailsService, antPathMatcher());
 
 		jwtFilter
-			.addUriPattern(HttpMethod.GET, "/api/v1/question/*", "/api/v1/answer/*", "/api/v1/answer")
-			.addUriPattern(HttpMethod.POST, "/api/v1/question", "/api/v1/answer", "/api/v1/voter/*")
-			.addUriPattern(HttpMethod.PATCH, "/api/v1/question/*", "/api/v1/answer/*")
-			.addUriPattern(HttpMethod.DELETE, "/api/v1/question/*", "/api/v1/answer/*", "/api/v1/voter/*");
+			.addUriPattern(HttpMethod.GET, "/api/v1/question/*", "/api/v1/answer/*", "/api/v1/answer", "/api/v1/comment")
+			.addUriPattern(HttpMethod.POST, "/api/v1/question", "/api/v1/answer", "/api/v1/voter/*", "/api/v1/comment")
+			.addUriPattern(HttpMethod.PATCH, "/api/v1/question/*", "/api/v1/answer/*", "/api/v1/comment/*")
+			.addUriPattern(HttpMethod.DELETE, "/api/v1/question/*", "/api/v1/answer/*", "/api/v1/voter/*", "/api/v1/comment/*");
 		return jwtFilter;
 	}
 }
