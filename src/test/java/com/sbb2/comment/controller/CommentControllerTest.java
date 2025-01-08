@@ -281,6 +281,34 @@ public class CommentControllerTest {
 		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
 		verify(commentService, times(1))
 			.update(commentId, updateContent, givenMemberUserDetails.getMember());
+	}
+
+	@DisplayName("댓글 삭제 성공 테스트")
+	@Test
+	void delete_comment_success() {
+	    //given
+	    Member givenMember = Member.builder()
+			.id(1L)
+			.email("testEmail@naver.com")
+			.username("testUsername")
+			.password("testPassword1234!")
+			.build();
+
+		MemberUserDetails givenMemberUserDetails = new MemberUserDetails(givenMember);
+
+		Long commentId = 1L;
+
+		doNothing().when(commentService).deleteById(commentId, givenMemberUserDetails.getMember());
+
+	    //when
+		ResponseEntity<GenericResponse<Void>> result = commentController
+			.delete(commentId, givenMemberUserDetails);
+
+	    //then
+		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(result.getBody().getData()).isNull();
+		verify(commentService, times(1))
+			.deleteById(commentId, givenMemberUserDetails.getMember());
 
 	}
 
