@@ -34,7 +34,7 @@ public class CategoryRepositoryTest {
 	@BeforeAll
 	void setUp() {
 		Category category1 = Category.builder()
-			.categoryName("qusetion_board")
+			.categoryName("question_board")
 			.build();
 
 		Category category2 = Category.builder()
@@ -66,5 +66,24 @@ public class CategoryRepositoryTest {
 		//then
 		Assertions.assertThat(savedCategory.id()).isNotNull();
 		Assertions.assertThat(savedCategory.categoryName()).isEqualTo(categoryName);
+	}
+
+	@DisplayName("카테고리 ID로 조회 성공 테스트")
+	@Test
+	void find_category_id_success() {
+		//given
+		Long givenId = 1L;
+		String categoryName = "question_board";
+
+		Category givenCategory = Category.builder()
+			.id(givenId)
+			.categoryName(categoryName)
+			.build();
+
+		//when
+		Category savedCategory = categoryRepository.findById(givenId).get();
+
+		//then
+		Assertions.assertThat(savedCategory).isEqualTo(givenCategory);
 	}
 }
