@@ -24,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 
+import com.sbb2.comment.controller.request.CommentForm;
 import com.sbb2.comment.domain.ParentType;
 import com.sbb2.comment.service.CommentService;
 import com.sbb2.comment.service.response.CommentResponse;
