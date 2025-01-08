@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.LongStream;
 
+import org.hibernate.validator.HibernateValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
 
 import com.sbb2.comment.domain.ParentType;
 import com.sbb2.comment.service.CommentService;
@@ -27,19 +30,29 @@ import com.sbb2.comment.service.response.CommentResponse;
 import com.sbb2.common.auth.userdetails.MemberUserDetails;
 import com.sbb2.common.response.GenericResponse;
 import com.sbb2.common.util.SearchCondition;
+import com.sbb2.common.validation.ValidationGroups;
+import com.sbb2.common.validation.annotation.ValidStringEnum;
 import com.sbb2.member.domain.Member;
+
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 
 //TODO 01/08 컨트롤러 테스트부터 작성하고 로직 구현할 것
 @ExtendWith(MockitoExtension.class)
 public class CommentControllerTest {
 	@Mock
 	private CommentService commentService;
-
 	private CommentController commentController;
+	private Validator validator;
 
 	@BeforeEach
 	void setUp() {
 		commentController = new CommentController(commentService);
+		ValidatorFactory factory = Validation.byProvider(HibernateValidator.class)
+			.configure()
+			.buildValidatorFactory();
+		validator = factory.getValidator();
 	}
 
 	@DisplayName("질문 댓글 조회 성공 테스트")
@@ -169,4 +182,39 @@ public class CommentControllerTest {
 		verify(commentService, times(1))
 			.findAll(givenAnswerId, givenMemberUserDetails.getMember().id(), givenParentType, givenSearchCondition);
 	}
+
+	@DisplayName("댓글 페이징 조회시 ParentType가 일치하는게 없을 때 실패 테스트")
+	@Test
+	void findAll_parentType_not_match_fail() {
+		//given
+		ParentTypeValid parentTypeValid = new ParentTypeValid("test");
+
+		BindingResult bindingResult = new BeanPropertyBindingResult(parentTypeValid, "parentTypeValid");
+		validator.validate(parentTypeValid, ValidationGroups.ValidEnumGroup.class).forEach(violation ->
+			bindingResult.rejectValue(
+				violation.getPropertyPath().toString(),
+				"error",
+				violation.getMessage()
+			)
+		);
+
+		//then
+		assertThat(bindingResult.hasErrors()).isTrue();
+		assertThat(bindingResult.getErrorCount()).isEqualTo(1);
+		assertThat(bindingResult.getFieldError("parentType").getDefaultMessage()).isEqualTo("지원하지 않는 타입입니다.");
+	}
+
+	private static class ParentTypeValid {
+        @ValidStringEnum(enumClass = ParentType.class, groups = ValidationGroups.ValidEnumGroup.class)
+        private String parentType;
+
+		public ParentTypeValid(String parentType) {
+			this.parentType = parentType;
+		}
+
+		public String getParentType() {
+			return parentType;
+		}
+	}
+
 }
