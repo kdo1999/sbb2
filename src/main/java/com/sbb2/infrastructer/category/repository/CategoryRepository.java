@@ -10,4 +10,6 @@ public interface CategoryRepository {
 	Optional<Category> findById(Long categoryId);
 
 	Optional<Category> findByCategoryName(String categoryName);
+
+	void deleteById(Long categoryId);
 }
