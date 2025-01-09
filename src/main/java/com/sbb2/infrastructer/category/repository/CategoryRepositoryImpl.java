@@ -1,5 +1,6 @@
 package com.sbb2.infrastructer.category.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
@@ -33,6 +34,13 @@ public class CategoryRepositoryImpl implements CategoryRepository {
 	@Override
 	public void deleteById(Long categoryId) {
 		categoryJpaRepository.deleteById(categoryId);
+	}
+
+	@Override
+	public List<Category> findAll() {
+		return categoryJpaRepository.findAll().stream()
+			.map(CategoryEntity::toModel)
+			.toList();
 	}
 }
 
