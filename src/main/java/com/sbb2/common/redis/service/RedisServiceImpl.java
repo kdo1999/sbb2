@@ -54,4 +54,9 @@ public class RedisServiceImpl implements RedisService {
 	public void setTimeout(String key, long timeout) {
 		redisDao.setTimeout(key, timeout);
 	}
+
+	@Override
+	public boolean hasKey(String key) {
+		return redisDao.hasKey(key);
+	}
 }

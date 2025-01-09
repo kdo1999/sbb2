@@ -18,4 +18,6 @@ public interface RedisService {
 	void setHashData(String key, String hashKey, String data);
 
 	void setTimeout(String key, long timeout);
+
+	boolean hasKey(String key);
 }

@@ -19,4 +19,6 @@ public interface RedisDao {
 
 	void setTimeout(String key, long timeout);
 
+	boolean hasKey(String key);
+
 }

@@ -72,4 +72,9 @@ public class RedisDaoImpl implements RedisDao {
 	public void setTimeout(String key, long timeout) {
 		redisTemplate.expire(key, timeout, TimeUnit.MILLISECONDS);
 	}
+
+	@Override
+	public boolean hasKey(String key) {
+		return Boolean.TRUE.equals(redisTemplate.hasKey(key));
+	}
 }
