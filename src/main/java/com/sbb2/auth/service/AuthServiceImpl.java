@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sbb2.auth.service.response.MemberEmailSignupResponse;
 import com.sbb2.auth.service.response.MemberLoginResponse;
+import com.sbb2.common.auth.exception.AuthBusinessLogicException;
+import com.sbb2.common.auth.exception.AuthErrorCode;
 import com.sbb2.common.auth.token.MemberLoginToken;
 import com.sbb2.common.auth.userdetails.MemberUserDetails;
 import com.sbb2.infrastructer.member.repository.MemberRepository;
@@ -62,6 +64,17 @@ public class AuthServiceImpl implements AuthService {
 			member.email(), member.username(),
 			member.memberRole()
 		);
+	}
+
+	@Override
+	public void passwordChange(String originalPassword, String changePassword, Member loginMember) {
+		if (!passwordEncoder.matches(originalPassword, loginMember.password())) {
+			throw new AuthBusinessLogicException(AuthErrorCode.PASSWORD_NOT_MATCH);
+		}
+
+		Member changedPasswordMember = loginMember.changePassword(passwordEncoder.encode(changePassword));
+
+		memberRepository.save(changedPasswordMember);
 	}
 
 	private void existsMember(String email, String username) {

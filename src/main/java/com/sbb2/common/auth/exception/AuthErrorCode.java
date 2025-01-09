@@ -11,6 +11,7 @@ public enum AuthErrorCode {
 	NOT_VERIFIED(HttpStatus.UNAUTHORIZED, "탈퇴되었거나 계정이 잠겼습니다."),
 	SOCIAL_NOT_SIGNUP(HttpStatus.UNAUTHORIZED, "해당 소셜 계정이 없습니다."),
 	NICKNAME_DUPLICATION(HttpStatus.BAD_REQUEST, "닉네임이 중복입니다."),
+	PASSWORD_NOT_MATCH(HttpStatus.BAD_REQUEST, "기존 비밀번호가 일치하지 않습니다."),
 	EMAIL_DUPLICATION(HttpStatus.BAD_REQUEST, "해당 이메일은 이미 가입이 돼있습니다.");
 
 	private final HttpStatus httpStatus;
