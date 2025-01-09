@@ -3,6 +3,7 @@ package com.sbb2.category.service;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -64,5 +65,36 @@ public class CategoryServiceTest {
 		assertThatThrownBy(() -> categoryService.findById(givenCategoryId))
 			.isInstanceOf(CategoryBusinessLogicException.class)
 			.hasMessage(CategoryErrorCode.NOT_FOUND.getMessage());
+	}
+
+	@DisplayName("카테고리 전체 조회 성공 테스트")
+	@Test
+	void findAll_category_success() {
+	    //given
+		Long givenCategoryId1 = 1L;
+		CategoryName givenCategoryName1 = CategoryName.QUESTION_BOARD;
+
+		Long givenCategoryId2 = 2L;
+		CategoryName givenCategoryName2 = CategoryName.LECTURE_BOARD;
+
+		Category givenCategory1 = Category.builder()
+			.id(givenCategoryId1)
+			.categoryName(givenCategoryName1)
+			.build();
+
+		Category givenCategory2 = Category.builder()
+			.id(givenCategoryId2)
+			.categoryName(givenCategoryName2)
+			.build();
+
+		List<Category> givenCategoryList = List.of(givenCategory1, givenCategory2);
+		given(categoryRepository.findAll())
+			.willReturn(givenCategoryList);
+
+		//when
+		List<Category> findCategoryList = categoryService.findAll();
+
+		//then
+		assertThat(findCategoryList).isEqualTo(givenCategoryList);
 	}
 }
