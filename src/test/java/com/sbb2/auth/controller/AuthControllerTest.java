@@ -23,6 +23,8 @@ import com.sbb2.common.jwt.JwtUtil;
 import com.sbb2.common.response.GenericResponse;
 import com.sbb2.member.domain.MemberRole;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @ExtendWith(MockitoExtension.class)
 class AuthControllerTest {
 
@@ -34,6 +36,9 @@ class AuthControllerTest {
 
     @InjectMocks
     private AuthController authController;
+
+	@Mock
+    private HttpServletRequest request;
 
 	@DisplayName("회원가입 성공 테스트")
     @Test
@@ -95,4 +100,41 @@ class AuthControllerTest {
         assertThat(result.getHeaders().getFirst("Authorization")).isEqualTo("Bearer " + accessToken);
         assertThat(result.getHeaders().get(HttpHeaders.SET_COOKIE)).containsExactly(cookie.toString());
     }
+
+	@DisplayName("로그아웃 성공 테스트")
+	@Test
+	void logout_success() {
+		//given
+        String accessToken = "mockAccessToken";
+        String refreshToken = "mockRefreshToken";
+
+        given(jwtUtil.getAccessToken(request)).willReturn(accessToken);
+        given(jwtUtil.getRefreshToken(request)).willReturn(refreshToken);
+
+		ResponseCookie refreshCookie = ResponseCookie
+			.from("refresh", null)
+			.domain("localhost")
+			.path("/")
+			.httpOnly(true)
+			.secure(false)
+			.maxAge(0)
+			.sameSite("Strict")
+			.build();
+
+		doNothing().when(jwtUtil).logout(accessToken, refreshToken);
+
+        //when
+        ResponseEntity<GenericResponse<Void>> response = authController.logout(request);
+
+        //then
+        verify(jwtUtil).getAccessToken(request);
+        verify(jwtUtil).getRefreshToken(request);
+        verify(jwtUtil).logout(accessToken, refreshToken);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getHeaders().getFirst(HttpHeaders.SET_COOKIE)).isEqualTo(refreshCookie.toString());
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getData()).isNull();
+
+	}
 }
