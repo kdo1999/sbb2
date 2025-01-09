@@ -21,16 +21,19 @@ import org.springframework.stereotype.Repository;
 import org.springframework.test.annotation.DirtiesContext;
 
 import com.sbb2.answer.domain.Answer;
+import com.sbb2.category.domain.Category;
 import com.sbb2.common.config.JpaAudtingConfig;
 import com.sbb2.common.config.QuerydslConfig;
+import com.sbb2.common.util.SearchCondition;
 import com.sbb2.infrastructer.answer.repository.AnswerRepository;
+import com.sbb2.infrastructer.category.entity.CategoryName;
+import com.sbb2.infrastructer.category.repository.CategoryRepository;
 import com.sbb2.infrastructer.member.repository.MemberRepository;
 import com.sbb2.infrastructer.voter.repository.VoterRepository;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
 import com.sbb2.question.service.response.QuestionDetailResponse;
 import com.sbb2.question.service.response.QuestionPageResponse;
-import com.sbb2.common.util.SearchCondition;
 import com.sbb2.voter.domain.Voter;
 
 import jakarta.persistence.EntityManager;
@@ -44,15 +47,17 @@ public class QuestionRepositoryTest {
 	private final QuestionRepository questionRepository;
 	private final AnswerRepository answerRepository;
 	private final VoterRepository voterRepository;
+	private final CategoryRepository categoryRepository;
 	private final EntityManager em;
 
 	@Autowired
 	public QuestionRepositoryTest(QuestionRepository questionRepository, MemberRepository memberRepository,
-		AnswerRepository answerRepository, VoterRepository voterRepository, EntityManager em) {
+		AnswerRepository answerRepository, VoterRepository voterRepository, CategoryRepository categoryRepository, EntityManager em) {
 		this.questionRepository = questionRepository;
 		this.memberRepository = memberRepository;
 		this.answerRepository = answerRepository;
 		this.voterRepository = voterRepository;
+		this.categoryRepository = categoryRepository;
 		this.em = em;
 	}
 
@@ -85,10 +90,27 @@ public class QuestionRepositoryTest {
 		String content = "testContent";
 		Member author = memberRepository.findById(1L).get();
 
+		Category category1 = Category.builder()
+			.categoryName(CategoryName.QUESTION_BOARD)
+			.build();
+
+		Category category2 = Category.builder()
+			.categoryName(CategoryName.LECTURE_BOARD)
+			.build();
+
+		Category category3 = Category.builder()
+			.categoryName(CategoryName.FREE_BOARD)
+			.build();
+
+		Category savedCategory1 = categoryRepository.save(category1);
+		Category savedCategory2 = categoryRepository.save(category2);
+		categoryRepository.save(category3);
+
 		for (int i = 0; i < 20; i++) {
 			Question question = Question.builder()
 				.subject(subject + i + 1)
 				.content(content + i + 1)
+				.category(savedCategory1)
 				.author(author)
 				.build();
 
@@ -99,6 +121,7 @@ public class QuestionRepositoryTest {
 			Question question = Question.builder()
 				.subject("searchSubject" + i + 1)
 				.content("searchContent" + i + 1)
+				.category(savedCategory2)
 				.author(author)
 				.build();
 
@@ -130,13 +153,15 @@ public class QuestionRepositoryTest {
 		//given
 		String subject = "testSubject1";
 		String content = "testContent1";
-		Member author = memberRepository.findById(1L).get();
+		Member givenAuthor = memberRepository.findById(1L).get();
+		Category givenCategory = categoryRepository.findById(1L).get();
 
 		//when
 		Question question = Question.builder()
 			.subject(subject)
 			.content(content)
-			.author(author)
+			.category(givenCategory)
+			.author(givenAuthor)
 			.build();
 
 		Question savedQuestion = questionRepository.save(question);
@@ -144,7 +169,8 @@ public class QuestionRepositoryTest {
 		//then
 		assertThat(savedQuestion.subject()).isEqualTo(subject);
 		assertThat(savedQuestion.content()).isEqualTo(content);
-		assertThat(savedQuestion.author()).isEqualTo(author);
+		assertThat(savedQuestion.author()).isEqualTo(givenAuthor);
+		assertThat(savedQuestion.category()).isEqualTo(givenCategory);
 		assertThat(savedQuestion.createdAt()).isNotNull();
 		assertThat(savedQuestion.modifiedAt()).isNotNull();
 	}
@@ -159,8 +185,32 @@ public class QuestionRepositoryTest {
 		SearchCondition searchCondition = SearchCondition.builder()
 			.kw(keyword)
 			.pageNum(page)
+			.categoryName("lecture_boarD")
 			.sort("createdAt")
 			.order("desc")
+			.build();
+
+		//when
+		Pageable pageable = PageRequest.of(searchCondition.pageNum(), 10);
+		Page<QuestionPageResponse> questionPage = questionRepository.findAll(searchCondition, pageable);
+		questionPage.getContent().iterator().forEachRemaining(System.out::println);
+
+		//then
+		assertThat(questionPage.getTotalPages()).isEqualTo(1);
+		assertThat(questionPage.getContent().size()).isEqualTo(5);
+	}
+
+	@DisplayName("질문 카테고리 조회 테스트")
+	@Test
+	void find_categoryName_sort_order_question() {
+		//given
+		int page = 0;
+
+		SearchCondition searchCondition = SearchCondition.builder()
+			.pageNum(page)
+			.categoryName("lecture_boarD")
+			.sort("modifiedAt")
+			.order("asc")
 			.build();
 
 		//when
@@ -183,8 +233,6 @@ public class QuestionRepositoryTest {
 		SearchCondition searchCondition = SearchCondition.builder()
 			.kw(keyword)
 			.pageNum(page)
-			.sort("createdAt")
-			.order("desc")
 			.build();
 		Pageable pageable = PageRequest.of(searchCondition.pageNum(), 10);
 
@@ -196,19 +244,20 @@ public class QuestionRepositoryTest {
 		assertThat(questionPage.getContent().size()).isEqualTo(10);
 	}
 
-
 	@DisplayName("질문 ID 조회 테스트")
 	@Test
 	void find_id_question() {
 		//given
-		String subject = "testSubject1";
-		String content = "testContent1";
-		Member author = memberRepository.findById(1L).get();
+		String givenSubject = "testSubject1";
+		String givenContent = "testContent1";
+		Member givenAuthor = memberRepository.findById(1L).get();
+		Category givenCategory = categoryRepository.findById(1L).get();
 
 		Question givenQuestion = Question.builder()
-			.subject(subject)
-			.content(content)
-			.author(author)
+			.subject(givenSubject)
+			.content(givenContent)
+			.author(givenAuthor)
+			.category(givenCategory)
 			.build();
 
 		Question savedQuestion = questionRepository.save(givenQuestion);
@@ -228,23 +277,27 @@ public class QuestionRepositoryTest {
 		String content = "testContent1";
 		String updateSubject = "updateSubject";
 		String updateContent = "updateContent";
+		Category givenCategory = categoryRepository.findById(1L).get();
+		Category updateCategory = categoryRepository.findById(2L).get();
 		Member author = memberRepository.findById(1L).get();
 
 		Question givenQuestion = Question.builder()
 			.subject(subject)
 			.content(content)
+			.category(givenCategory)
 			.author(author)
 			.build();
 
 		Question savedQuestion = questionRepository.save(givenQuestion);
 		//when
-		savedQuestion = savedQuestion.fetch(updateSubject, updateContent);
+		savedQuestion = savedQuestion.fetch(updateSubject, updateContent, updateCategory);
 
 		Question updateQuestion = questionRepository.save(savedQuestion);
 
 		//then
 		assertThat(updateQuestion.subject()).isEqualTo(updateSubject);
 		assertThat(updateQuestion.content()).isEqualTo(updateContent);
+		assertThat(updateQuestion.category()).isEqualTo(updateCategory);
 		assertThat(updateQuestion.id()).isEqualTo(savedQuestion.id());
 	}
 
@@ -290,9 +343,11 @@ public class QuestionRepositoryTest {
 	void delete_question_answer_success() {
 		//given
 		Member member = memberRepository.findById(1L).get();
+		Category givenCategory = categoryRepository.findById(1L).get();
 		Question question = Question.builder()
 			.subject("givenSubject")
 			.content("givenContent")
+			.category(givenCategory)
 			.author(member)
 			.build();
 
@@ -324,9 +379,11 @@ public class QuestionRepositoryTest {
 	void delete_question_voter_success() {
 		//given
 		Member member = memberRepository.findById(1L).get();
+		Category givenCategory = categoryRepository.findById(1L).get();
 		Question question = Question.builder()
 			.subject("givenSubject")
 			.content("givenContent")
+			.category(givenCategory)
 			.author(member)
 			.build();
 

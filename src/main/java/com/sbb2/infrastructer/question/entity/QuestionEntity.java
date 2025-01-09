@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import com.sbb2.common.util.BaseEntity;
 import com.sbb2.infrastructer.answer.entity.AnswerEntity;
+import com.sbb2.infrastructer.category.entity.CategoryEntity;
 import com.sbb2.infrastructer.comment.entity.CommentEntity;
 import com.sbb2.infrastructer.member.entity.MemberEntity;
 import com.sbb2.infrastructer.voter.entity.VoterEntity;
@@ -50,6 +51,10 @@ public class QuestionEntity extends BaseEntity {
 	@JoinColumn(name = "member_id")
 	private MemberEntity author;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "category_id")
+	private CategoryEntity category;
+
 	@OneToMany(mappedBy = "questionEntity", cascade = CascadeType.ALL)
 	private List<AnswerEntity> answerEntityList = new ArrayList<>();
 
@@ -61,11 +66,12 @@ public class QuestionEntity extends BaseEntity {
 
 	@Builder
 	public QuestionEntity(Long id, String subject, String content, MemberEntity author, LocalDateTime createdAt,
-		LocalDateTime modifiedAt, List<AnswerEntity> answerEntityList, List<CommentEntity> commentEntityList) {
+		LocalDateTime modifiedAt, CategoryEntity category, List<AnswerEntity> answerEntityList, List<CommentEntity> commentEntityList) {
 		this.id = id;
 		this.subject = subject;
 		this.content = content;
 		this.author = author;
+		this.category = category;
 		this.createdAt = createdAt;
 		this.modifiedAt = modifiedAt;
 		this.answerEntityList = answerEntityList;
@@ -78,17 +84,18 @@ public class QuestionEntity extends BaseEntity {
 	}
 
 	public static QuestionEntity from(Question question) {
-		QuestionEntity buildQuestion = QuestionEntity.builder()
+		QuestionEntity questionEntity = QuestionEntity.builder()
 			.id(question.id())
 			.subject(question.subject())
 			.content(question.content())
 			.author(MemberEntity.from(question.author()))
+			.category(CategoryEntity.from(question.category()))
 			.createdAt(question.createdAt())
 			.modifiedAt(question.modifiedAt())
 			.build();
-		buildQuestion.setVoterEntitySet(question.voterSet().stream().map(voter -> VoterEntity.from(voter)).collect(
+		questionEntity.setVoterEntitySet(question.voterSet().stream().map(voter -> VoterEntity.from(voter)).collect(
 			Collectors.toSet()));
-		return buildQuestion;
+		return questionEntity;
 	}
 
 	public Question toModel() {
@@ -97,6 +104,7 @@ public class QuestionEntity extends BaseEntity {
 			.subject(this.subject)
 			.content(this.content)
 			.author(this.author.toModel())
+			.category(this.category.toModel())
 			.createdAt(this.createdAt)
 			.modifiedAt(this.modifiedAt)
 			.build();

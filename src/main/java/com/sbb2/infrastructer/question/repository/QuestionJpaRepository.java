@@ -9,6 +9,6 @@ import org.springframework.data.repository.query.Param;
 import com.sbb2.infrastructer.question.entity.QuestionEntity;
 
 public interface QuestionJpaRepository extends JpaRepository<QuestionEntity, Long> {
-	@Query("select q from QuestionEntity q left join fetch q.author left join fetch q.answerEntityList left join fetch q.voterEntitySet where q.id = :id")
+	@Query("select q from QuestionEntity q left join fetch q.author left join fetch q.answerEntityList left join fetch q.voterEntitySet left join fetch q.category where q.id = :id")
 	Optional<QuestionEntity> findById(@Param("id") Long id);
 }

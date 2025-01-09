@@ -15,12 +15,14 @@ import org.springframework.util.StringUtils;
 
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sbb2.common.util.SearchCondition;
 import com.sbb2.infrastructer.answer.entity.QAnswerEntity;
+import com.sbb2.infrastructer.category.entity.CategoryName;
 import com.sbb2.question.service.response.QQuestionDetailResponse;
 import com.sbb2.question.service.response.QQuestionPageResponse;
 import com.sbb2.question.service.response.QuestionDetailResponse;
@@ -48,7 +50,8 @@ public class QuestionQueryRepository {
 					.where(QAnswerEntity.answerEntity.questionEntity.id.eq(questionEntity.id))))
 			.from(questionEntity)
 			.leftJoin(questionEntity.author)
-			.where(subjectAndContentContains(searchCondition))
+			.leftJoin(questionEntity.category)
+			.where(subjectAndContentContains(searchCondition), categoryNameContains(searchCondition))
 			.orderBy(getOrderBy(searchCondition))
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
@@ -116,5 +119,10 @@ public class QuestionQueryRepository {
 			questionEntity.subject.contains(searchCondition.kw())
 				.or(questionEntity.content.contains(searchCondition.kw())) :
 			null;
+	}
+
+	private Predicate categoryNameContains(SearchCondition searchCondition) {
+		CategoryName categoryName = CategoryName.from(searchCondition.categoryName());
+		return categoryName != null ? questionEntity.category.categoryName.eq(categoryName) : null;
 	}
 }
