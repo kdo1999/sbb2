@@ -2,7 +2,6 @@ package com.sbb2.question.controller.request;
 
 import static com.sbb2.common.validation.ValidationGroups.*;
 
-import com.sbb2.common.validation.annotation.ValidEnum;
 import com.sbb2.common.validation.annotation.ValidStringEnum;
 import com.sbb2.infrastructer.category.entity.CategoryName;
 
@@ -16,7 +15,7 @@ public record QuestionForm(
 	String subject,
 	@NotBlank(message = "내용은 필수 항목입니다.", groups = NotBlankGroup.class)
 	String content,
-	@ValidStringEnum(enumClass = CategoryName.class, message = "카테고리는 필수 항목입니다.", groups = ValidEnum.class)
+	@ValidStringEnum(enumClass = CategoryName.class, message = "카테고리는 필수 항목입니다.", groups = ValidEnumGroup.class)
 	String categoryName) {
 
 	@Builder
