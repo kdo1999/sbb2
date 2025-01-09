@@ -55,7 +55,7 @@ public class CategoryControllerTest {
 
 		List<CategoryResponse> categoryResponseList = givenCategoryList.stream()
 			.map(category -> CategoryResponse.builder()
-				.categoryName(category.categoryName().toString())
+				.categoryId(category.id())
 				.categoryDisplayName(category.categoryName().getCategoryDisplayName())
 				.build())
 			.toList();

@@ -29,7 +29,7 @@ public class CategoryServiceImpl implements CategoryService {
 		List<Category> findCategoryList = categoryRepository.findAll();
 
 		List<CategoryResponse> categoryResponseList = findCategoryList.stream().map((category) -> CategoryResponse.builder()
-				.categoryName(category.categoryName().toString())
+				.categoryId(category.id())
 				.categoryDisplayName(category.categoryName().getCategoryDisplayName())
 				.build())
 			.toList();

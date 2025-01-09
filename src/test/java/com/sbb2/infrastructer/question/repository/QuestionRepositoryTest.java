@@ -188,7 +188,7 @@ public class QuestionRepositoryTest {
 		SearchCondition searchCondition = SearchCondition.builder()
 			.kw(keyword)
 			.pageNum(page)
-			.categoryName("lecture_boarD")
+			.categoryId(2L)
 			.sort("createdAt")
 			.order("desc")
 			.build();
@@ -211,7 +211,7 @@ public class QuestionRepositoryTest {
 
 		SearchCondition searchCondition = SearchCondition.builder()
 			.pageNum(page)
-			.categoryName("lecture_boarD")
+			.categoryId(2L)
 			.sort("modifiedAt")
 			.order("asc")
 			.build();

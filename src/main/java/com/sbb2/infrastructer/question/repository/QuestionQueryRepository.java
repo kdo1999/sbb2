@@ -54,8 +54,7 @@ public class QuestionQueryRepository {
 					.where(QAnswerEntity.answerEntity.questionEntity.id.eq(questionEntity.id))))
 			.from(questionEntity)
 			.leftJoin(questionEntity.author)
-			.leftJoin(questionEntity.category)
-			.where(subjectAndContentContains(searchCondition), categoryNameContains(searchCondition))
+			.where(subjectAndContentContains(searchCondition), categoryIdEquals(searchCondition))
 			.orderBy(getOrderBy(searchCondition))
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
@@ -76,7 +75,7 @@ public class QuestionQueryRepository {
 				questionEntity.content,
 				questionEntity.author.username,
 				questionEntity.viewCount,
-				new QCategoryResponse(questionEntity.category.categoryName.stringValue(),
+				new QCategoryResponse(questionEntity.category.id,
 					getCategoryDisplayName()),
 				questionEntity.createdAt,
 				questionEntity.modifiedAt,
@@ -87,6 +86,7 @@ public class QuestionQueryRepository {
 			))
 			.from(questionEntity)
 			.leftJoin(questionEntity.author)
+			.leftJoin(questionEntity.category)
 			.leftJoin(questionEntity.voterEntitySet, voterEntity)
 			.leftJoin(questionEntity.commentEntityList, commentEntity)
 			.where(questionEntity.id.eq(questionId))
@@ -139,8 +139,8 @@ public class QuestionQueryRepository {
 			null;
 	}
 
-	private Predicate categoryNameContains(SearchCondition searchCondition) {
-		CategoryName categoryName = CategoryName.from(searchCondition.categoryName());
-		return categoryName != null ? questionEntity.category.categoryName.eq(categoryName) : null;
+	private Predicate categoryIdEquals(SearchCondition searchCondition) {
+		return searchCondition.categoryId() != null ? questionEntity.category.id.eq(searchCondition.categoryId()) :
+			null;
 	}
 }

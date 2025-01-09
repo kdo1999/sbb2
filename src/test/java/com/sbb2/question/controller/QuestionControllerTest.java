@@ -106,7 +106,8 @@ public class QuestionControllerTest {
 		given(questionService.findAll(searchCondition)).willReturn(questionPageResponses);
 
 		//when
-		ResponseEntity<GenericResponse<Page<QuestionPageResponse>>> result = questionController.findAll(searchCondition);
+		ResponseEntity<GenericResponse<Page<QuestionPageResponse>>> result = questionController.findAll(
+			searchCondition);
 
 		//then
 		Page<QuestionPageResponse> data = result.getBody().getData();
@@ -159,7 +160,7 @@ public class QuestionControllerTest {
 				.anyMatch(v -> v.member().id().equals(givenMember.id())))
 			.isAuthor(question.author().id().equals(givenMember.id()))
 			.categoryResponse(CategoryResponse.builder()
-				.categoryName(question.category().categoryName().toString())
+				.categoryId(question.category().id())
 				.categoryDisplayName(question.category().categoryName().getCategoryDisplayName())
 				.build())
 			.createdAt(LocalDateTime.now())
@@ -185,11 +186,11 @@ public class QuestionControllerTest {
 	@DisplayName("질문 저장 성공 테스트")
 	@Test
 	void save_success() {
-	    //given
+		//given
 		QuestionForm questionForm = QuestionForm.builder()
 			.subject("testSubject")
 			.content("testContent")
-			.categoryName("question_board")
+			.categoryId(1L)
 			.build();
 
 		Member givenMember = Member.builder()
@@ -211,7 +212,8 @@ public class QuestionControllerTest {
 		);
 
 		QuestionCreateResponse questionCreateResponse = QuestionCreateResponse.builder().id(1L).build();
-		given(questionService.save(questionForm.subject(), questionForm.content(), givenMember, questionForm.categoryName()))
+		given(questionService.save(questionForm.subject(), questionForm.content(), givenMember,
+			questionForm.categoryId()))
 			.willReturn(questionCreateResponse);
 
 		//when
@@ -228,11 +230,11 @@ public class QuestionControllerTest {
 	@DisplayName("질문 저장시 제목 빈 값 들어갔을 때 실패 테스트")
 	@Test
 	void save_emptySubject_fail() {
-	    //given
+		//given
 		QuestionForm questionForm = QuestionForm.builder()
 			.subject("")
 			.content("testContent")
-			.categoryName("question_board")
+			.categoryId(1L)
 			.build();
 
 		Member givenMember = Member.builder()
@@ -262,11 +264,11 @@ public class QuestionControllerTest {
 	@DisplayName("질문 저장시 내용 빈 값 들어갔을 때 실패 테스트")
 	@Test
 	void save_emptyContent_fail() {
-	    //given
+		//given
 		QuestionForm questionForm = QuestionForm.builder()
 			.subject("testSubject")
 			.content("")
-			.categoryName("question_board")
+			.categoryId(1L)
 			.build();
 
 		Member givenMember = Member.builder()
@@ -296,7 +298,7 @@ public class QuestionControllerTest {
 	@DisplayName("질문 수정 성공 테스트")
 	@Test
 	void update_question_success() {
-	    //given
+		//given
 		Category givenCategory = Category.builder()
 			.id(1L)
 			.categoryName(CategoryName.QUESTION_BOARD)
@@ -320,12 +322,13 @@ public class QuestionControllerTest {
 		QuestionForm givenQuestionForm = QuestionForm.builder()
 			.content("updateContent")
 			.subject("updateSubject")
-			.categoryName("question_board")
+			.categoryId(1L)
 			.build();
 
 		MemberUserDetails member = new MemberUserDetails(givenMember);
 
-		given(questionService.update(givenQuestion.id(), givenQuestionForm.subject(), givenQuestionForm.content(), givenMember, givenQuestionForm.categoryName())).willReturn(givenQuestion);
+		given(questionService.update(givenQuestion.id(), givenQuestionForm.subject(), givenQuestionForm.content(),
+			givenMember, givenQuestionForm.categoryId())).willReturn(givenQuestion);
 
 		BindingResult bindingResult = new BeanPropertyBindingResult(givenQuestionForm, "questionForm");
 
@@ -344,17 +347,18 @@ public class QuestionControllerTest {
 		//then
 		assertThat(result.getBody().getData()).isNull();
 		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-		verify(questionService, times(1)).update(givenQuestion.id(), givenQuestionForm.subject(), givenQuestionForm.content(), givenMember, givenQuestionForm.categoryName());
+		verify(questionService, times(1)).update(givenQuestion.id(), givenQuestionForm.subject(),
+			givenQuestionForm.content(), givenMember, givenQuestionForm.categoryId());
 	}
 
 	@DisplayName("질문 수정시 제목이 비었을 때 실패 테스트")
 	@Test
 	void update_subject_empty_fail() {
-	    //given
+		//given
 		QuestionForm givenQuestionForm = QuestionForm.builder()
 			.content("updateContent")
 			.subject("")
-			.categoryName("question_board")
+			.categoryId(1L)
 			.build();
 
 		BindingResult bindingResult = new BeanPropertyBindingResult(givenQuestionForm, "questionForm");
@@ -377,11 +381,11 @@ public class QuestionControllerTest {
 	@DisplayName("질문 수정시 내용이 비었을 때 실패 테스트")
 	@Test
 	void update_content_empty_fail() {
-	    //given
+		//given
 		QuestionForm givenQuestionForm = QuestionForm.builder()
 			.content("")
 			.subject("updateSubject")
-			.categoryName("question_board")
+			.categoryId(1L)
 			.build();
 
 		BindingResult bindingResult = new BeanPropertyBindingResult(givenQuestionForm, "questionForm");
@@ -404,7 +408,7 @@ public class QuestionControllerTest {
 	@DisplayName("질문 삭제 성공 테스트")
 	@Test
 	void delete_question_success() {
-	    //given
+		//given
 		Member givenMember = Member.builder()
 			.id(1L)
 			.username("testMember")
@@ -423,7 +427,7 @@ public class QuestionControllerTest {
 
 		doNothing().when(questionService).deleteById(givenQuestion.id(), givenMember);
 
-	    //when
+		//when
 		ResponseEntity<GenericResponse<Void>> result = questionController.delete(givenQuestion.id(), member);
 
 		//then

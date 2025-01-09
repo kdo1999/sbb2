@@ -75,7 +75,7 @@ public class QuestionServiceTest {
 			.categoryName(CategoryName.QUESTION_BOARD)
 			.build();
 
-		given(categoryRepository.findByCategoryName(givenCategory.categoryName()))
+		given(categoryRepository.findById(givenCategory.id()))
 			.willReturn(Optional.of(givenCategory));
 
 		given(questionRepository.save(any(Question.class)))
@@ -91,7 +91,7 @@ public class QuestionServiceTest {
 
 		//when
 		QuestionCreateResponse questionCreateResponse = questionService.save("questionSubject", "questionContent",
-			givenMember, givenCategory.categoryName().toString());
+			givenMember, givenCategory.id());
 
 		//then
 		assertThat(questionCreateResponse.id()).isEqualTo(1L);
@@ -110,14 +110,14 @@ public class QuestionServiceTest {
 			.email("testEmail")
 			.build();
 
-		CategoryName givenCategoryName = CategoryName.QUESTION_BOARD;
+		Long givenCategoryId = 1L;
 
-		given(categoryRepository.findByCategoryName(givenCategoryName))
+		given(categoryRepository.findById(givenCategoryId))
 			.willReturn(Optional.empty());
 
 		//when & then
 		assertThatThrownBy(() ->
-			questionService.save("questionSubject", "questionContent", givenMember, givenCategoryName.toString()))
+			questionService.save("questionSubject", "questionContent", givenMember, givenCategoryId))
 			.isInstanceOf(CategoryBusinessLogicException.class)
 			.hasMessage(CategoryErrorCode.NOT_FOUND.getMessage());
 	}
@@ -179,7 +179,7 @@ public class QuestionServiceTest {
 		QuestionForm questionForm = QuestionForm.builder()
 			.subject("updateSubject")
 			.content("updateContent")
-			.categoryName("question_board")
+			.categoryId(1L)
 			.build();
 
 		Member givenMember = Member.builder()
@@ -217,12 +217,12 @@ public class QuestionServiceTest {
 				.author(givenMember)
 				.build());
 
-		given(categoryRepository.findByCategoryName(updateCategory.categoryName()))
+		given(categoryRepository.findById(updateCategory.id()))
 			.willReturn(Optional.of(updateCategory));
 
 		//when
 		Question updateQuestion = questionService.update(1L, questionForm.subject(), questionForm.content(),
-			givenMember, questionForm.categoryName());
+			givenMember, questionForm.categoryId());
 
 		//then
 		assertThat(updateQuestion.author()).isEqualTo(givenMember);
@@ -238,7 +238,7 @@ public class QuestionServiceTest {
 		QuestionForm questionForm = QuestionForm.builder()
 			.subject("updateSubject")
 			.content("updateContent")
-			.categoryName("free_board")
+			.categoryId(1L)
 			.build();
 
 		Member givenMember = Member.builder()
@@ -272,7 +272,7 @@ public class QuestionServiceTest {
 		//when & then
 		assertThatThrownBy(
 			() -> questionService.update(1L, questionForm.subject(), questionForm.content(), givenMember2,
-				questionForm.categoryName()))
+				questionForm.categoryId()))
 			.isInstanceOf(QuestionBusinessLogicException.class)
 			.hasMessage(QuestionErrorCode.UNAUTHORIZED.getMessage());
 	}
@@ -284,7 +284,7 @@ public class QuestionServiceTest {
 		QuestionForm questionForm = QuestionForm.builder()
 			.subject("updateSubject")
 			.content("updateContent")
-			.categoryName("free_board")
+			.categoryId(1L)
 			.build();
 
 		Member givenMember = Member.builder()
@@ -300,7 +300,7 @@ public class QuestionServiceTest {
 		//then
 		assertThatThrownBy(
 			() -> questionService.update(1L, questionForm.subject(), questionForm.content(), givenMember,
-				questionForm.categoryName()))
+				questionForm.categoryId()))
 			.isInstanceOf(QuestionBusinessLogicException.class)
 			.hasMessage(QuestionErrorCode.NOT_FOUND.getMessage());
 	}
@@ -312,7 +312,7 @@ public class QuestionServiceTest {
 		QuestionForm questionForm = QuestionForm.builder()
 			.subject("updateSubject")
 			.content("updateContent")
-			.categoryName("question_board")
+			.categoryId(2L)
 			.build();
 
 		Member givenMember = Member.builder()
@@ -341,13 +341,13 @@ public class QuestionServiceTest {
 				.category(givenCategory)
 				.build()));
 
-		given(categoryRepository.findByCategoryName(updateCategory.categoryName()))
+		given(categoryRepository.findById(updateCategory.id()))
 			.willReturn(Optional.empty());
 
 		//then
 		assertThatThrownBy(
 			() -> questionService.update(1L, questionForm.subject(), questionForm.content(), givenMember,
-				questionForm.categoryName()))
+				questionForm.categoryId()))
 			.isInstanceOf(CategoryBusinessLogicException.class)
 			.hasMessage(CategoryErrorCode.NOT_FOUND.getMessage());
 	}
@@ -542,7 +542,7 @@ public class QuestionServiceTest {
 			.subject(question.subject())
 			.content(question.content())
 			.categoryResponse(CategoryResponse.builder()
-				.categoryName(question.category().categoryName().toString())
+				.categoryId(question.category().id())
 				.categoryDisplayName(question.category().categoryName().getCategoryDisplayName())
 				.build())
 			.voterCount(question.viewCount())
@@ -610,7 +610,7 @@ public class QuestionServiceTest {
 			.subject(question.subject())
 			.content(question.content())
 			.categoryResponse(CategoryResponse.builder()
-				.categoryName(question.category().categoryName().toString())
+				.categoryId(question.category().id())
 				.categoryDisplayName(question.category().categoryName().getCategoryDisplayName())
 				.build())
 			.viewCount(question.viewCount() + 1)

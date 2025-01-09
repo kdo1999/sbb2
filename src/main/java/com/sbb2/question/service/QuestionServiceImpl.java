@@ -9,17 +9,16 @@ import com.sbb2.category.domain.Category;
 import com.sbb2.category.exception.CategoryBusinessLogicException;
 import com.sbb2.category.exception.CategoryErrorCode;
 import com.sbb2.common.redis.service.RedisService;
-import com.sbb2.infrastructer.category.entity.CategoryName;
+import com.sbb2.common.util.SearchCondition;
 import com.sbb2.infrastructer.category.repository.CategoryRepository;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
-import com.sbb2.question.service.response.QuestionDetailResponse;
-import com.sbb2.question.service.response.QuestionPageResponse;
 import com.sbb2.question.exception.QuestionBusinessLogicException;
 import com.sbb2.question.exception.QuestionErrorCode;
 import com.sbb2.question.service.response.QuestionCreateResponse;
-import com.sbb2.common.util.SearchCondition;
+import com.sbb2.question.service.response.QuestionDetailResponse;
+import com.sbb2.question.service.response.QuestionPageResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -33,10 +32,8 @@ public class QuestionServiceImpl implements QuestionService {
 	private static final int PAGE_SIZE = 10;
 
 	@Override
-	public QuestionCreateResponse save(String subject, String content, Member author, String categoryName) {
-		CategoryName fromCategoryName = CategoryName.from(categoryName);
-
-		Category findCategory = categoryRepository.findByCategoryName(fromCategoryName)
+	public QuestionCreateResponse save(String subject, String content, Member author, Long categoryId) {
+		Category findCategory = categoryRepository.findById(categoryId)
 			.orElseThrow(() -> new CategoryBusinessLogicException(
 				CategoryErrorCode.NOT_FOUND));
 
@@ -64,7 +61,7 @@ public class QuestionServiceImpl implements QuestionService {
 	}
 
 	@Override
-	public Question update(Long id, String subject, String content, Member author, String categoryName) {
+	public Question update(Long id, String subject, String content, Member author, Long categoryId) {
 		Question target = questionRepository.findById(id)
 			.orElseThrow(() -> new QuestionBusinessLogicException(QuestionErrorCode.NOT_FOUND));
 
@@ -72,11 +69,10 @@ public class QuestionServiceImpl implements QuestionService {
 			throw new QuestionBusinessLogicException(QuestionErrorCode.UNAUTHORIZED);
 		}
 
-		CategoryName fromCategoryName = CategoryName.from(categoryName);
 		Category category = null;
 
-		if (!target.category().categoryName().equals(fromCategoryName)) {
-			category = categoryRepository.findByCategoryName(fromCategoryName)
+		if (!target.category().id().equals(categoryId)) {
+			category = categoryRepository.findById(categoryId)
 				.orElseThrow(() -> new CategoryBusinessLogicException(CategoryErrorCode.NOT_FOUND));
 		} else {
 			category = target.category();

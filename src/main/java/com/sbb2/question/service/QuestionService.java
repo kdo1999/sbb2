@@ -10,11 +10,11 @@ import com.sbb2.question.service.response.QuestionDetailResponse;
 import com.sbb2.question.service.response.QuestionPageResponse;
 
 public interface QuestionService {
-	QuestionCreateResponse save(String subject, String content, Member author, String categoryName);
+	QuestionCreateResponse save(String subject, String content, Member author, Long categoryId);
 
 	Question findById(Long id);
 
-	Question update(Long id, String subject, String content, Member author, String categoryName);
+	Question update(Long id, String subject, String content, Member author, Long categoryId);
 
 	void deleteById(Long id, Member author);
 

@@ -4,12 +4,12 @@ import com.querydsl.core.annotations.QueryProjection;
 
 import lombok.Builder;
 
-public record CategoryResponse(String categoryName, String categoryDisplayName) {
+public record CategoryResponse(Long categoryId, String categoryDisplayName) {
 
 	@QueryProjection
 	@Builder
-	public CategoryResponse(String categoryName, String categoryDisplayName) {
-		this.categoryName = categoryName;
+	public CategoryResponse(Long categoryId, String categoryDisplayName) {
+		this.categoryId = categoryId;
 		this.categoryDisplayName = categoryDisplayName;
 	}
 }
