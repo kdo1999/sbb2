@@ -5,7 +5,9 @@ import java.net.URI;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,9 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sbb2.auth.controller.request.MemberEmailSignupRequest;
 import com.sbb2.auth.controller.request.MemberLoginRequest;
+import com.sbb2.auth.controller.request.PasswordChangeRequest;
 import com.sbb2.auth.service.AuthService;
 import com.sbb2.auth.service.response.MemberEmailSignupResponse;
 import com.sbb2.auth.service.response.MemberLoginResponse;
+import com.sbb2.common.auth.userdetails.MemberUserDetails;
 import com.sbb2.common.jwt.JwtUtil;
 import com.sbb2.common.response.GenericResponse;
 import com.sbb2.common.validation.ValidationSequence;
@@ -32,7 +36,8 @@ public class AuthController {
 	private final JwtUtil jwtUtil;
 
 	@PostMapping("/signup")
-	public ResponseEntity<GenericResponse<MemberEmailSignupResponse>> signup(@Validated(ValidationSequence.class) @RequestBody MemberEmailSignupRequest memberEmailSignupRequest) {
+	public ResponseEntity<GenericResponse<MemberEmailSignupResponse>> signup(
+		@Validated(ValidationSequence.class) @RequestBody MemberEmailSignupRequest memberEmailSignupRequest) {
 		MemberEmailSignupResponse signup = authService.signup(memberEmailSignupRequest.email(),
 			memberEmailSignupRequest.username(), memberEmailSignupRequest.password());
 
@@ -40,7 +45,8 @@ public class AuthController {
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<GenericResponse<MemberLoginResponse>> login(@Validated(ValidationSequence.class) @RequestBody MemberLoginRequest memberLoginRequest) {
+	public ResponseEntity<GenericResponse<MemberLoginResponse>> login(
+		@Validated(ValidationSequence.class) @RequestBody MemberLoginRequest memberLoginRequest) {
 		MemberLoginResponse memberLoginResponse = authService.memberLogin(memberLoginRequest.email(),
 			memberLoginRequest.password());
 
@@ -69,8 +75,19 @@ public class AuthController {
 			.body(GenericResponse.of());
 	}
 
+	@PatchMapping("/password/change")
+	public ResponseEntity<GenericResponse<Void>> changePassword(@Validated(ValidationSequence.class) @RequestBody
+	PasswordChangeRequest passwordChangeRequest, @AuthenticationPrincipal MemberUserDetails memberUserDetails) {
+
+		authService.passwordChange(passwordChangeRequest.originalPassword(), passwordChangeRequest.getPassword(),
+			memberUserDetails.getMember());
+
+		return ResponseEntity.ok().body(GenericResponse.of());
+	}
+
 	/**
 	 * RefreshToken를 파라미터로 보내면 쿠키를 생성후 반환
+	 *
 	 * @param refreshToken
 	 * @return {@link ResponseCookie}
 	 */
