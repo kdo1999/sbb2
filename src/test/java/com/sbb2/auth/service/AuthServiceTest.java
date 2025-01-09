@@ -138,4 +138,38 @@ public class AuthServiceTest {
 
         verify(authenticationManager).authenticate(any(MemberLoginToken.class));
     }
+
+	@DisplayName("비밀번호 변경 성공 테스트")
+	@Test
+	void update_password_success() {
+	    //given
+		Member loginMember = Member.builder()
+			.id(1L)
+			.email("testEmail@naver.com")
+			.username("testUsername")
+			.password("!testPassword1234")
+			.memberRole(MemberRole.USER)
+			.build();
+
+		String originalPassword = "!testPassword1234";
+		String changePassword = "!testPassword4321";
+
+		given(passwordEncoder.matches(originalPassword, loginMember.password()))
+			.willReturn(originalPassword.equals(loginMember.password()));
+
+		Member changedPasswordMember = loginMember.changePassword(changePassword);
+
+		given(memberRepository.save(changedPasswordMember))
+			.willReturn(changedPasswordMember);
+
+		given(passwordEncoder.encode(changePassword))
+			.willReturn(changePassword);
+
+		//when
+	    authService.passwordChange(originalPassword, changePassword, loginMember);
+
+	    //then
+		verify(passwordEncoder, times(1)).matches(originalPassword, loginMember.password());
+		verify(memberRepository, times(1)).save(changedPasswordMember);
+	}
 }
