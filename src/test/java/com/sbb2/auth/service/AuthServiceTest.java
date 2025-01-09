@@ -16,6 +16,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.sbb2.auth.service.response.MemberEmailSignupResponse;
 import com.sbb2.auth.service.response.MemberLoginResponse;
+import com.sbb2.common.auth.exception.AuthBusinessLogicException;
+import com.sbb2.common.auth.exception.AuthErrorCode;
 import com.sbb2.common.auth.token.MemberLoginToken;
 import com.sbb2.common.auth.userdetails.MemberUserDetails;
 import com.sbb2.infrastructer.member.repository.MemberRepository;
@@ -171,5 +173,30 @@ public class AuthServiceTest {
 	    //then
 		verify(passwordEncoder, times(1)).matches(originalPassword, loginMember.password());
 		verify(memberRepository, times(1)).save(changedPasswordMember);
+	}
+
+	@DisplayName("비밀번호 변경시 기존 비밀번호가 일치하지 않을 떄 실패 테스트")
+	@Test
+	void update_password_not_match_fail() {
+	    //given
+		Member loginMember = Member.builder()
+			.id(1L)
+			.email("testEmail@naver.com")
+			.username("testUsername")
+			.password("!testPassword1234")
+			.memberRole(MemberRole.USER)
+			.build();
+
+		String originalPassword = "!testPassword12345";
+		String changePassword = "!testPassword4321";
+
+		given(passwordEncoder.matches(originalPassword, loginMember.password()))
+			.willReturn(originalPassword.equals(loginMember.password()));
+
+		//when & then
+	    assertThatThrownBy(() -> authService.passwordChange(originalPassword, changePassword, loginMember))
+			.isInstanceOf(AuthBusinessLogicException.class)
+			.hasMessage(AuthErrorCode.PASSWORD_NOT_MATCH.getMessage());
+
 	}
 }
