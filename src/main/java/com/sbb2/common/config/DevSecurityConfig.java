@@ -64,7 +64,7 @@ public class DevSecurityConfig {
 					"/api/v1/comment")
 				.hasRole("USER")
 				.requestMatchers(HttpMethod.PATCH, "/api/v1/question/{id}", "/api/v1/answer/{id}",
-					"/api/v1/comment/{id}")
+					"/api/v1/comment/{id}", "/api/v1/auth/password/change")
 				.hasRole("USER")
 				.requestMatchers(HttpMethod.DELETE, "/api/v1/question/{id}", "/api/v1/answer/{id}",
 					"/api/v1/voter/{id}", "/api/v1/comment/{id}")
@@ -123,7 +123,8 @@ public class DevSecurityConfig {
 			.addUriPattern(HttpMethod.GET, "/api/v1/question/*", "/api/v1/answer/*", "/api/v1/answer",
 				"/api/v1/comment")
 			.addUriPattern(HttpMethod.POST, "/api/v1/question", "/api/v1/answer", "/api/v1/voter/*", "/api/v1/comment")
-			.addUriPattern(HttpMethod.PATCH, "/api/v1/question/*", "/api/v1/answer/*", "/api/v1/comment/*")
+			.addUriPattern(HttpMethod.PATCH, "/api/v1/question/*", "/api/v1/answer/*", "/api/v1/comment/*",
+				"/api/v1/auth/password/change")
 			.addUriPattern(HttpMethod.DELETE, "/api/v1/question/*", "/api/v1/answer/*", "/api/v1/voter/*",
 				"/api/v1/comment/*");
 		return jwtFilter;
