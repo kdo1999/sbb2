@@ -6,10 +6,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.sbb2.common.auth.exception.AuthBusinessLogicException;
 import com.sbb2.common.httpError.ErrorDetail;
 import com.sbb2.common.httpError.HttpErrorInfo;
 import com.sbb2.member.exception.MemberBusinessLoginException;
-import com.sbb2.question.exception.QuestionBusinessLogicException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +20,14 @@ public class AuthControllerAdvice {
 
 	@ExceptionHandler(MemberBusinessLoginException.class)
 	public ResponseEntity<HttpErrorInfo> handlerMemberBizLogicException(MemberBusinessLoginException ex,
+		HttpServletRequest request) {
+		return ResponseEntity.status(ex.getStatus().value())
+			.body(createHttpErrorInfo(ex.getStatus().value(), request.getRequestURI(), ex.getMessage(), ErrorDetail.of(
+				Collections.emptyList())));
+	}
+
+	@ExceptionHandler(AuthBusinessLogicException.class)
+	public ResponseEntity<HttpErrorInfo> handlerAuthBusinessLogicException(AuthBusinessLogicException ex,
 		HttpServletRequest request) {
 		return ResponseEntity.status(ex.getStatus().value())
 			.body(createHttpErrorInfo(ex.getStatus().value(), request.getRequestURI(), ex.getMessage(), ErrorDetail.of(
