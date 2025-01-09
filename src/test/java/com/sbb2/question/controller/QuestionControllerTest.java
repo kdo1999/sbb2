@@ -28,6 +28,7 @@ import org.springframework.validation.BindingResult;
 
 import com.sbb2.answer.domain.Answer;
 import com.sbb2.category.domain.Category;
+import com.sbb2.category.service.response.CategoryResponse;
 import com.sbb2.common.auth.userdetails.MemberUserDetails;
 import com.sbb2.common.response.GenericResponse;
 import com.sbb2.infrastructer.category.entity.CategoryName;
@@ -156,7 +157,10 @@ public class QuestionControllerTest {
 			.isVoter(question.voterSet().stream()
 				.anyMatch(v -> v.member().id().equals(givenMember.id())))
 			.isAuthor(question.author().id().equals(givenMember.id()))
-			.categoryDisplayName(question.category().categoryName().getCategoryDisplayName())
+			.categoryResponse(CategoryResponse.builder()
+				.categoryName(question.category().categoryName().toString())
+				.categoryDisplayName(question.category().categoryName().getCategoryDisplayName())
+				.build())
 			.createdAt(LocalDateTime.now())
 			.modifiedAt(LocalDateTime.now())
 			.build();

@@ -22,6 +22,7 @@ import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.core.types.dsl.StringExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sbb2.category.service.response.QCategoryResponse;
 import com.sbb2.common.util.SearchCondition;
 import com.sbb2.infrastructer.answer.entity.QAnswerEntity;
 import com.sbb2.infrastructer.category.entity.CategoryName;
@@ -73,7 +74,8 @@ public class QuestionQueryRepository {
 				questionEntity.subject,
 				questionEntity.content,
 				questionEntity.author.username,
-				getCategoryDisplayName(),
+				new QCategoryResponse(questionEntity.category.categoryName.stringValue(),
+					getCategoryDisplayName()),
 				questionEntity.createdAt,
 				questionEntity.modifiedAt,
 				voterEntity.countDistinct(),

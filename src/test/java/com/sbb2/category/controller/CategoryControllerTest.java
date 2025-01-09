@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.sbb2.category.domain.Category;
 import com.sbb2.category.service.CategoryService;
+import com.sbb2.category.service.response.CategoryResponse;
 import com.sbb2.common.response.GenericResponse;
 import com.sbb2.infrastructer.category.entity.CategoryName;
 
@@ -52,14 +53,21 @@ public class CategoryControllerTest {
 
 		List<Category> givenCategoryList = List.of(givenCategory1, givenCategory2);
 
-		given(categoryService.findAll()).willReturn(givenCategoryList);
+		List<CategoryResponse> categoryResponseList = givenCategoryList.stream()
+			.map(category -> CategoryResponse.builder()
+				.categoryName(category.categoryName().toString())
+				.categoryDisplayName(category.categoryName().getCategoryDisplayName())
+				.build())
+			.toList();
+
+		given(categoryService.findAll()).willReturn(categoryResponseList);
 
 		//when
-		ResponseEntity<GenericResponse<List<Category>>> result = categoryController.findAll();
+		ResponseEntity<GenericResponse<List<CategoryResponse>>> result = categoryController.findAll();
 
 		//then
 		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-		assertThat(result.getBody().getData()).isEqualTo(givenCategoryList);
+		assertThat(result.getBody().getData()).isEqualTo(categoryResponseList);
 		verify(categoryService, times(1)).findAll();
 	}
 }

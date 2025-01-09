@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.sbb2.category.domain.Category;
 import com.sbb2.category.exception.CategoryBusinessLogicException;
 import com.sbb2.category.exception.CategoryErrorCode;
+import com.sbb2.category.service.response.CategoryResponse;
 import com.sbb2.infrastructer.category.entity.CategoryName;
 import com.sbb2.infrastructer.category.repository.CategoryRepository;
 
@@ -33,7 +34,7 @@ public class CategoryServiceTest {
 	@DisplayName("카테고리 ID로 조회 성공 테스트")
 	@Test
 	void find_category_id_success() {
-	    //given
+		//given
 		Long givenCategoryId = 1L;
 		CategoryName givenCategoryName = CategoryName.QUESTION_BOARD;
 
@@ -70,7 +71,7 @@ public class CategoryServiceTest {
 	@DisplayName("카테고리 전체 조회 성공 테스트")
 	@Test
 	void findAll_category_success() {
-	    //given
+		//given
 		Long givenCategoryId1 = 1L;
 		CategoryName givenCategoryName1 = CategoryName.QUESTION_BOARD;
 
@@ -88,13 +89,21 @@ public class CategoryServiceTest {
 			.build();
 
 		List<Category> givenCategoryList = List.of(givenCategory1, givenCategory2);
+
+		List<CategoryResponse> categoryResponseList = givenCategoryList.stream()
+			.map(category -> CategoryResponse.builder()
+				.categoryName(category.categoryName().toString())
+				.categoryDisplayName(category.categoryName().getCategoryDisplayName())
+				.build())
+			.toList();
+
 		given(categoryRepository.findAll())
 			.willReturn(givenCategoryList);
 
 		//when
-		List<Category> findCategoryList = categoryService.findAll();
+		List<CategoryResponse> findCategoryList = categoryService.findAll();
 
 		//then
-		assertThat(findCategoryList).isEqualTo(givenCategoryList);
+		assertThat(findCategoryList).isEqualTo(categoryResponseList);
 	}
 }

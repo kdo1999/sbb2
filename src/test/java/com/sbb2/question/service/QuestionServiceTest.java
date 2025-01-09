@@ -25,6 +25,7 @@ import com.sbb2.answer.domain.Answer;
 import com.sbb2.category.domain.Category;
 import com.sbb2.category.exception.CategoryBusinessLogicException;
 import com.sbb2.category.exception.CategoryErrorCode;
+import com.sbb2.category.service.response.CategoryResponse;
 import com.sbb2.infrastructer.category.entity.CategoryName;
 import com.sbb2.infrastructer.category.repository.CategoryRepository;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
@@ -535,7 +536,10 @@ public class QuestionServiceTest {
 			.id(question.id())
 			.subject(question.subject())
 			.content(question.content())
-			.categoryDisplayName(givenCategory.categoryName().getCategoryDisplayName())
+			.categoryResponse(CategoryResponse.builder()
+				.categoryName(question.category().categoryName().toString())
+				.categoryDisplayName(question.category().categoryName().getCategoryDisplayName())
+				.build())
 			.voterCount((long)question.voterSet().size())
 			.isVoter(question.voterSet().stream()
 				.anyMatch(v -> v.member().id().equals(givenMember.id())))
