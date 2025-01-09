@@ -46,6 +46,7 @@ public class QuestionQueryRepository {
 				questionEntity.subject,
 				questionEntity.content,
 				questionEntity.author.username,
+				questionEntity.viewCount,
 				questionEntity.createdAt,
 				questionEntity.modifiedAt,
 				queryFactory.select(QAnswerEntity.answerEntity.count())
@@ -74,6 +75,7 @@ public class QuestionQueryRepository {
 				questionEntity.subject,
 				questionEntity.content,
 				questionEntity.author.username,
+				questionEntity.viewCount,
 				new QCategoryResponse(questionEntity.category.categoryName.stringValue(),
 					getCategoryDisplayName()),
 				questionEntity.createdAt,

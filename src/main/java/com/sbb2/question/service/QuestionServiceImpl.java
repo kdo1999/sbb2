@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.sbb2.category.domain.Category;
 import com.sbb2.category.exception.CategoryBusinessLogicException;
 import com.sbb2.category.exception.CategoryErrorCode;
+import com.sbb2.common.redis.service.RedisService;
 import com.sbb2.infrastructer.category.entity.CategoryName;
 import com.sbb2.infrastructer.category.repository.CategoryRepository;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
@@ -28,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 public class QuestionServiceImpl implements QuestionService {
 	private final QuestionRepository questionRepository;
 	private final CategoryRepository categoryRepository;
+	private final RedisService redisService;
 	private static final int PAGE_SIZE = 10;
 
 	@Override
@@ -109,7 +111,15 @@ public class QuestionServiceImpl implements QuestionService {
 	@Transactional(readOnly = true)
 	@Override
 	public QuestionDetailResponse findDetailById(Long id, Member loginMember) {
+		String key = "view:" + id + ":" + loginMember.id();
 
+		//조회했던 게시글인지 체크
+		if (!redisService.hasKey(key)) {
+			redisService.setData(key, "viewed", 24 * 60 * 60 * 1000);
+			questionRepository.incrementViewCount(id);
+		};
+
+		//TODO null 체크하기
 		return questionRepository.findDetailById(id, loginMember.id());
 	}
 }

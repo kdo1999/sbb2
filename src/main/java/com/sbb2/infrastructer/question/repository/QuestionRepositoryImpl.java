@@ -44,4 +44,10 @@ public class QuestionRepositoryImpl implements QuestionRepository {
 	public QuestionDetailResponse findDetailById(Long questionId, Long memberId) {
 		return questionQueryRepository.findById(questionId, memberId);
 	}
+
+	//TODO 테스트 추가할 것
+	@Override
+	public void incrementViewCount(Long questionId) {
+		questionJpaRepository.incrementViewCount(questionId);
+	}
 }

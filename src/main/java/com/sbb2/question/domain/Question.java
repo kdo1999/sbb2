@@ -12,16 +12,17 @@ import com.sbb2.voter.domain.Voter;
 
 import lombok.Builder;
 
-public record Question(Long id, String subject, String content, Member author, Category category, LocalDateTime createdAt,
+public record Question(Long id, String subject, String content, Member author, Long viewCount, Category category, LocalDateTime createdAt,
 					   LocalDateTime modifiedAt, Set<Voter> voterSet) {
 
 	@Builder
-	public Question(Long id, String subject, String content, Member author, Category category, LocalDateTime createdAt,
+	public Question(Long id, String subject, String content, Member author, Long viewCount, Category category, LocalDateTime createdAt,
 		LocalDateTime modifiedAt, Set<Voter> voterSet) {
 		this.id = id;
 		this.subject = subject;
 		this.content = content;
 		this.author = author;
+		this.viewCount = viewCount;
 		this.category = category;
 		this.createdAt = createdAt;
 		this.modifiedAt = modifiedAt;
@@ -35,6 +36,7 @@ public record Question(Long id, String subject, String content, Member author, C
 			.content(updateContent)
 			.author(this.author)
 			.category(updateCategory)
+			.viewCount(this.viewCount)
 			.createdAt(this.createdAt)
 			.modifiedAt(this.modifiedAt)
 			.voterSet(this.voterSet)

@@ -26,6 +26,7 @@ import com.sbb2.category.domain.Category;
 import com.sbb2.category.exception.CategoryBusinessLogicException;
 import com.sbb2.category.exception.CategoryErrorCode;
 import com.sbb2.category.service.response.CategoryResponse;
+import com.sbb2.common.redis.service.RedisService;
 import com.sbb2.infrastructer.category.entity.CategoryName;
 import com.sbb2.infrastructer.category.repository.CategoryRepository;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
@@ -46,12 +47,14 @@ public class QuestionServiceTest {
 	private QuestionRepository questionRepository;
 	@Mock
 	private CategoryRepository categoryRepository;
+	@Mock
+	private RedisService redisService;
 
 	private QuestionService questionService;
 
 	@BeforeEach
 	void setUp() {
-		questionService = new QuestionServiceImpl(questionRepository, categoryRepository);
+		questionService = new QuestionServiceImpl(questionRepository, categoryRepository, redisService);
 	}
 
 	@DisplayName("질문 저장 테스트")
@@ -460,6 +463,7 @@ public class QuestionServiceTest {
 					"subject" + (i + 1),
 					"content" + (i + 1),
 					givenMember.username(),
+					0L,
 					LocalDateTime.now(),
 					LocalDateTime.now(),
 					(long)i)

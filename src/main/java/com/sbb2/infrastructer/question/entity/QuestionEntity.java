@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import com.sbb2.common.util.BaseEntity;
 import com.sbb2.infrastructer.answer.entity.AnswerEntity;
 import com.sbb2.infrastructer.category.entity.CategoryEntity;
@@ -47,6 +49,10 @@ public class QuestionEntity extends BaseEntity {
 	@Column(nullable = false, columnDefinition = "text")
 	private String content;
 
+	@Column(name = "view_count")
+	@ColumnDefault("0")
+	private Long viewCount;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
 	private MemberEntity author;
@@ -65,12 +71,13 @@ public class QuestionEntity extends BaseEntity {
 	private List<CommentEntity> commentEntityList = new ArrayList<>();
 
 	@Builder
-	public QuestionEntity(Long id, String subject, String content, MemberEntity author, LocalDateTime createdAt,
+	public QuestionEntity(Long id, String subject, String content, MemberEntity author, Long viewCount, LocalDateTime createdAt,
 		LocalDateTime modifiedAt, CategoryEntity category, List<AnswerEntity> answerEntityList, List<CommentEntity> commentEntityList) {
 		this.id = id;
 		this.subject = subject;
 		this.content = content;
 		this.author = author;
+		this.viewCount = viewCount == null ? 0 : viewCount;
 		this.category = category;
 		this.createdAt = createdAt;
 		this.modifiedAt = modifiedAt;
@@ -89,6 +96,7 @@ public class QuestionEntity extends BaseEntity {
 			.subject(question.subject())
 			.content(question.content())
 			.author(MemberEntity.from(question.author()))
+			.viewCount(question.viewCount())
 			.category(CategoryEntity.from(question.category()))
 			.createdAt(question.createdAt())
 			.modifiedAt(question.modifiedAt())
@@ -105,6 +113,7 @@ public class QuestionEntity extends BaseEntity {
 			.content(this.content)
 			.author(this.author.toModel())
 			.category(this.category.toModel())
+			.viewCount(this.viewCount)
 			.createdAt(this.createdAt)
 			.modifiedAt(this.modifiedAt)
 			.build();

@@ -86,6 +86,7 @@ public class QuestionControllerTest {
 					"subject" + (i + 1),
 					"content" + (i + 1),
 					givenMember.username(),
+					0L,
 					LocalDateTime.now(),
 					LocalDateTime.now(),
 					(long)i)

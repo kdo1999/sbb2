@@ -423,8 +423,24 @@ public class QuestionRepositoryTest {
 
 		//when
 		QuestionDetailResponse detailById = questionRepository.findDetailById(question.id(), member.id());
-		log.info("detailById={}", detailById);
+
 		//then
 		assertThat(detailById.isVoter()).isTrue();
+	}
+
+	@DisplayName("질문 조회수 증가 성공 테스트")
+	@Test
+	void increment_viewCount_success () {
+	    //given
+		Question findQuestion = questionRepository.findById(1L).get();
+
+		//when
+		questionRepository.incrementViewCount(findQuestion.id());
+		em.flush();
+		em.clear();
+
+		//then
+		Question incrementQuestion = questionRepository.findById(1L).get();
+		assertThat(incrementQuestion.viewCount()).isEqualTo(1L);
 	}
 }
