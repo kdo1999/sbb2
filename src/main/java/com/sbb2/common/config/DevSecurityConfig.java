@@ -55,7 +55,7 @@ public class DevSecurityConfig {
 				.permitAll()
 				.requestMatchers("/", "/docs/**", "/error")
 				.permitAll()
-				.requestMatchers(HttpMethod.GET, "/api/v1/question")
+				.requestMatchers(HttpMethod.GET, "/api/v1/question", "/api/v1/category")
 				.permitAll()
 				.requestMatchers(HttpMethod.GET, "/api/v1/question/{id}", "/api/v1/answer/{id}", "/api/v1/answer",
 					"/api/v1/comment")
