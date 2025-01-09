@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import com.sbb2.category.domain.Category;
 import com.sbb2.infrastructer.category.entity.CategoryEntity;
+import com.sbb2.infrastructer.category.entity.CategoryName;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,7 +26,7 @@ public class CategoryRepositoryImpl implements CategoryRepository {
 	}
 
 	@Override
-	public Optional<Category> findByCategoryName(String categoryName) {
+	public Optional<Category> findByCategoryName(CategoryName categoryName) {
 		return categoryJpaRepository.findByCategoryName(categoryName).map(CategoryEntity::toModel);
 	}
 

@@ -4,6 +4,8 @@ import com.sbb2.category.domain.Category;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,10 +26,11 @@ public class CategoryEntity {
 	private Long id;
 
 	@Column(name = "category_name", nullable = false, unique = true)
-	private String categoryName;
+	@Enumerated(value = EnumType.STRING)
+	private CategoryName categoryName;
 
 	@Builder
-	public CategoryEntity(Long id, String categoryName) {
+	public CategoryEntity(Long id, CategoryName categoryName) {
 		this.id = id;
 		this.categoryName = categoryName;
 	}

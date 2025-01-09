@@ -5,7 +5,8 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.sbb2.infrastructer.category.entity.CategoryEntity;
+import com.sbb2.infrastructer.category.entity.CategoryName;
 
 public interface CategoryJpaRepository extends JpaRepository<CategoryEntity, Long> {
-	Optional<CategoryEntity> findByCategoryName(String categoryName);
+	Optional<CategoryEntity> findByCategoryName(CategoryName categoryName);
 }

@@ -17,6 +17,7 @@ import org.springframework.test.annotation.DirtiesContext;
 
 import com.sbb2.category.domain.Category;
 import com.sbb2.common.config.QuerydslConfig;
+import com.sbb2.infrastructer.category.entity.CategoryName;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,27 +37,22 @@ public class CategoryRepositoryTest {
 	@BeforeAll
 	void setUp() {
 		Category category1 = Category.builder()
-			.categoryName("question_board")
+			.categoryName(CategoryName.QUESTION_BOARD)
 			.build();
 
 		Category category2 = Category.builder()
-			.categoryName("lecture_board")
-			.build();
-
-		Category category3 = Category.builder()
-			.categoryName("free_board")
+			.categoryName(CategoryName.LECTURE_BOARD)
 			.build();
 
 		categoryRepository.save(category1);
 		categoryRepository.save(category2);
-		categoryRepository.save(category3);
 	}
 
 	@DisplayName("카테고리 저장 성공 테스트")
 	@Test
 	void save_category_success() {
 		//given
-		String categoryName = "test_board";
+		CategoryName categoryName = CategoryName.FREE_BOARD;
 
 		Category givenCategory = Category.builder()
 			.categoryName(categoryName)
@@ -75,7 +71,7 @@ public class CategoryRepositoryTest {
 	void find_category_id_success() {
 		//given
 		Long givenId = 1L;
-		String categoryName = "question_board";
+		CategoryName categoryName = CategoryName.QUESTION_BOARD;
 
 		Category givenCategory = Category.builder()
 			.id(givenId)
@@ -94,7 +90,7 @@ public class CategoryRepositoryTest {
 	void find_category_categoryName_success() {
 		//given
 		Long givenId = 1L;
-		String categoryName = "question_board";
+		CategoryName categoryName = CategoryName.QUESTION_BOARD;
 
 		Category givenCategory = Category.builder()
 			.id(givenId)
@@ -112,19 +108,13 @@ public class CategoryRepositoryTest {
 	@Test
 	void delete_category_id_success() {
 		//given
-		String categoryName = "test2_board";
-
-		Category givenCategory = Category.builder()
-			.categoryName(categoryName)
-			.build();
-
-		Category savedCategory = categoryRepository.save(givenCategory);
+		Category givenCategory = categoryRepository.findById(1L).get();
 
 		//when
-		categoryRepository.deleteById(savedCategory.id());
+		categoryRepository.deleteById(givenCategory.id());
 
 		//then
-		Optional<Category> findCategory = categoryRepository.findById(savedCategory.id());
+		Optional<Category> findCategory = categoryRepository.findById(givenCategory.id());
 		Assertions.assertThat(findCategory).isEmpty();
 	}
 }
