@@ -1,12 +1,17 @@
 package com.sbb2.infrastructer.category.repository;
 
+import static org.assertj.core.api.Assertions.*;
+
+import java.util.List;
 import java.util.Optional;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
@@ -26,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DirtiesContext
 @Slf4j
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CategoryRepositoryTest {
 	private final CategoryRepository categoryRepository;
 
@@ -48,6 +54,17 @@ public class CategoryRepositoryTest {
 		categoryRepository.save(category2);
 	}
 
+	@Order(1)
+	@DisplayName("카테고리 전체 조회 성공 테스트")
+	@Test
+	void findAll_category_success() {
+		//when
+		List<Category> findAll = categoryRepository.findAll();
+
+		//then
+		assertThat(findAll.size()).isEqualTo(2);
+	}
+
 	@DisplayName("카테고리 저장 성공 테스트")
 	@Test
 	void save_category_success() {
@@ -62,8 +79,8 @@ public class CategoryRepositoryTest {
 		Category savedCategory = categoryRepository.save(givenCategory);
 
 		//then
-		Assertions.assertThat(savedCategory.id()).isNotNull();
-		Assertions.assertThat(savedCategory.categoryName()).isEqualTo(categoryName);
+		assertThat(savedCategory.id()).isNotNull();
+		assertThat(savedCategory.categoryName()).isEqualTo(categoryName);
 	}
 
 	@DisplayName("카테고리 ID로 조회 성공 테스트")
@@ -82,7 +99,7 @@ public class CategoryRepositoryTest {
 		Category savedCategory = categoryRepository.findById(givenId).get();
 
 		//then
-		Assertions.assertThat(savedCategory).isEqualTo(givenCategory);
+		assertThat(savedCategory).isEqualTo(givenCategory);
 	}
 
 	@DisplayName("카테고리 이름으로 조회 성공 테스트")
@@ -101,7 +118,7 @@ public class CategoryRepositoryTest {
 		Category savedCategory = categoryRepository.findByCategoryName(categoryName).get();
 
 		//then
-		Assertions.assertThat(savedCategory).isEqualTo(givenCategory);
+		assertThat(savedCategory).isEqualTo(givenCategory);
 	}
 
 	@DisplayName("카테고리 ID로 삭제 성공 테스트")
@@ -115,6 +132,6 @@ public class CategoryRepositoryTest {
 
 		//then
 		Optional<Category> findCategory = categoryRepository.findById(givenCategory.id());
-		Assertions.assertThat(findCategory).isEmpty();
+		assertThat(findCategory).isEmpty();
 	}
 }
