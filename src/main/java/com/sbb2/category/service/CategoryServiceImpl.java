@@ -1,5 +1,7 @@
 package com.sbb2.category.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.sbb2.category.domain.Category;
@@ -17,5 +19,10 @@ public class CategoryServiceImpl implements CategoryService {
 	public Category findById(Long id) {
 		return categoryRepository.findById(id)
 			.orElseThrow(() -> new CategoryBusinessLogicException(CategoryErrorCode.NOT_FOUND));
+	}
+
+	@Override
+	public List<Category> findAll() {
+		return categoryRepository.findAll();
 	}
 }
