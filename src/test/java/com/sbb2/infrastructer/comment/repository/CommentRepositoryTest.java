@@ -22,6 +22,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.test.annotation.DirtiesContext;
 
 import com.sbb2.answer.domain.Answer;
+import com.sbb2.category.domain.Category;
 import com.sbb2.comment.domain.Comment;
 import com.sbb2.comment.domain.ParentType;
 import com.sbb2.comment.service.response.CommentResponse;
@@ -29,6 +30,8 @@ import com.sbb2.common.config.JpaAudtingConfig;
 import com.sbb2.common.config.QuerydslConfig;
 import com.sbb2.common.util.SearchCondition;
 import com.sbb2.infrastructer.answer.repository.AnswerRepository;
+import com.sbb2.infrastructer.category.entity.CategoryName;
+import com.sbb2.infrastructer.category.repository.CategoryRepository;
 import com.sbb2.infrastructer.member.repository.MemberRepository;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
 import com.sbb2.member.domain.Member;
@@ -46,14 +49,16 @@ public class CommentRepositoryTest {
 	private final QuestionRepository questionRepository;
 	private final MemberRepository memberRepository;
 	private final AnswerRepository answerRepository;
+	private final CategoryRepository categoryRepository;
 
 	@Autowired
 	public CommentRepositoryTest(CommentRepository commentRepository, QuestionRepository questionRepository,
-		MemberRepository memberRepository, AnswerRepository answerRepository) {
+		MemberRepository memberRepository, AnswerRepository answerRepository, CategoryRepository categoryRepository) {
 		this.commentRepository = commentRepository;
 		this.questionRepository = questionRepository;
 		this.memberRepository = memberRepository;
 		this.answerRepository = answerRepository;
+		this.categoryRepository = categoryRepository;
 	}
 
 	@BeforeAll
@@ -70,18 +75,31 @@ public class CommentRepositoryTest {
 
 		Member savedMember = memberRepository.save(member);
 
+		Category category1 = Category.builder()
+			.categoryName(CategoryName.QUESTION_BOARD)
+			.build();
+
+		Category category2 = Category.builder()
+			.categoryName(CategoryName.LECTURE_BOARD)
+			.build();
+
+		Category savedCategory = categoryRepository.save(category1);
+		categoryRepository.save(category2);
+
 		String questionSubject = "testSubject";
 		String questionContent = "testContent";
 
 		Question question1 = Question.builder()
 			.subject(questionSubject)
 			.content(questionContent)
+			.category(savedCategory)
 			.author(savedMember)
 			.build();
 
 		Question question2 = Question.builder()
 			.subject(questionSubject)
 			.content(questionContent)
+			.category(savedCategory)
 			.author(savedMember)
 			.build();
 

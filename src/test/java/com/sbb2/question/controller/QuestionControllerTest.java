@@ -27,8 +27,10 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 
 import com.sbb2.answer.domain.Answer;
+import com.sbb2.category.domain.Category;
 import com.sbb2.common.auth.userdetails.MemberUserDetails;
 import com.sbb2.common.response.GenericResponse;
+import com.sbb2.infrastructer.category.entity.CategoryName;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.controller.request.QuestionForm;
 import com.sbb2.question.domain.Question;
@@ -121,13 +123,18 @@ public class QuestionControllerTest {
 			.email("testEmail")
 			.build();
 
-		Answer answer = Answer.builder()
+		Category givenCategory = Category.builder()
+			.id(1L)
+			.categoryName(CategoryName.QUESTION_BOARD)
+			.build();
+
+		Answer givenAnwer = Answer.builder()
 			.id(1L)
 			.content("testContent")
 			.author(givenMember)
 			.build();
 
-		Voter voter = Voter.builder()
+		Voter givenVoter = Voter.builder()
 			.member(givenMember)
 			.question(Question.builder().id(1L).build())
 			.build();
@@ -137,7 +144,8 @@ public class QuestionControllerTest {
 			.subject("subject")
 			.content("content")
 			.author(givenMember)
-			.voterSet(Set.of(voter))
+			.category(givenCategory)
+			.voterSet(Set.of(givenVoter))
 			.build();
 
 		QuestionDetailResponse questionDetailResponse = QuestionDetailResponse.builder()
@@ -148,6 +156,7 @@ public class QuestionControllerTest {
 			.isVoter(question.voterSet().stream()
 				.anyMatch(v -> v.member().id().equals(givenMember.id())))
 			.isAuthor(question.author().id().equals(givenMember.id()))
+			.categoryDisplayName(question.category().categoryName().getCategoryDisplayName())
 			.createdAt(LocalDateTime.now())
 			.modifiedAt(LocalDateTime.now())
 			.build();
@@ -175,6 +184,7 @@ public class QuestionControllerTest {
 		QuestionForm questionForm = QuestionForm.builder()
 			.subject("testSubject")
 			.content("testContent")
+			.categoryName("question_board")
 			.build();
 
 		Member givenMember = Member.builder()
@@ -196,7 +206,7 @@ public class QuestionControllerTest {
 		);
 
 		QuestionCreateResponse questionCreateResponse = QuestionCreateResponse.builder().id(1L).build();
-		given(questionService.save(questionForm.subject(), questionForm.content(), givenMember))
+		given(questionService.save(questionForm.subject(), questionForm.content(), givenMember, questionForm.categoryName()))
 			.willReturn(questionCreateResponse);
 
 		//when
@@ -217,6 +227,7 @@ public class QuestionControllerTest {
 		QuestionForm questionForm = QuestionForm.builder()
 			.subject("")
 			.content("testContent")
+			.categoryName("question_board")
 			.build();
 
 		Member givenMember = Member.builder()
@@ -250,6 +261,7 @@ public class QuestionControllerTest {
 		QuestionForm questionForm = QuestionForm.builder()
 			.subject("testSubject")
 			.content("")
+			.categoryName("question_board")
 			.build();
 
 		Member givenMember = Member.builder()
@@ -280,6 +292,11 @@ public class QuestionControllerTest {
 	@Test
 	void update_question_success() {
 	    //given
+		Category givenCategory = Category.builder()
+			.id(1L)
+			.categoryName(CategoryName.QUESTION_BOARD)
+			.build();
+
 		Member givenMember = Member.builder()
 			.id(1L)
 			.username("testMember")
@@ -291,17 +308,19 @@ public class QuestionControllerTest {
 			.id(1L)
 			.content("testContent")
 			.subject("testSubject")
+			.category(givenCategory)
 			.author(givenMember)
 			.build();
 
 		QuestionForm givenQuestionForm = QuestionForm.builder()
 			.content("updateContent")
 			.subject("updateSubject")
+			.categoryName("question_board")
 			.build();
 
 		MemberUserDetails member = new MemberUserDetails(givenMember);
 
-		given(questionService.update(givenQuestion.id(), givenQuestionForm.subject(), givenQuestionForm.content(), givenMember)).willReturn(givenQuestion);
+		given(questionService.update(givenQuestion.id(), givenQuestionForm.subject(), givenQuestionForm.content(), givenMember, givenQuestionForm.categoryName())).willReturn(givenQuestion);
 
 		BindingResult bindingResult = new BeanPropertyBindingResult(givenQuestionForm, "questionForm");
 
@@ -320,30 +339,17 @@ public class QuestionControllerTest {
 		//then
 		assertThat(result.getBody().getData()).isNull();
 		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-		verify(questionService, times(1)).update(givenQuestion.id(), givenQuestionForm.subject(), givenQuestionForm.content(), givenMember);
+		verify(questionService, times(1)).update(givenQuestion.id(), givenQuestionForm.subject(), givenQuestionForm.content(), givenMember, givenQuestionForm.categoryName());
 	}
 
 	@DisplayName("질문 수정시 제목이 비었을 때 실패 테스트")
 	@Test
 	void update_subject_empty_fail() {
 	    //given
-		Member givenMember = Member.builder()
-			.id(1L)
-			.username("testMember")
-			.password("testPassword")
-			.email("testEmail")
-			.build();
-
-		Question givenQuestion = Question.builder()
-			.id(1L)
-			.content("testContent")
-			.subject("testSubject")
-			.author(givenMember)
-			.build();
-
 		QuestionForm givenQuestionForm = QuestionForm.builder()
 			.content("updateContent")
 			.subject("")
+			.categoryName("question_board")
 			.build();
 
 		BindingResult bindingResult = new BeanPropertyBindingResult(givenQuestionForm, "questionForm");
@@ -367,23 +373,10 @@ public class QuestionControllerTest {
 	@Test
 	void update_content_empty_fail() {
 	    //given
-		Member givenMember = Member.builder()
-			.id(1L)
-			.username("testMember")
-			.password("testPassword")
-			.email("testEmail")
-			.build();
-
-		Question givenQuestion = Question.builder()
-			.id(1L)
-			.content("testContent")
-			.subject("testSubject")
-			.author(givenMember)
-			.build();
-
 		QuestionForm givenQuestionForm = QuestionForm.builder()
 			.content("")
 			.subject("updateSubject")
+			.categoryName("question_board")
 			.build();
 
 		BindingResult bindingResult = new BeanPropertyBindingResult(givenQuestionForm, "questionForm");

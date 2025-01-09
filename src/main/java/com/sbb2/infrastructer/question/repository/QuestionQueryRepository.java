@@ -17,7 +17,9 @@ import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
+import com.querydsl.core.types.dsl.StringExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sbb2.common.util.SearchCondition;
@@ -71,6 +73,7 @@ public class QuestionQueryRepository {
 				questionEntity.subject,
 				questionEntity.content,
 				questionEntity.author.username,
+				getCategoryDisplayName(),
 				questionEntity.createdAt,
 				questionEntity.modifiedAt,
 				voterEntity.countDistinct(),
@@ -94,6 +97,17 @@ public class QuestionQueryRepository {
 			.fetchOne();
 
 		return questionDetailResponse;
+	}
+
+	private StringExpression getCategoryDisplayName() {
+		return new CaseBuilder()
+			.when(questionEntity.category.categoryName.eq(CategoryName.QUESTION_BOARD))
+			.then(CategoryName.QUESTION_BOARD.getCategoryDisplayName())
+			.when(questionEntity.category.categoryName.eq(CategoryName.LECTURE_BOARD))
+			.then(CategoryName.LECTURE_BOARD.getCategoryDisplayName())
+			.when(questionEntity.category.categoryName.eq(CategoryName.FREE_BOARD))
+			.then(CategoryName.FREE_BOARD.getCategoryDisplayName())
+			.otherwise(new String());
 	}
 
 	public OrderSpecifier<?> getOrderBy(SearchCondition searchCondition) {

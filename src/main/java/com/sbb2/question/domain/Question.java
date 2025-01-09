@@ -34,7 +34,7 @@ public record Question(Long id, String subject, String content, Member author, C
 			.subject(updateSubject)
 			.content(updateContent)
 			.author(this.author)
-			.category(updateCategory == null ? this.category : updateCategory)
+			.category(updateCategory)
 			.createdAt(this.createdAt)
 			.modifiedAt(this.modifiedAt)
 			.voterSet(this.voterSet)

@@ -48,4 +48,8 @@ public class CategoryEntity {
 			.categoryName(categoryName)
 			.build();
 	}
+
+	public String getCategoryDisplayName() {
+		return this.categoryName.getCategoryDisplayName();
+	}
 }

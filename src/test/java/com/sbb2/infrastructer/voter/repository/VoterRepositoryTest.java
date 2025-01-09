@@ -18,9 +18,12 @@ import org.springframework.stereotype.Repository;
 import org.springframework.test.annotation.DirtiesContext;
 
 import com.sbb2.answer.domain.Answer;
+import com.sbb2.category.domain.Category;
 import com.sbb2.common.config.JpaAudtingConfig;
 import com.sbb2.common.config.QuerydslConfig;
 import com.sbb2.infrastructer.answer.repository.AnswerRepository;
+import com.sbb2.infrastructer.category.entity.CategoryName;
+import com.sbb2.infrastructer.category.repository.CategoryRepository;
 import com.sbb2.infrastructer.member.repository.MemberRepository;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
 import com.sbb2.member.domain.Member;
@@ -38,15 +41,17 @@ public class VoterRepositoryTest {
 	private final QuestionRepository questionRepository;
 	private final AnswerRepository answerRepository;
 	private final VoterRepository voterRepository;
+	private final CategoryRepository categoryRepository;
 	private final EntityManager em;
 
 	@Autowired
 	public VoterRepositoryTest(MemberRepository memberRepository, QuestionRepository questionRepository,
-		AnswerRepository answerRepository, VoterRepository voterRepository, EntityManager em) {
+		AnswerRepository answerRepository, VoterRepository voterRepository, CategoryRepository categoryRepository, EntityManager em) {
 		this.memberRepository = memberRepository;
 		this.questionRepository = questionRepository;
 		this.answerRepository = answerRepository;
 		this.voterRepository = voterRepository;
+		this.categoryRepository = categoryRepository;
 		this.em = em;
 	}
 	@BeforeAll
@@ -65,10 +70,22 @@ public class VoterRepositoryTest {
 			.build();
 		Member savedMember2 = memberRepository.save(member2);
 
+		Category category1 = Category.builder()
+			.categoryName(CategoryName.QUESTION_BOARD)
+			.build();
+
+		Category category2 = Category.builder()
+			.categoryName(CategoryName.LECTURE_BOARD)
+			.build();
+
+		Category savedCategory = categoryRepository.save(category1);
+		categoryRepository.save(category2);
+
 
 		Question question1 = Question.builder()
 			.subject("testSubject")
 			.content("testContent")
+			.category(savedCategory)
 			.author(savedMember1)
 			.build();
 		Question savedQuestion1 = questionRepository.save(question1);
@@ -76,6 +93,7 @@ public class VoterRepositoryTest {
 		Question question2 = Question.builder()
 			.subject("testSubject")
 			.content("testContent")
+			.category(savedCategory)
 			.author(savedMember1)
 			.build();
 		Question savedQuestion2 = questionRepository.save(question2);

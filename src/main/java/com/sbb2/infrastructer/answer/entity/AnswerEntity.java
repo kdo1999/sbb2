@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import com.sbb2.answer.domain.Answer;
 import com.sbb2.common.util.BaseEntity;
+import com.sbb2.infrastructer.category.entity.CategoryEntity;
 import com.sbb2.infrastructer.comment.entity.CommentEntity;
 import com.sbb2.infrastructer.member.entity.MemberEntity;
 import com.sbb2.infrastructer.question.entity.QuestionEntity;
@@ -86,6 +87,7 @@ public class AnswerEntity extends BaseEntity {
 				.id(answer.question().id())
 				.subject(answer.question().subject())
 				.content(answer.question().content())
+				.category(CategoryEntity.from(answer.question().category()))
 				.createdAt(answer.question().createdAt())
 				.modifiedAt(answer.question().modifiedAt())
 				.author(MemberEntity.from(answer.author()))
@@ -107,6 +109,7 @@ public class AnswerEntity extends BaseEntity {
 				.id(questionEntity.getId())
 				.subject(questionEntity.getSubject())
 				.content(questionEntity.getContent())
+				.category(questionEntity.getCategory().toModel())
 				.createdAt(questionEntity.getCreatedAt())
 				.modifiedAt(questionEntity.getModifiedAt())
 				.author(questionEntity.getAuthor().toModel())

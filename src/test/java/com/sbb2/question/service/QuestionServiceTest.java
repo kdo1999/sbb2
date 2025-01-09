@@ -22,6 +22,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import com.sbb2.answer.domain.Answer;
+import com.sbb2.category.domain.Category;
+import com.sbb2.category.exception.CategoryBusinessLogicException;
+import com.sbb2.category.exception.CategoryErrorCode;
+import com.sbb2.infrastructer.category.entity.CategoryName;
+import com.sbb2.infrastructer.category.repository.CategoryRepository;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.controller.request.QuestionForm;
@@ -38,12 +43,14 @@ import com.sbb2.voter.domain.Voter;
 public class QuestionServiceTest {
 	@Mock
 	private QuestionRepository questionRepository;
+	@Mock
+	private CategoryRepository categoryRepository;
 
 	private QuestionService questionService;
 
 	@BeforeEach
 	void setUp() {
-		questionService = new QuestionServiceImpl(questionRepository);
+		questionService = new QuestionServiceImpl(questionRepository, categoryRepository);
 	}
 
 	@DisplayName("질문 저장 테스트")
@@ -59,21 +66,56 @@ public class QuestionServiceTest {
 			.email("testEmail")
 			.build();
 
+		Category givenCategory = Category.builder()
+			.id(1L)
+			.categoryName(CategoryName.QUESTION_BOARD)
+			.build();
+
+		given(categoryRepository.findByCategoryName(givenCategory.categoryName()))
+			.willReturn(Optional.of(givenCategory));
+
 		given(questionRepository.save(any(Question.class)))
 			.willReturn(
 				Question.builder()
 					.id(1L)
 					.subject(questionSubject)
 					.content(questionContent)
+					.category(givenCategory)
 					.author(givenMember)
 					.build()
 			);
 
 		//when
-		QuestionCreateResponse questionCreateResponse = questionService.save("questionSubject", "questionContent", givenMember);
+		QuestionCreateResponse questionCreateResponse = questionService.save("questionSubject", "questionContent",
+			givenMember, givenCategory.categoryName().toString());
 
 		//then
 		assertThat(questionCreateResponse.id()).isEqualTo(1L);
+	}
+
+	@DisplayName("질문 저장시 카테고리가 존재하지 않을때 실패 테스트")
+	@Test
+	void save_question_category_not_found() {
+		//given
+		String questionSubject = "subject";
+		String questionContent = "content";
+		Member givenMember = Member.builder()
+			.id(1L)
+			.username("testMember")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
+
+		CategoryName givenCategoryName = CategoryName.QUESTION_BOARD;
+
+		given(categoryRepository.findByCategoryName(givenCategoryName))
+			.willReturn(Optional.empty());
+
+		//when & then
+		assertThatThrownBy(() ->
+			questionService.save("questionSubject", "questionContent", givenMember, givenCategoryName.toString()))
+			.isInstanceOf(CategoryBusinessLogicException.class)
+			.hasMessage(CategoryErrorCode.NOT_FOUND.getMessage());
 	}
 
 	@DisplayName("질문 ID로 조회 성공 테스트")
@@ -82,6 +124,11 @@ public class QuestionServiceTest {
 		//given
 		String questionSubject = "subject";
 		String questionContent = "content";
+		Category givenCategory = Category.builder()
+			.id(1L)
+			.categoryName(CategoryName.QUESTION_BOARD)
+			.build();
+
 		Member givenMember = Member.builder()
 			.id(1L)
 			.username("testMember")
@@ -95,6 +142,7 @@ public class QuestionServiceTest {
 					.id(1L)
 					.subject(questionSubject)
 					.content(questionContent)
+					.category(givenCategory)
 					.author(givenMember)
 					.build()
 				)
@@ -113,15 +161,6 @@ public class QuestionServiceTest {
 	@Test
 	void find_id_question_fail() {
 		//given
-		String questionSubject = "subject";
-		String questionContent = "content";
-		Member givenMember = Member.builder()
-			.id(1L)
-			.username("testMember")
-			.password("testPassword")
-			.email("testEmail")
-			.build();
-
 		given(questionRepository.findById(any(Long.class)))
 			.willThrow(new QuestionBusinessLogicException(QuestionErrorCode.NOT_FOUND));
 
@@ -136,6 +175,7 @@ public class QuestionServiceTest {
 		QuestionForm questionForm = QuestionForm.builder()
 			.subject("updateSubject")
 			.content("updateContent")
+			.categoryName("question_board")
 			.build();
 
 		Member givenMember = Member.builder()
@@ -145,29 +185,46 @@ public class QuestionServiceTest {
 			.email("testEmail")
 			.build();
 
+		Category givenCategory = Category.builder()
+			.id(1L)
+			.categoryName(CategoryName.FREE_BOARD)
+			.build();
+
 		given(questionRepository.findById(any(Long.class)))
 			.willReturn(Optional.of(Question.builder()
 				.id(1L)
 				.subject("subject")
 				.content("content")
+				.category(givenCategory)
 				.author(givenMember)
 				.build()));
+
+		Category updateCategory = Category.builder()
+			.id(2L)
+			.categoryName(CategoryName.QUESTION_BOARD)
+			.build();
 
 		given(questionRepository.save(any(Question.class)))
 			.willReturn(Question.builder()
 				.id(1L)
 				.subject(questionForm.subject())
 				.content(questionForm.content())
+				.category(updateCategory)
 				.author(givenMember)
 				.build());
+
+		given(categoryRepository.findByCategoryName(updateCategory.categoryName()))
+			.willReturn(Optional.of(updateCategory));
+
 		//when
 		Question updateQuestion = questionService.update(1L, questionForm.subject(), questionForm.content(),
-			givenMember);
+			givenMember, questionForm.categoryName());
 
 		//then
 		assertThat(updateQuestion.author()).isEqualTo(givenMember);
 		assertThat(updateQuestion.subject()).isEqualTo(questionForm.subject());
 		assertThat(updateQuestion.content()).isEqualTo(questionForm.content());
+		assertThat(updateQuestion.category()).isEqualTo(updateCategory);
 	}
 
 	@DisplayName("질문 수정시 작성자가 아닐 때 실패 테스트")
@@ -177,6 +234,7 @@ public class QuestionServiceTest {
 		QuestionForm questionForm = QuestionForm.builder()
 			.subject("updateSubject")
 			.content("updateContent")
+			.categoryName("free_board")
 			.build();
 
 		Member givenMember = Member.builder()
@@ -193,16 +251,24 @@ public class QuestionServiceTest {
 			.email("testEmail2")
 			.build();
 
+		Category givenCategory = Category.builder()
+			.id(1L)
+			.categoryName(CategoryName.FREE_BOARD)
+			.build();
+
 		given(questionRepository.findById(any(Long.class)))
 			.willReturn(Optional.of(Question.builder()
 				.id(1L)
 				.subject("subject")
 				.content("content")
 				.author(givenMember)
+				.category(givenCategory)
 				.build()));
 
 		//when & then
-		assertThatThrownBy(() -> questionService.update(1L, questionForm.subject(), questionForm.content(), givenMember2))
+		assertThatThrownBy(
+			() -> questionService.update(1L, questionForm.subject(), questionForm.content(), givenMember2,
+				questionForm.categoryName()))
 			.isInstanceOf(QuestionBusinessLogicException.class)
 			.hasMessage(QuestionErrorCode.UNAUTHORIZED.getMessage());
 	}
@@ -214,6 +280,7 @@ public class QuestionServiceTest {
 		QuestionForm questionForm = QuestionForm.builder()
 			.subject("updateSubject")
 			.content("updateContent")
+			.categoryName("free_board")
 			.build();
 
 		Member givenMember = Member.builder()
@@ -228,9 +295,57 @@ public class QuestionServiceTest {
 
 		//then
 		assertThatThrownBy(
-			() -> questionService.update(1L, questionForm.subject(), questionForm.content(), givenMember))
+			() -> questionService.update(1L, questionForm.subject(), questionForm.content(), givenMember,
+				questionForm.categoryName()))
 			.isInstanceOf(QuestionBusinessLogicException.class)
 			.hasMessage(QuestionErrorCode.NOT_FOUND.getMessage());
+	}
+
+	@DisplayName("질문 수정시 카테고리 조회 실패 테스트")
+	@Test
+	void update_find_category_fail() {
+		//given
+		QuestionForm questionForm = QuestionForm.builder()
+			.subject("updateSubject")
+			.content("updateContent")
+			.categoryName("question_board")
+			.build();
+
+		Member givenMember = Member.builder()
+			.id(1L)
+			.username("testMember")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
+
+		Category givenCategory = Category.builder()
+			.id(1L)
+			.categoryName(CategoryName.FREE_BOARD)
+			.build();
+
+		Category updateCategory = Category.builder()
+			.id(2L)
+			.categoryName(CategoryName.QUESTION_BOARD)
+			.build();
+
+		given(questionRepository.findById(any(Long.class)))
+			.willReturn(Optional.of(Question.builder()
+				.id(1L)
+				.subject("subject")
+				.content("content")
+				.author(givenMember)
+				.category(givenCategory)
+				.build()));
+
+		given(categoryRepository.findByCategoryName(updateCategory.categoryName()))
+			.willReturn(Optional.empty());
+
+		//then
+		assertThatThrownBy(
+			() -> questionService.update(1L, questionForm.subject(), questionForm.content(), givenMember,
+				questionForm.categoryName()))
+			.isInstanceOf(CategoryBusinessLogicException.class)
+			.hasMessage(CategoryErrorCode.NOT_FOUND.getMessage());
 	}
 
 	@DisplayName("질문 삭제 성공 테스트")
@@ -244,11 +359,17 @@ public class QuestionServiceTest {
 			.email("testEmail")
 			.build();
 
+		Category givenCategory = Category.builder()
+			.id(1L)
+			.categoryName(CategoryName.FREE_BOARD)
+			.build();
+
 		given(questionRepository.findById(any(Long.class)))
 			.willReturn(Optional.of(Question.builder()
 				.id(1L)
 				.subject("subject")
 				.content("content")
+				.category(givenCategory)
 				.author(givenMember)
 				.build()));
 
@@ -265,9 +386,9 @@ public class QuestionServiceTest {
 	@Test
 	void delete_author_loginMember_not_match_fail() {
 		//given
-		QuestionForm questionForm = QuestionForm.builder()
-			.subject("updateSubject")
-			.content("updateContent")
+		Category givenCategory = Category.builder()
+			.id(1L)
+			.categoryName(CategoryName.FREE_BOARD)
 			.build();
 
 		Member givenMember = Member.builder()
@@ -289,6 +410,7 @@ public class QuestionServiceTest {
 				.id(1L)
 				.subject("subject")
 				.content("content")
+				.category(givenCategory)
 				.author(givenMember)
 				.build()));
 
@@ -308,14 +430,6 @@ public class QuestionServiceTest {
 			.password("testPassword")
 			.email("testEmail")
 			.build();
-
-		given(questionRepository.findById(any(Long.class)))
-			.willReturn(Optional.of(Question.builder()
-				.id(1L)
-				.subject("subject")
-				.content("content")
-				.author(givenMember)
-				.build()));
 
 		given(questionRepository.findById(any(Long.class))).willReturn(Optional.empty());
 
@@ -342,8 +456,8 @@ public class QuestionServiceTest {
 			questionPageResponseList.add(
 				new QuestionPageResponse(
 					(long)i,
-					"subject" + (i+1),
-					"content" + (i+1),
+					"subject" + (i + 1),
+					"content" + (i + 1),
 					givenMember.username(),
 					LocalDateTime.now(),
 					LocalDateTime.now(),
@@ -364,11 +478,11 @@ public class QuestionServiceTest {
 		);
 
 		given(questionRepository.findAll(searchCondition, pageable)).willReturn(new PageImpl<>(
-			questionPageResponseList.subList(
-				startIndex, Math.min(startIndex + pageable.getPageSize(), questionPageResponseList.size())
-			),
-			pageable,
-			questionPageResponseList.size()
+				questionPageResponseList.subList(
+					startIndex, Math.min(startIndex + pageable.getPageSize(), questionPageResponseList.size())
+				),
+				pageable,
+				questionPageResponseList.size()
 			)
 		);
 
@@ -384,7 +498,12 @@ public class QuestionServiceTest {
 	@DisplayName("추천한 사용자가 질문을 조회하면 isVoter가 true인 테스트")
 	@Test
 	void find_QuestionDetail_isVoter_true() {
-	    //given
+		//given
+		Category givenCategory = Category.builder()
+			.id(1L)
+			.categoryName(CategoryName.FREE_BOARD)
+			.build();
+
 		Member givenMember = Member.builder()
 			.id(1L)
 			.username("testMember")
@@ -408,6 +527,7 @@ public class QuestionServiceTest {
 			.subject("subject")
 			.content("content")
 			.author(givenMember)
+			.category(givenCategory)
 			.voterSet(Set.of(voter))
 			.build();
 
@@ -415,6 +535,7 @@ public class QuestionServiceTest {
 			.id(question.id())
 			.subject(question.subject())
 			.content(question.content())
+			.categoryDisplayName(givenCategory.categoryName().getCategoryDisplayName())
 			.voterCount((long)question.voterSet().size())
 			.isVoter(question.voterSet().stream()
 				.anyMatch(v -> v.member().id().equals(givenMember.id())))
@@ -430,7 +551,7 @@ public class QuestionServiceTest {
 		QuestionDetailResponse findDetailResponse = questionService.findDetailById(question.id(), givenMember);
 
 		//then
-	    assertThat(findDetailResponse).isEqualTo(questionDetailResponse);
+		assertThat(findDetailResponse).isEqualTo(questionDetailResponse);
 		assertThat(findDetailResponse.isVoter()).isTrue();
 	}
 }

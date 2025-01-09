@@ -57,7 +57,7 @@ public class QuestionController {
 		@AuthenticationPrincipal MemberUserDetails loginMember) {
 
 		QuestionCreateResponse savedQuestion = questionService.save(questionForm.subject(), questionForm.content(),
-			loginMember.getMember());
+			loginMember.getMember(), questionForm.categoryName());
 
 		return ResponseEntity.created(URI.create("/question/" + savedQuestion.id()))
 			.body(GenericResponse.of(savedQuestion));
@@ -66,7 +66,7 @@ public class QuestionController {
 	@PatchMapping("/{id}")
 	public ResponseEntity<GenericResponse<Void>> update(@PathVariable("id") Long id,
 		@Validated(ValidationSequence.class) @RequestBody QuestionForm questionForm, @AuthenticationPrincipal MemberUserDetails loginMember) {
-		questionService.update(id, questionForm.subject(), questionForm.content(), loginMember.getMember());
+		questionService.update(id, questionForm.subject(), questionForm.content(), loginMember.getMember(), questionForm.categoryName());
 
 		return ResponseEntity.ok(GenericResponse.of());
 	}

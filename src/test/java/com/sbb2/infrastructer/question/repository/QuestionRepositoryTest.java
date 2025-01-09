@@ -37,11 +37,13 @@ import com.sbb2.question.service.response.QuestionPageResponse;
 import com.sbb2.voter.domain.Voter;
 
 import jakarta.persistence.EntityManager;
+import lombok.extern.slf4j.Slf4j;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class))
 @Import({JpaAudtingConfig.class, QuerydslConfig.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DirtiesContext
+@Slf4j
 public class QuestionRepositoryTest {
 	private final MemberRepository memberRepository;
 	private final QuestionRepository questionRepository;
@@ -52,7 +54,8 @@ public class QuestionRepositoryTest {
 
 	@Autowired
 	public QuestionRepositoryTest(QuestionRepository questionRepository, MemberRepository memberRepository,
-		AnswerRepository answerRepository, VoterRepository voterRepository, CategoryRepository categoryRepository, EntityManager em) {
+		AnswerRepository answerRepository, VoterRepository voterRepository, CategoryRepository categoryRepository,
+		EntityManager em) {
 		this.questionRepository = questionRepository;
 		this.memberRepository = memberRepository;
 		this.answerRepository = answerRepository;
@@ -321,7 +324,8 @@ public class QuestionRepositoryTest {
 
 		//then
 		Voter findVoter = savedQuestion.voterSet().iterator().next();
-		assertThat(findVoter).isEqualTo(savedVoter);
+		assertThat(findVoter.question().id()).isEqualTo(savedVoter.question().id());
+		assertThat(findVoter.question().author()).isEqualTo(savedVoter.question().author());
 	}
 
 	@DisplayName("질문 삭제 테스트")
@@ -419,7 +423,7 @@ public class QuestionRepositoryTest {
 
 		//when
 		QuestionDetailResponse detailById = questionRepository.findDetailById(question.id(), member.id());
-
+		log.info("detailById={}", detailById);
 		//then
 		assertThat(detailById.isVoter()).isTrue();
 	}

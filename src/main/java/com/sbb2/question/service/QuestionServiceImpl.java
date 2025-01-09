@@ -5,6 +5,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sbb2.category.domain.Category;
+import com.sbb2.category.exception.CategoryBusinessLogicException;
+import com.sbb2.category.exception.CategoryErrorCode;
+import com.sbb2.infrastructer.category.entity.CategoryName;
+import com.sbb2.infrastructer.category.repository.CategoryRepository;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
 import com.sbb2.member.domain.Member;
 import com.sbb2.question.domain.Question;
@@ -22,13 +27,21 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class QuestionServiceImpl implements QuestionService {
 	private final QuestionRepository questionRepository;
+	private final CategoryRepository categoryRepository;
 	private static final int PAGE_SIZE = 10;
 
 	@Override
-	public QuestionCreateResponse save(String subject, String content, Member author) {
+	public QuestionCreateResponse save(String subject, String content, Member author, String categoryName) {
+		CategoryName fromCategoryName = CategoryName.from(categoryName);
+
+		Category findCategory = categoryRepository.findByCategoryName(fromCategoryName)
+			.orElseThrow(() -> new CategoryBusinessLogicException(
+				CategoryErrorCode.NOT_FOUND));
+
 		Question question = Question.builder()
 			.subject(subject)
 			.content(content)
+			.category(findCategory)
 			.author(author)
 			.build();
 
@@ -49,7 +62,7 @@ public class QuestionServiceImpl implements QuestionService {
 	}
 
 	@Override
-	public Question update(Long id, String subject, String content, Member author) {
+	public Question update(Long id, String subject, String content, Member author, String categoryName) {
 		Question target = questionRepository.findById(id)
 			.orElseThrow(() -> new QuestionBusinessLogicException(QuestionErrorCode.NOT_FOUND));
 
@@ -57,7 +70,17 @@ public class QuestionServiceImpl implements QuestionService {
 			throw new QuestionBusinessLogicException(QuestionErrorCode.UNAUTHORIZED);
 		}
 
-		Question updateQuestion = target.fetch(subject, content);
+		CategoryName fromCategoryName = CategoryName.from(categoryName);
+		Category category = null;
+
+		if (!target.category().categoryName().equals(fromCategoryName)) {
+			category = categoryRepository.findByCategoryName(fromCategoryName)
+				.orElseThrow(() -> new CategoryBusinessLogicException(CategoryErrorCode.NOT_FOUND));
+		} else {
+			category = target.category();
+		}
+
+		Question updateQuestion = target.fetch(subject, content, category);
 
 		return questionRepository.save(updateQuestion);
 	}

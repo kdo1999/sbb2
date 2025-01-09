@@ -22,9 +22,12 @@ import org.springframework.test.annotation.DirtiesContext;
 
 import com.sbb2.answer.domain.Answer;
 import com.sbb2.answer.service.response.AnswerDetailResponse;
+import com.sbb2.category.domain.Category;
 import com.sbb2.common.config.JpaAudtingConfig;
 import com.sbb2.common.config.QuerydslConfig;
 import com.sbb2.common.util.SearchCondition;
+import com.sbb2.infrastructer.category.entity.CategoryName;
+import com.sbb2.infrastructer.category.repository.CategoryRepository;
 import com.sbb2.infrastructer.member.repository.MemberRepository;
 import com.sbb2.infrastructer.question.repository.QuestionRepository;
 import com.sbb2.infrastructer.voter.repository.VoterRepository;
@@ -44,14 +47,16 @@ public class AnswerRepositoryTest {
 	private final QuestionRepository questionRepository;
 	private final MemberRepository memberRepository;
 	private final VoterRepository voterRepository;
+	private final CategoryRepository categoryRepository;
 
 	@Autowired
 	public AnswerRepositoryTest(AnswerRepository answerRepository, QuestionRepository questionRepository,
-		MemberRepository memberRepository, VoterRepository voterRepository) {
+		MemberRepository memberRepository, VoterRepository voterRepository, CategoryRepository categoryRepository) {
 		this.answerRepository = answerRepository;
 		this.questionRepository = questionRepository;
 		this.memberRepository = memberRepository;
 		this.voterRepository = voterRepository;
+		this.categoryRepository = categoryRepository;
 	}
 
 	@BeforeAll
@@ -75,6 +80,17 @@ public class AnswerRepositoryTest {
 		Member savedMember = memberRepository.save(member);
 		Member savedMember2 = memberRepository.save(member2);
 
+		Category category1 = Category.builder()
+			.categoryName(CategoryName.QUESTION_BOARD)
+			.build();
+
+		Category category2 = Category.builder()
+			.categoryName(CategoryName.LECTURE_BOARD)
+			.build();
+
+		Category savedCategory = categoryRepository.save(category1);
+		categoryRepository.save(category2);
+
 		String questionSubject = "testSubject";
 		String questionContent = "testContent";
 		Member author = memberRepository.findById(1L).get();
@@ -83,6 +99,7 @@ public class AnswerRepositoryTest {
 			Question question = Question.builder()
 				.subject(questionSubject + (i + 1))
 				.content(questionContent + (i + 1))
+				.category(savedCategory)
 				.author(author)
 				.build();
 
