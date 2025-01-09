@@ -15,6 +15,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.sbb2.category.domain.Category;
 import com.sbb2.infrastructer.category.entity.CategoryName;
 import com.sbb2.infrastructer.category.repository.CategoryRepository;
+import com.sbb2.question.exception.QuestionBusinessLogicException;
+import com.sbb2.question.exception.QuestionErrorCode;
 
 @ExtendWith(MockitoExtension.class)
 public class CategoryServiceTest {
@@ -29,7 +31,7 @@ public class CategoryServiceTest {
 
 	@DisplayName("카테고리 ID로 조회 성공 테스트")
 	@Test
-	void save_category_success() {
+	void find_category_id_success() {
 	    //given
 		Long givenCategoryId = 1L;
 		CategoryName givenCategoryName = CategoryName.QUESTION_BOARD;
@@ -47,5 +49,20 @@ public class CategoryServiceTest {
 
 		//then
 		assertThat(findCategory).isEqualTo(givenCategory);
+	}
+
+	@DisplayName("카테고리 ID로 조회 실패 테스트")
+	@Test
+	void find_category_id_not_found_fail() {
+		//given
+		Long givenCategoryId = 1L;
+
+		given(categoryRepository.findById(givenCategoryId))
+			.willReturn(Optional.empty());
+
+		//when & then
+		assertThatThrownBy(() -> categoryService.findById(givenCategoryId))
+			.isInstanceOf(CategoryBusinessLogicException.class)
+			.hasMessage(CategoryErrorCode.NOT_FOUND.getMessage());
 	}
 }
