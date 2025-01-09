@@ -13,10 +13,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.sbb2.category.domain.Category;
+import com.sbb2.category.exception.CategoryBusinessLogicException;
+import com.sbb2.category.exception.CategoryErrorCode;
 import com.sbb2.infrastructer.category.entity.CategoryName;
 import com.sbb2.infrastructer.category.repository.CategoryRepository;
-import com.sbb2.question.exception.QuestionBusinessLogicException;
-import com.sbb2.question.exception.QuestionErrorCode;
 
 @ExtendWith(MockitoExtension.class)
 public class CategoryServiceTest {
