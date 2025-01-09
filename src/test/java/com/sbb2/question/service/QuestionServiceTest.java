@@ -531,6 +531,7 @@ public class QuestionServiceTest {
 			.id(1L)
 			.subject("subject")
 			.content("content")
+			.viewCount(0L)
 			.author(givenMember)
 			.category(givenCategory)
 			.voterSet(Set.of(voter))
@@ -544,7 +545,7 @@ public class QuestionServiceTest {
 				.categoryName(question.category().categoryName().toString())
 				.categoryDisplayName(question.category().categoryName().getCategoryDisplayName())
 				.build())
-			.voterCount((long)question.voterSet().size())
+			.voterCount(question.viewCount())
 			.isVoter(question.voterSet().stream()
 				.anyMatch(v -> v.member().id().equals(givenMember.id())))
 			.isAuthor(question.author().id().equals(givenMember.id()))
@@ -555,11 +556,86 @@ public class QuestionServiceTest {
 		given(questionRepository.findDetailById(question.id(), givenMember.id()))
 			.willReturn(questionDetailResponse);
 
+		String key = "view:" + question.id() + ":" + givenMember.id();
+
+		given(redisService.hasKey(key)).willReturn(true);
+
 		//when
 		QuestionDetailResponse findDetailResponse = questionService.findDetailById(question.id(), givenMember);
 
 		//then
 		assertThat(findDetailResponse).isEqualTo(questionDetailResponse);
 		assertThat(findDetailResponse.isVoter()).isTrue();
+	}
+
+	@DisplayName("사용자가 질문을 24시간내에 조회한 적이 없으면 조회수 증가 성공 테스트")
+	@Test
+	void increment_viewCount_success() {
+		//given
+		Category givenCategory = Category.builder()
+			.id(1L)
+			.categoryName(CategoryName.FREE_BOARD)
+			.build();
+
+		Member givenMember = Member.builder()
+			.id(1L)
+			.username("testMember")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
+
+		Answer answer = Answer.builder()
+			.id(1L)
+			.content("testContent")
+			.author(givenMember)
+			.build();
+
+		Voter voter = Voter.builder()
+			.member(givenMember)
+			.question(Question.builder().id(1L).build())
+			.build();
+
+		Question question = Question.builder()
+			.id(1L)
+			.subject("subject")
+			.content("content")
+			.author(givenMember)
+			.viewCount(0L)
+			.category(givenCategory)
+			.voterSet(Set.of(voter))
+			.build();
+
+		QuestionDetailResponse questionDetailResponse = QuestionDetailResponse.builder()
+			.id(question.id())
+			.subject(question.subject())
+			.content(question.content())
+			.categoryResponse(CategoryResponse.builder()
+				.categoryName(question.category().categoryName().toString())
+				.categoryDisplayName(question.category().categoryName().getCategoryDisplayName())
+				.build())
+			.viewCount(question.viewCount() + 1)
+			.voterCount((long)question.voterSet().size())
+			.isVoter(question.voterSet().stream()
+				.anyMatch(v -> v.member().id().equals(givenMember.id())))
+			.isAuthor(question.author().id().equals(givenMember.id()))
+			.createdAt(LocalDateTime.now())
+			.modifiedAt(LocalDateTime.now())
+			.build();
+
+		String key = "view:" + question.id() + ":" + givenMember.id();
+
+		given(questionRepository.findDetailById(question.id(), givenMember.id()))
+			.willReturn(questionDetailResponse);
+
+		given(redisService.hasKey(key)).willReturn(false);
+
+		doNothing().when(questionRepository).incrementViewCount(question.id());
+
+		//when
+		QuestionDetailResponse findDetailResponse = questionService.findDetailById(question.id(), givenMember);
+
+		//then
+		assertThat(findDetailResponse.viewCount()).isEqualTo(1L);
+		verify(questionRepository, times(1)).incrementViewCount(question.id());
 	}
 }
