@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sbb2.auth.controller.request.EmailSendRequestDto;
 import com.sbb2.auth.controller.request.MemberEmailSignupRequest;
 import com.sbb2.auth.controller.request.MemberLoginRequest;
 import com.sbb2.auth.controller.request.PasswordChangeRequest;
+import com.sbb2.auth.controller.request.PasswordResetRequest;
 import com.sbb2.auth.service.AuthService;
 import com.sbb2.auth.service.response.MemberEmailSignupResponse;
 import com.sbb2.auth.service.response.MemberLoginResponse;
@@ -81,6 +83,23 @@ public class AuthController {
 
 		authService.passwordChange(passwordChangeRequest.originalPassword(), passwordChangeRequest.getPassword(),
 			memberUserDetails.getMember());
+
+		return ResponseEntity.ok().body(GenericResponse.of());
+	}
+
+	@PostMapping("/code")
+	public ResponseEntity<GenericResponse<Void>> sendCode(
+		@Validated(ValidationSequence.class) @RequestBody EmailSendRequestDto emailSendRequestDto) {
+		authService.sendCode(emailSendRequestDto.email(), emailSendRequestDto.verifyType());
+
+		return ResponseEntity.ok().body(GenericResponse.of());
+	}
+
+	@PostMapping("/password/reset")
+	public ResponseEntity<GenericResponse<Void>> passwordReset(
+		@Validated(ValidationSequence.class) @RequestBody PasswordResetRequest passwordResetRequest) {
+		authService.passwordReset(passwordResetRequest.email(), passwordResetRequest.certificationCode(),
+			passwordResetRequest.verifyType());
 
 		return ResponseEntity.ok().body(GenericResponse.of());
 	}

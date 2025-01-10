@@ -57,6 +57,8 @@ public class DevSecurityConfig {
 				.permitAll()
 				.requestMatchers(HttpMethod.GET, "/api/v1/question", "/api/v1/category")
 				.permitAll()
+				.requestMatchers(HttpMethod.POST, "/api/v1/auth/code", "/api/v1/auth/password/reset")
+				.permitAll()
 				.requestMatchers(HttpMethod.GET, "/api/v1/question/{id}", "/api/v1/answer/{id}", "/api/v1/answer",
 					"/api/v1/comment")
 				.hasRole("USER")
