@@ -44,6 +44,12 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
     implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
 
+    // mail 라이브러리
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // 메일 템플릿 설정을 위한 thymeleaf 라이브러리
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
     // spring-redis-data 라이브러리
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
