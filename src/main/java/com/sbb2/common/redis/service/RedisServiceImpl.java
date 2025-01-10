@@ -36,7 +36,7 @@ public class RedisServiceImpl implements RedisService {
 	}
 
 	@Override
-	public Map<?, ?> getHashDataAll(String key) {
+	public Map<Object, Object> getHashDataAll(String key) {
 		return redisDao.getHashDataAll(key);
 	}
 

@@ -11,7 +11,7 @@ public interface RedisService {
 
 	void setHashDataAll(String key, Map<?, ?> map);
 
-	Map<?, ?> getHashDataAll(String key);
+	Map<Object, Object> getHashDataAll(String key);
 
 	String getHashData(String key, String hashKey);
 

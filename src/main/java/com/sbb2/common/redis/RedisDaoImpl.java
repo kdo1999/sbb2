@@ -54,7 +54,7 @@ public class RedisDaoImpl implements RedisDao {
 	}
 
 	@Override
-	public Map<?, ?> getHashDataAll(String key) {
+	public Map<Object, Object> getHashDataAll(String key) {
 		return redisTemplate.opsForHash().entries(key);
 	}
 
