@@ -39,8 +39,8 @@ public class AnswerQueryRepository {
 				answerEntity.questionEntity.id,
 				answerEntity.createdAt,
 				answerEntity.modifiedAt,
-				voterEntity.countDistinct(),
-				commentEntity.countDistinct(),
+				voterEntity.id.countDistinct(),
+				commentEntity.id.countDistinct(),
 				answerEntity.author.id.eq(memberId),
 				voterEntity.memberEntity.id.eq(memberId)
 			))
@@ -83,7 +83,8 @@ public class AnswerQueryRepository {
 			.leftJoin(answerEntity.questionEntity)
 			.leftJoin(answerEntity.voterEntitySet, voterEntity)
 			.leftJoin(answerEntity.commentEntityList, commentEntity)
-			.where(contentContains(searchCondition), answerEntity.questionEntity.id.eq(questionId))
+			.where(contentContains(searchCondition), answerEntity.questionEntity.id.eq(questionId),
+				usernameEquals(searchCondition))
 			.orderBy(getOrderBy(searchCondition))
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
@@ -119,5 +120,10 @@ public class AnswerQueryRepository {
 		return StringUtils.hasText(searchCondition.kw()) ?
 			answerEntity.content.contains(searchCondition.kw()) :
 			null;
+	}
+
+	private BooleanExpression usernameEquals(SearchCondition searchCondition) {
+		return StringUtils.hasText(searchCondition.username()) ?
+			answerEntity.author.username.eq(searchCondition.username()) : null;
 	}
 }
