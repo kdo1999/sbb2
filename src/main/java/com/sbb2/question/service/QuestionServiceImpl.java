@@ -104,7 +104,6 @@ public class QuestionServiceImpl implements QuestionService {
 		return questionRepository.findAll(searchCondition, pageRequest);
 	}
 
-	@Transactional(readOnly = true)
 	@Override
 	public QuestionDetailResponse findDetailById(Long id, Member loginMember) {
 		String key = "view:" + id + ":" + loginMember.id();
