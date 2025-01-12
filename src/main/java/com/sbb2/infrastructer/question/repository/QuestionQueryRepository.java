@@ -69,7 +69,8 @@ public class QuestionQueryRepository {
 		JPAQuery<Long> countQuery = queryFactory
 			.select(questionEntity.count())
 			.from(questionEntity)
-			.where(subjectAndContentContains(searchCondition), categoryIdEquals(searchCondition));
+			.where(subjectAndContentContains(searchCondition), categoryIdEquals(searchCondition),
+				usernameEquals(searchCondition));
 
 		return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
 	}
