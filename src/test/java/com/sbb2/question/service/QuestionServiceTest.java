@@ -217,6 +217,62 @@ public class QuestionServiceTest {
 				.author(givenMember)
 				.build());
 
+		//when
+		Question updateQuestion = questionService.update(1L, questionForm.subject(), questionForm.content(),
+			givenMember, questionForm.categoryId());
+
+		//then
+		assertThat(updateQuestion.author()).isEqualTo(givenMember);
+		assertThat(updateQuestion.subject()).isEqualTo(questionForm.subject());
+		assertThat(updateQuestion.content()).isEqualTo(questionForm.content());
+		assertThat(updateQuestion.category()).isEqualTo(updateCategory);
+	}
+
+	@DisplayName("질문 수정 카테고리가 다를 때 성공 테스트")
+	@Test
+	void update_question_category_success() {
+		//given
+		Member givenMember = Member.builder()
+			.id(1L)
+			.username("testMember")
+			.password("testPassword")
+			.email("testEmail")
+			.build();
+
+		Category givenCategory = Category.builder()
+			.id(1L)
+			.categoryName(CategoryName.FREE_BOARD)
+			.build();
+
+		given(questionRepository.findById(any(Long.class)))
+			.willReturn(Optional.of(Question.builder()
+				.id(1L)
+				.subject("subject")
+				.content("content")
+				.category(givenCategory)
+				.author(givenMember)
+				.build()));
+
+		Category updateCategory = Category.builder()
+			.id(2L)
+			.categoryName(CategoryName.QUESTION_BOARD)
+			.build();
+
+		QuestionForm questionForm = QuestionForm.builder()
+			.subject("updateSubject")
+			.content("updateContent")
+			.categoryId(updateCategory.id())
+			.build();
+
+		given(questionRepository.save(any(Question.class)))
+			.willReturn(Question.builder()
+				.id(1L)
+				.subject(questionForm.subject())
+				.content(questionForm.content())
+				.category(updateCategory)
+				.author(givenMember)
+				.build());
+
 		given(categoryRepository.findById(updateCategory.id()))
 			.willReturn(Optional.of(updateCategory));
 
