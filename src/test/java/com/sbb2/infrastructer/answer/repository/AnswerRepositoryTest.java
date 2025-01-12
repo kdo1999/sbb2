@@ -93,14 +93,13 @@ public class AnswerRepositoryTest {
 
 		String questionSubject = "testSubject";
 		String questionContent = "testContent";
-		Member author = memberRepository.findById(1L).get();
 
 		for (int i = 0; i < 4; i++) {
 			Question question = Question.builder()
 				.subject(questionSubject + (i + 1))
 				.content(questionContent + (i + 1))
 				.category(savedCategory)
-				.author(author)
+				.author(savedMember)
 				.build();
 
 			questionRepository.save(question);
@@ -112,12 +111,12 @@ public class AnswerRepositoryTest {
 		for (int i = 0; i < 30; i++) {
 			Answer givenAnswer = Answer.builder()
 				.content(answerContent + (i + 1))
-				.author(author)
+				.author(savedMember)
 				.question(question)
 				.build();
 
 			Voter givenVoter = Voter.builder()
-				.member(author)
+				.member(savedMember)
 				.answer(givenAnswer)
 				.build();
 
@@ -128,7 +127,7 @@ public class AnswerRepositoryTest {
 
 		Answer givenAnswer = Answer.builder()
 			.content(answerContent)
-			.author(savedMember)
+			.author(savedMember2)
 			.question(question)
 			.build();
 
@@ -301,6 +300,30 @@ public class AnswerRepositoryTest {
 		assertThat(answerDetailResponse.isVoter()).isEqualTo(savedAnswer.voterSet().stream()
 			.anyMatch(voter -> voter.member().id().equals(member.id())));
 		assertThat(answerDetailResponse.voterCount()).isEqualTo(savedAnswer.voterSet().size());
+	}
+
+	@DisplayName("답변 회원 이름으로 페이징 조회 성공 테스트")
+	@Test
+	void find_answerDetailPage_username_success() {
+		//given
+		Member findMember = memberRepository.findById(2L).get();
+
+		SearchCondition givenSearchCondition = SearchCondition.builder()
+			.pageNum(0)
+			.username(findMember.username())
+			.build();
+		Long questionId = 1L;
+		Long loginMemberId = 1L;
+
+		Pageable pageable = PageRequest.of(givenSearchCondition.pageNum(), 10);
+
+		//when
+		Page<AnswerDetailResponse> answerDetailResponsePage = answerRepository.findAnswerDetailPageByQuestionId(
+			givenSearchCondition, questionId, loginMemberId, pageable);
+
+		//then
+		assertThat(answerDetailResponsePage.getTotalPages()).isEqualTo(1);
+		assertThat(answerDetailResponsePage.getContent().size()).isEqualTo(1);
 	}
 
 	@DisplayName("답변 페이징 조회 성공 테스트")
