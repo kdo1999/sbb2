@@ -312,7 +312,7 @@ public class AnswerRepositoryTest {
 			.pageNum(0)
 			.username(findMember.username())
 			.build();
-		Long questionId = 1L;
+		Long questionId = null;
 		Long loginMemberId = 1L;
 
 		Pageable pageable = PageRequest.of(givenSearchCondition.pageNum(), 10);

@@ -102,14 +102,12 @@ public class AnswerServiceImpl implements AnswerService {
 	@Override
 	public Page<AnswerDetailResponse> findAnswerDetailPageByQuestionId(SearchCondition searchCondition, Long questionId,
 		Long memberId) {
-		Question findQuestion = questionRepository.findById(questionId)
-			.orElseThrow(() -> new QuestionBusinessLogicException(QuestionErrorCode.NOT_FOUND));
 
 		Pageable pageable = PageRequest.of(
 			searchCondition.pageNum() == null ? 0 : searchCondition.pageNum(), PAGE_SIZE
 		);
 
-		return answerRepository.findAnswerDetailPageByQuestionId(searchCondition, findQuestion.id(), memberId, pageable);
+		return answerRepository.findAnswerDetailPageByQuestionId(searchCondition, questionId, memberId, pageable);
 	}
 
 	private void loginMemberEqualsAuthor(Member author, Answer findAnswer) {

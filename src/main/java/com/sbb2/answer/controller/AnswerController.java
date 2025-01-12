@@ -34,7 +34,7 @@ public class AnswerController {
 
 	@GetMapping
 	public ResponseEntity<GenericResponse<Page<AnswerDetailResponse>>> findAll(
-		@RequestParam("questionId") Long questionId,
+		@RequestParam(value = "questionId", required = false) Long questionId,
 		@AuthenticationPrincipal MemberUserDetails loginMember,
 		SearchCondition searchCondition) {
 

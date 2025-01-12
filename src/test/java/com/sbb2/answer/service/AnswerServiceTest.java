@@ -502,12 +502,6 @@ public class AnswerServiceTest {
 			),
 			pageable,
 			answerDetailResponseList.size());
-		given(questionRepository.findById(1L))
-			.willReturn(
-				Optional.of(Question.builder()
-					.id(1L)
-					.build())
-			);
 
 		given(answerRepository.findAnswerDetailPageByQuestionId(searchCondition, 1L, 1L, pageable))
 			.willReturn(answerDetailResponsePage);
@@ -520,22 +514,5 @@ public class AnswerServiceTest {
 		assertThat(result.getTotalElements()).isEqualTo(answerDetailResponseList.size());
 		assertThat(result.getTotalPages()).isEqualTo(2);
 		assertThat(result.getContent()).isEqualTo(answerDetailResponseSubList);
-	}
-
-	@DisplayName("답변 페이징 조회시 질문이 존재하지 않는 실패 테스트")
-	@Test
-	void find_answerDetailPage_findQuestion_fail() {
-		//given
-		SearchCondition searchCondition = SearchCondition.builder()
-			.pageNum(0)
-			.build();
-
-		given(questionRepository.findById(1L))
-			.willReturn(Optional.empty());
-
-		//when & then
-		assertThatThrownBy(() -> answerService.findAnswerDetailPageByQuestionId(searchCondition, 1L, 1L))
-			.isInstanceOf(QuestionBusinessLogicException.class)
-			.hasMessage(QuestionErrorCode.NOT_FOUND.getMessage());
 	}
 }

@@ -83,7 +83,7 @@ public class AnswerQueryRepository {
 			.leftJoin(answerEntity.questionEntity)
 			.leftJoin(answerEntity.voterEntitySet, voterEntity)
 			.leftJoin(answerEntity.commentEntityList, commentEntity)
-			.where(contentContains(searchCondition), answerEntity.questionEntity.id.eq(questionId),
+			.where(contentContains(searchCondition), questionIdEq(questionId),
 				usernameEquals(searchCondition))
 			.orderBy(getOrderBy(searchCondition))
 			.offset(pageable.getOffset())
@@ -93,9 +93,13 @@ public class AnswerQueryRepository {
 		JPAQuery<Long> countQuery = queryFactory
 			.select(answerEntity.count())
 			.from(answerEntity)
-			.where(contentContains(searchCondition), answerEntity.questionEntity.id.eq(questionId));
+			.where(contentContains(searchCondition), questionIdEq(questionId), usernameEquals(searchCondition));
 
 		return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+	}
+
+	private BooleanExpression questionIdEq(Long questionId) {
+		return questionId == null ? null : answerEntity.questionEntity.id.eq(questionId);
 	}
 
 	public OrderSpecifier<?> getOrderBy(SearchCondition searchCondition) {
