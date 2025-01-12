@@ -149,9 +149,9 @@ public class QuestionRepositoryTest {
 		voterRepository.save(voter);
 	}
 
-	@DisplayName("질문 저장 테스트")
+	@DisplayName("질문 저장 성공 테스트")
 	@Test
-	void save_question() {
+	void save_question_success() {
 		//given
 		String subject = "testSubject1";
 		String content = "testContent1";
@@ -177,9 +177,9 @@ public class QuestionRepositoryTest {
 		assertThat(savedQuestion.modifiedAt()).isNotNull();
 	}
 
-	@DisplayName("질문 키워드 조회 테스트")
+	@DisplayName("질문 키워드 조회 성공 테스트")
 	@Test
-	void find_keyword_question() {
+	void find_keyword_question_success() {
 		//given
 		String keyword = "search";
 		int page = 0;
@@ -202,9 +202,9 @@ public class QuestionRepositoryTest {
 		assertThat(questionPage.getContent().size()).isEqualTo(5);
 	}
 
-	@DisplayName("질문 카테고리 조회 테스트")
+	@DisplayName("질문 카테고리ID로 전체 조회 성공 테스트")
 	@Test
-	void find_categoryName_sort_order_question() {
+	void find_question_categoryName_success() {
 		//given
 		int page = 0;
 
@@ -225,9 +225,9 @@ public class QuestionRepositoryTest {
 		assertThat(questionPage.getContent().size()).isEqualTo(5);
 	}
 
-	@DisplayName("질문 전체 조회 테스트")
+	@DisplayName("질문 전체 조회 성공 테스트")
 	@Test
-	void findAll_question() {
+	void findAll_question_success() {
 		//given
 		String keyword = "";
 		int page = 0;
@@ -268,9 +268,9 @@ public class QuestionRepositoryTest {
 		assertThat(questionPage.getContent().size()).isEqualTo(5);
 	}
 
-	@DisplayName("질문 ID 조회 테스트")
+	@DisplayName("질문 ID 조회 성공 테스트")
 	@Test
-	void find_id_question() {
+	void find_question_id_success() {
 		//given
 		String givenSubject = "testSubject1";
 		String givenContent = "testContent1";
@@ -293,9 +293,9 @@ public class QuestionRepositoryTest {
 		assertThat(findQuestion).isEqualTo(savedQuestion);
 	}
 
-	@DisplayName("질문 수정 테스트")
+	@DisplayName("질문 수정 성공 테스트")
 	@Test
-	void update_question() {
+	void update_question_success() {
 		//given
 		String subject = "testSubject1";
 		String content = "testContent1";
@@ -325,9 +325,9 @@ public class QuestionRepositoryTest {
 		assertThat(updateQuestion.id()).isEqualTo(savedQuestion.id());
 	}
 
-	@DisplayName("질문 추천 조회")
+	@DisplayName("질문 추천 조회 성공 테스트")
 	@Test
-	void find_voter_question() {
+	void find_question_voter_success() {
 		//given
 		Member member = memberRepository.findById(1L).get();
 		Question question = questionRepository.findById(1L).get();
@@ -349,9 +349,9 @@ public class QuestionRepositoryTest {
 		assertThat(findVoter.question().author()).isEqualTo(savedVoter.question().author());
 	}
 
-	@DisplayName("질문 삭제 테스트")
+	@DisplayName("질문 삭제 성공 테스트")
 	@Test
-	void delete_question() {
+	void delete_question_success() {
 		//given
 		Question question = questionRepository.findById(1L).get();
 
