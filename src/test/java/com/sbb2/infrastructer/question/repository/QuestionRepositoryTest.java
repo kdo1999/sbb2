@@ -91,7 +91,6 @@ public class QuestionRepositoryTest {
 
 		String subject = "testSubject";
 		String content = "testContent";
-		Member author = memberRepository.findById(1L).get();
 
 		Category category1 = Category.builder()
 			.categoryName(CategoryName.QUESTION_BOARD)
@@ -114,7 +113,7 @@ public class QuestionRepositoryTest {
 				.subject(subject + i + 1)
 				.content(content + i + 1)
 				.category(savedCategory1)
-				.author(author)
+				.author(savedMember)
 				.build();
 
 			questionRepository.save(question);
@@ -125,7 +124,7 @@ public class QuestionRepositoryTest {
 				.subject("searchSubject" + i + 1)
 				.content("searchContent" + i + 1)
 				.category(savedCategory2)
-				.author(author)
+				.author(savedMember2)
 				.build();
 
 			questionRepository.save(question);
@@ -138,7 +137,7 @@ public class QuestionRepositoryTest {
 			answerRepository.save(Answer.builder()
 				.content(answerContent)
 				.question(question)
-				.author(author)
+				.author(savedMember)
 				.build());
 		}
 
@@ -228,7 +227,7 @@ public class QuestionRepositoryTest {
 
 	@DisplayName("질문 전체 조회 테스트")
 	@Test
-	void find_question() {
+	void findAll_question() {
 		//given
 		String keyword = "";
 		int page = 0;
@@ -245,6 +244,28 @@ public class QuestionRepositoryTest {
 		//then
 		assertThat(questionPage.getTotalPages()).isEqualTo(3);
 		assertThat(questionPage.getContent().size()).isEqualTo(10);
+	}
+
+	@DisplayName("질문 회원 이름으로 전체 조회 성공 테스트")
+	@Test
+	void findAll_question_username_success() {
+		//given
+		String keyword = "";
+		int page = 0;
+		Member findMember = memberRepository.findById(2L).get();
+
+		SearchCondition searchCondition = SearchCondition.builder()
+			.username(findMember.username())
+			.pageNum(0)
+			.build();
+		Pageable pageable = PageRequest.of(searchCondition.pageNum(), 10);
+
+		//when
+		Page<QuestionPageResponse> questionPage = questionRepository.findAll(searchCondition, pageable);
+
+		//then
+		assertThat(questionPage.getTotalPages()).isEqualTo(1);
+		assertThat(questionPage.getContent().size()).isEqualTo(5);
 	}
 
 	@DisplayName("질문 ID 조회 테스트")
