@@ -83,6 +83,7 @@ public class CommentControllerTest {
 			.forEach((index) -> {
 				commentResponseList.add(CommentResponse.builder()
 					.commentId(index + 1)
+					.rootQuestionId(givenQuestionId)
 					.parentId(givenQuestionId)
 					.parentType(givenParentType)
 					.author("testUsername")
@@ -133,6 +134,8 @@ public class CommentControllerTest {
 			.password("testPassword1234!")
 			.build();
 
+		Long givenQuestionId = 1L;
+
 		MemberUserDetails givenMemberUserDetails = new MemberUserDetails(givenMember);
 
 		ParentType givenParentType = ParentType.ANSWER;
@@ -147,6 +150,7 @@ public class CommentControllerTest {
 			.forEach((index) -> {
 				commentResponseList.add(CommentResponse.builder()
 					.commentId(index + 1)
+					.rootQuestionId(givenQuestionId)
 					.parentId(givenAnswerId)
 					.parentType(givenParentType)
 					.author("testUsername")
@@ -206,6 +210,7 @@ public class CommentControllerTest {
 
 		CommentResponse givenCommentResponse = CommentResponse.builder()
 			.commentId(commentId)
+			.rootQuestionId(givenParentId)
 			.parentId(givenParentId)
 			.parentType(ParentType.QUESTION)
 			.author(givenMemberUserDetails.getMember().username())
@@ -216,13 +221,15 @@ public class CommentControllerTest {
 			.build();
 
 		CommentCreateForm givenCommentCreateForm = CommentCreateForm.builder()
+			.rootQuestionId(givenParentId)
 			.parentId(givenParentId)
 			.parentType(givenParentType.toString())
 			.content(givenContent)
 			.build();
 
 
-		given(commentService.save(givenParentId, givenContent, givenParentType, givenMemberUserDetails.getMember()))
+		given(commentService.save(givenCommentResponse.rootQuestionId(), givenParentId, givenContent,
+			givenParentType, givenMemberUserDetails.getMember()))
 			.willReturn(givenCommentResponse);
 
 	    //when
@@ -233,7 +240,7 @@ public class CommentControllerTest {
 	    assertThat(result.getBody().getData()).isEqualTo(givenCommentResponse);
 		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 		verify(commentService, times(1))
-			.save(givenParentId, givenContent, givenParentType, givenMemberUserDetails.getMember());
+			.save(givenParentId, givenParentId, givenContent, givenParentType, givenMemberUserDetails.getMember());
 	}
 
 	@DisplayName("댓글 수정 성공 테스트")
@@ -255,6 +262,7 @@ public class CommentControllerTest {
 
 		CommentResponse givenCommentResponse = CommentResponse.builder()
 			.commentId(commentId)
+			.rootQuestionId(1L)
 			.parentId(1L)
 			.parentType(ParentType.QUESTION)
 			.author(givenMemberUserDetails.getMember().username())
@@ -332,11 +340,37 @@ public class CommentControllerTest {
 		assertThat(bindingResult.getFieldError("parentType").getDefaultMessage()).isEqualTo("지원하지 않는 타입입니다.");
 	}
 
+	@DisplayName("댓글 저장시 rootQuestionId가 없을 때 실패 테스트")
+	@Test
+	void save_comment_rootQuestionId_parentId_is_null_fail() {
+		//given
+		CommentCreateForm givenCommentCreateForm = CommentCreateForm.builder()
+			.parentId(1L)
+			.parentType("answer")
+			.content("givenContent")
+			.build();
+
+		BindingResult bindingResult = new BeanPropertyBindingResult(givenCommentCreateForm, "givenCommentCreateForm");
+		validator.validate(givenCommentCreateForm, ValidationGroups.NotNullGroup.class).forEach(violation ->
+			bindingResult.rejectValue(
+				violation.getPropertyPath().toString(),
+				"error",
+				violation.getMessage()
+			)
+		);
+
+		//then
+		assertThat(bindingResult.hasErrors()).isTrue();
+		assertThat(bindingResult.getErrorCount()).isEqualTo(1);
+		assertThat(bindingResult.getFieldError("rootQuestionId").getDefaultMessage()).isEqualTo("질문 ID는 필수 항목입니다.");
+	}
+
 	@DisplayName("댓글 저장시 parentId가 없을 때 실패 테스트")
 	@Test
 	void save_comment_parentId_is_null_fail() {
 		//given
 		CommentCreateForm givenCommentCreateForm = CommentCreateForm.builder()
+			.rootQuestionId(1L)
 			.parentType("answer")
 			.content("givenContent")
 			.build();

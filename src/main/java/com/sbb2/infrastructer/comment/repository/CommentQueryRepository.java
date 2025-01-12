@@ -36,6 +36,7 @@ public class CommentQueryRepository {
 		List<CommentResponse> content = queryFactory
 			.select(new QCommentResponse(
 				commentEntity.id,
+				commentEntity.rootQuestion.id,
 				getParentIdPath(parentType),
 				commentEntity.content,
 				commentEntity.memberEntity.username,

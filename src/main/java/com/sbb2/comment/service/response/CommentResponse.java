@@ -7,15 +7,16 @@ import com.sbb2.comment.domain.ParentType;
 
 import lombok.Builder;
 
-public record CommentResponse(Long commentId, Long parentId, String content, String author, boolean isAuthor,
+public record CommentResponse(Long commentId, Long rootQuestionId, Long parentId, String content, String author, boolean isAuthor,
 							  ParentType parentType, LocalDateTime createdAt, LocalDateTime modifiedAt) {
 
 	@QueryProjection
 	@Builder
-	public CommentResponse(Long commentId, Long parentId, String content, String author, boolean isAuthor,
+	public CommentResponse(Long commentId, Long rootQuestionId, Long parentId, String content, String author, boolean isAuthor,
 		ParentType parentType,
 		LocalDateTime createdAt, LocalDateTime modifiedAt) {
 		this.commentId = commentId;
+		this.rootQuestionId = rootQuestionId;
 		this.parentId = parentId;
 		this.content = content;
 		this.author = author;

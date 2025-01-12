@@ -42,6 +42,10 @@ public class CommentEntity extends BaseEntity {
 	private QuestionEntity questionEntity;
 
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "root_question_Id")
+	private QuestionEntity rootQuestion;
+
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
 	private MemberEntity memberEntity;
 
@@ -50,11 +54,13 @@ public class CommentEntity extends BaseEntity {
 	private AnswerEntity answerEntity;
 
 	@Builder
-	public CommentEntity(Long id, String content, QuestionEntity questionEntity, MemberEntity memberEntity,
+	public CommentEntity(Long id, String content, QuestionEntity questionEntity, QuestionEntity rootQuestion,
+		MemberEntity memberEntity,
 		AnswerEntity answerEntity, LocalDateTime createdAt, LocalDateTime modifiedAt) {
 		this.id = id;
 		this.content = content;
 		this.questionEntity = questionEntity;
+		this.rootQuestion = rootQuestion;
 		this.memberEntity = memberEntity;
 		this.answerEntity = answerEntity;
 		this.createdAt = createdAt;
@@ -67,6 +73,9 @@ public class CommentEntity extends BaseEntity {
 			.content(comment.content())
 			.questionEntity(comment.question() == null ? null : QuestionEntity.builder()
 				.id(comment.question().id())
+				.build())
+			.rootQuestion(QuestionEntity.builder()
+				.id(comment.rootQuestion().id())
 				.build())
 			.memberEntity(MemberEntity.from(comment.author()))
 			.answerEntity(comment.answer() == null ? null : AnswerEntity.builder()
@@ -83,6 +92,9 @@ public class CommentEntity extends BaseEntity {
 			.content(content)
 			.question(questionEntity == null ? null : Question.builder()
 				.id(questionEntity.getId())
+				.build())
+			.rootQuestion(Question.builder()
+				.id(rootQuestion.getId())
 				.build())
 			.author(memberEntity.toModel())
 			.answer(answerEntity == null ? null : Answer.builder()

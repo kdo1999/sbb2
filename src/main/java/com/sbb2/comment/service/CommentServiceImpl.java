@@ -48,7 +48,7 @@ public class CommentServiceImpl implements CommentService {
 	}
 
 	@Override
-	public CommentResponse save(Long parentId, String content, ParentType parentType, Member author) {
+	public CommentResponse save(Long rootQuestionId, Long parentId, String content, ParentType parentType, Member author) {
 		if (parentType == null) {
 			throw new CommentBusinessLogicException(CommentErrorCode.NOT_SUPPORT);
 		}
@@ -61,21 +61,31 @@ public class CommentServiceImpl implements CommentService {
 				Question findQuestion = questionRepository.findById(parentId)
 					.orElseThrow(() -> new QuestionBusinessLogicException(QuestionErrorCode.NOT_FOUND));
 
-				commentBuilder.question(findQuestion);
+				commentBuilder
+					.question(findQuestion)
+					.rootQuestion(findQuestion);
 
 				break;
 			case ANSWER:
 				Answer findAnswer = answerRepository.findById(parentId)
 					.orElseThrow(() -> new AnswerBusinessLogicException(AnswerErrorCode.NOT_FOUND));
 
-				commentBuilder.answer(findAnswer);
+				Question findRootQuestion = questionRepository.findById(rootQuestionId)
+					.orElseThrow(() -> new QuestionBusinessLogicException(QuestionErrorCode.NOT_FOUND));
+
+				commentBuilder
+					.answer(findAnswer)
+					.rootQuestion(findRootQuestion);
+
+				break;
 		}
 
 		Comment savedComment = commentRepository.save(commentBuilder.build());
 
 		return CommentResponse.builder()
 			.commentId(savedComment.id())
-			.parentId(parentId)
+			.rootQuestionId(savedComment.rootQuestion().id())
+			.parentId(savedComment.id())
 			.parentType(parentType)
 			.content(savedComment.content())
 			.author(savedComment.author().username())
@@ -112,6 +122,7 @@ public class CommentServiceImpl implements CommentService {
 
 		return CommentResponse.builder()
 			.commentId(updatedComment.id())
+			.rootQuestionId(updatedComment.rootQuestion().id())
 			.parentId(parentId)
 			.parentType(parentType)
 			.content(updatedComment.content())

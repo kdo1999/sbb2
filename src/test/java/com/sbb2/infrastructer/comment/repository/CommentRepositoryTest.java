@@ -125,6 +125,7 @@ public class CommentRepositoryTest {
 
 		LongStream.range(0, 26).forEach(i -> {
 			Comment comment = Comment.builder()
+				.rootQuestion(savedQuestion1)
 				.content("testCommentContent" + i)
 				.question(savedQuestion1)
 				.author(savedMember)
@@ -135,6 +136,7 @@ public class CommentRepositoryTest {
 
 		LongStream.range(0, 26).forEach(i -> {
 			Comment comment = Comment.builder()
+				.rootQuestion(savedQuestion2)
 				.content("testCommentContent" + i)
 				.answer(savedAnswer1)
 				.author(savedMember)
@@ -153,6 +155,7 @@ public class CommentRepositoryTest {
 		String commentContent = "testCommentContent";
 
 		Comment givenComment = Comment.builder()
+			.rootQuestion(question)
 			.content(commentContent)
 			.question(question)
 			.author(member)
@@ -164,6 +167,7 @@ public class CommentRepositoryTest {
 		//then
 		assertThat(savedComment.id()).isNotNull();
 		assertThat(savedComment.content()).isEqualTo(givenComment.content());
+		assertThat(savedComment.rootQuestion().id()).isEqualTo(givenComment.rootQuestion().id());
 		assertThat(savedComment.question().id()).isEqualTo(givenComment.question().id());
 		assertThat(savedComment.author()).isEqualTo(givenComment.author());
 		assertThat(savedComment.answer()).isNull();
@@ -175,11 +179,13 @@ public class CommentRepositoryTest {
 	@Test
 	void save_answer_comment_success() {
 		//given
+		Question question = questionRepository.findById(1L).get();
 		Answer answer = answerRepository.findById(1L).get();
 		Member member = memberRepository.findById(1L).get();
 		String commentContent = "testCommentContent";
 
 		Comment givenComment = Comment.builder()
+			.rootQuestion(question)
 			.content(commentContent)
 			.answer(answer)
 			.author(member)
@@ -190,6 +196,7 @@ public class CommentRepositoryTest {
 
 		//then
 		assertThat(savedComment.id()).isNotNull();
+		assertThat(savedComment.rootQuestion().id()).isEqualTo(givenComment.rootQuestion().id());
 		assertThat(savedComment.content()).isEqualTo(givenComment.content());
 		assertThat(savedComment.answer().id()).isEqualTo(givenComment.answer().id());
 		assertThat(savedComment.author()).isEqualTo(givenComment.author());
@@ -202,6 +209,7 @@ public class CommentRepositoryTest {
 	@Test
 	void update_comment_success() {
 		//given
+		Question question = questionRepository.findById(1L).get();
 		Answer answer = answerRepository.findById(1L).get();
 		Member member = memberRepository.findById(1L).get();
 
@@ -209,6 +217,7 @@ public class CommentRepositoryTest {
 		String updateContent = "updateCommentContent";
 
 		Comment givenComment = Comment.builder()
+			.rootQuestion(question)
 			.content(commentContent)
 			.answer(answer)
 			.author(member)
@@ -222,6 +231,7 @@ public class CommentRepositoryTest {
 
 		//then
 		assertThat(updateComment.id()).isEqualTo(savedComment.id());
+		assertThat(updateComment.rootQuestion().id()).isEqualTo(savedComment.rootQuestion().id());
 		assertThat(updateComment.author().id()).isEqualTo(savedComment.author().id());
 		assertThat(updateComment.answer().id()).isEqualTo(savedComment.answer().id());
 		assertThat(updateComment.content()).isEqualTo(updateContent);
@@ -238,12 +248,14 @@ public class CommentRepositoryTest {
 		String commentContent = "testCommentContent";
 
 		Comment givenComment1 = Comment.builder()
+			.rootQuestion(question1)
 			.content(commentContent)
 			.question(question1)
 			.author(member)
 			.build();
 
 		Comment givenComment2 = Comment.builder()
+			.rootQuestion(question2)
 			.content(commentContent)
 			.question(question2)
 			.author(member)
@@ -265,6 +277,7 @@ public class CommentRepositoryTest {
 	@Test
 	void find_comment_answerId_success() {
 		//given
+		Question question = questionRepository.findById(1L).get();
 		Answer answer1 = answerRepository.findById(1L).get();
 		Answer answer2 = answerRepository.findById(2L).get();
 		Member member = memberRepository.findById(1L).get();
@@ -272,12 +285,14 @@ public class CommentRepositoryTest {
 		String commentContent = "testCommentContent";
 
 		Comment givenComment1 = Comment.builder()
+			.rootQuestion(question)
 			.content(commentContent)
 			.answer(answer1)
 			.author(member)
 			.build();
 
 		Comment givenComment2 = Comment.builder()
+			.rootQuestion(question)
 			.content(commentContent)
 			.answer(answer2)
 			.author(member)
@@ -299,11 +314,13 @@ public class CommentRepositoryTest {
 	@Test
 	void find_comment_success() {
 		//given
+		Question question = questionRepository.findById(1L).get();
 		Answer answer = answerRepository.findById(1L).get();
 		Member member = memberRepository.findById(1L).get();
 		String commentContent = "testCommentContent";
 
 		Comment givenComment = Comment.builder()
+			.rootQuestion(question)
 			.content(commentContent)
 			.answer(answer)
 			.author(member)
@@ -322,11 +339,13 @@ public class CommentRepositoryTest {
 	@Test
 	void delete_comment_success() {
 		//given
+		Question question = questionRepository.findById(1L).get();
 		Answer answer = answerRepository.findById(1L).get();
 		Member member = memberRepository.findById(1L).get();
 		String commentContent = "testCommentContent";
 
 		Comment givenComment = Comment.builder()
+			.rootQuestion(question)
 			.content(commentContent)
 			.answer(answer)
 			.author(member)

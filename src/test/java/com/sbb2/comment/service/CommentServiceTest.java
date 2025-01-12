@@ -73,6 +73,7 @@ public class CommentServiceTest {
 
 		Comment givenComment = Comment.builder()
 			.id(1L)
+			.rootQuestion(givenQuestion)
 			.content(givenContent)
 			.author(givenMember)
 			.question(givenQuestion)
@@ -88,16 +89,17 @@ public class CommentServiceTest {
 
 		//when
 		CommentResponse commentResponse = commentService.save(
-			givenQuestion.id(), givenContent, givenParentType, givenMember
+			givenQuestion.id(), givenQuestion.id(), givenContent, givenParentType, givenMember
 		);
 
 		//then
-		assertThat(commentResponse.commentId()).isEqualTo(1L);
-		assertThat(commentResponse.parentId()).isEqualTo(1L);
-		assertThat(commentResponse.author()).isEqualTo(givenMember.username());
+		assertThat(commentResponse.commentId()).isEqualTo(givenComment.id());
+		assertThat(commentResponse.rootQuestionId()).isEqualTo(givenComment.rootQuestion().id());
+		assertThat(commentResponse.parentId()).isEqualTo(givenComment.question().id());
+		assertThat(commentResponse.author()).isEqualTo(givenComment.author().username());
 		assertThat(commentResponse.isAuthor()).isTrue();
 		assertThat(commentResponse.parentType()).isEqualTo(givenParentType);
-		assertThat(commentResponse.content()).isEqualTo(givenContent);
+		assertThat(commentResponse.content()).isEqualTo(givenComment.content());
 		assertThat(commentResponse.createdAt()).isNotNull();
 		assertThat(commentResponse.modifiedAt()).isNotNull();
 
@@ -115,6 +117,8 @@ public class CommentServiceTest {
 			.username("testUsername")
 			.build();
 
+		Question givenQuestion = Question.builder().id(1L).build();
+
 		Answer givenAnswer = Answer.builder().id(1L).build();
 
 		String givenContent = "testContent";
@@ -123,6 +127,7 @@ public class CommentServiceTest {
 
 		Comment givenComment = Comment.builder()
 			.id(1L)
+			.rootQuestion(givenQuestion)
 			.content(givenContent)
 			.author(givenMember)
 			.answer(givenAnswer)
@@ -136,18 +141,22 @@ public class CommentServiceTest {
 		given(commentRepository.save(any(Comment.class)))
 			.willReturn(givenComment);
 
+		given(questionRepository.findById(givenComment.rootQuestion().id()))
+			.willReturn(Optional.of(givenQuestion));
+
 		//when
 		CommentResponse commentResponse = commentService.save(
-			givenAnswer.id(), givenContent, givenParentType, givenMember
+			givenQuestion.id(), givenAnswer.id(), givenContent, givenParentType, givenMember
 		);
 
 		//then
-		assertThat(commentResponse.commentId()).isEqualTo(1L);
-		assertThat(commentResponse.parentId()).isEqualTo(1L);
-		assertThat(commentResponse.author()).isEqualTo(givenMember.username());
+		assertThat(commentResponse.commentId()).isEqualTo(givenComment.id());
+		assertThat(commentResponse.rootQuestionId()).isEqualTo(givenComment.rootQuestion().id());
+		assertThat(commentResponse.parentId()).isEqualTo(givenComment.answer().id());
+		assertThat(commentResponse.author()).isEqualTo(givenComment.author().username());
 		assertThat(commentResponse.isAuthor()).isTrue();
 		assertThat(commentResponse.parentType()).isEqualTo(givenParentType);
-		assertThat(commentResponse.content()).isEqualTo(givenContent);
+		assertThat(commentResponse.content()).isEqualTo(givenComment.content());
 		assertThat(commentResponse.createdAt()).isNotNull();
 		assertThat(commentResponse.modifiedAt()).isNotNull();
 
@@ -175,7 +184,8 @@ public class CommentServiceTest {
 			.willReturn(Optional.empty());
 
 		//when & then
-		assertThatThrownBy(() -> commentService.save(givenQuestionId, givenContent, givenParentType, givenMember))
+		assertThatThrownBy(
+			() -> commentService.save(givenQuestionId, givenQuestionId, givenContent, givenParentType, givenMember))
 			.isInstanceOf(QuestionBusinessLogicException.class)
 			.hasMessage(QuestionErrorCode.NOT_FOUND.getMessage());
 	}
@@ -184,6 +194,8 @@ public class CommentServiceTest {
 	@Test
 	void save_comment_answer_not_found_fail() {
 		//given
+		Question givenQuestion = Question.builder().id(1L).build();
+
 		Member givenMember = Member.builder()
 			.id(1L)
 			.email("testEmail@naver.com")
@@ -200,7 +212,8 @@ public class CommentServiceTest {
 			.willReturn(Optional.empty());
 
 		//when & then
-		assertThatThrownBy(() -> commentService.save(givenAnswerId, givenContent, givenParentType, givenMember))
+		assertThatThrownBy(() ->
+			commentService.save(givenQuestion.id(), givenAnswerId, givenContent, givenParentType, givenMember))
 			.isInstanceOf(AnswerBusinessLogicException.class)
 			.hasMessage(AnswerErrorCode.NOT_FOUND.getMessage());
 	}
@@ -209,6 +222,8 @@ public class CommentServiceTest {
 	@Test
 	void save_comment_parentType_not_support_fail() {
 		//given
+		Question givenQuestion = Question.builder().id(1L).build();
+
 		Member givenMember = Member.builder()
 			.id(1L)
 			.email("testEmail@naver.com")
@@ -222,7 +237,8 @@ public class CommentServiceTest {
 		ParentType givenParentType = null;
 
 		//when & then
-		assertThatThrownBy(() -> commentService.save(givenAnswerId, givenContent, givenParentType, givenMember))
+		assertThatThrownBy(
+			() -> commentService.save(givenQuestion.id(), givenAnswerId, givenContent, givenParentType, givenMember))
 			.isInstanceOf(CommentBusinessLogicException.class)
 			.hasMessage(CommentErrorCode.NOT_SUPPORT.getMessage());
 	}
@@ -231,6 +247,8 @@ public class CommentServiceTest {
 	@Test
 	void update_comment_answer_success() {
 		//given
+		Question givenQuestion = Question.builder().id(1L).build();
+
 		Member givenMember = Member.builder()
 			.id(1L)
 			.email("testEmail@naver.com")
@@ -246,6 +264,7 @@ public class CommentServiceTest {
 
 		Comment givenFindComment = Comment.builder()
 			.id(1L)
+			.rootQuestion(givenQuestion)
 			.content(givenContent)
 			.author(givenMember)
 			.answer(givenAnswer)
@@ -268,6 +287,7 @@ public class CommentServiceTest {
 
 		//then
 		assertThat(commentResponse.commentId()).isEqualTo(1L);
+		assertThat(commentResponse.rootQuestionId()).isEqualTo(givenFindComment.rootQuestion().id());
 		assertThat(commentResponse.parentId()).isEqualTo(1L);
 		assertThat(commentResponse.author()).isEqualTo(givenMember.username());
 		assertThat(commentResponse.isAuthor()).isTrue();
@@ -299,6 +319,7 @@ public class CommentServiceTest {
 
 		Comment givenFindComment = Comment.builder()
 			.id(1L)
+			.rootQuestion(givenQuestion)
 			.content(givenContent)
 			.author(givenMember)
 			.question(givenQuestion)
@@ -321,8 +342,9 @@ public class CommentServiceTest {
 
 		//then
 		assertThat(commentResponse.commentId()).isEqualTo(1L);
-		assertThat(commentResponse.parentId()).isEqualTo(1L);
-		assertThat(commentResponse.author()).isEqualTo(givenMember.username());
+		assertThat(commentResponse.rootQuestionId()).isEqualTo(givenFindComment.rootQuestion().id());
+		assertThat(commentResponse.parentId()).isEqualTo(givenFindComment.question().id());
+		assertThat(commentResponse.author()).isEqualTo(givenFindComment.author().username());
 		assertThat(commentResponse.isAuthor()).isTrue();
 		assertThat(commentResponse.parentType()).isEqualTo(givenParentType);
 		assertThat(commentResponse.content()).isEqualTo(givenUpdateContent);
@@ -358,6 +380,7 @@ public class CommentServiceTest {
 
 		Comment givenFindComment = Comment.builder()
 			.id(1L)
+			.rootQuestion(givenQuestion)
 			.content(givenContent)
 			.author(givenMember)
 			.question(givenQuestion)
@@ -396,6 +419,7 @@ public class CommentServiceTest {
 		Comment givenComment = Comment.builder()
 			.id(1L)
 			.content(givenContent)
+			.rootQuestion(givenQuestion)
 			.author(givenMember)
 			.question(givenQuestion)
 			.createdAt(LocalDateTime.now())
@@ -433,6 +457,7 @@ public class CommentServiceTest {
 		Comment givenFindComment = Comment.builder()
 			.id(1L)
 			.content(givenContent)
+			.rootQuestion(givenQuestion)
 			.author(givenMember)
 			.question(givenQuestion)
 			.createdAt(LocalDateTime.now())
@@ -474,6 +499,8 @@ public class CommentServiceTest {
 			.username("testUsername")
 			.build();
 
+		Question givenQuestion = Question.builder().id(1L).build();
+
 		Answer givenAnswer = Answer.builder().id(1L).build();
 
 		String givenContent = "testContent";
@@ -482,6 +509,7 @@ public class CommentServiceTest {
 
 		Comment givenComment = Comment.builder()
 			.id(1L)
+			.rootQuestion(givenQuestion)
 			.content(givenContent)
 			.author(givenMember)
 			.answer(givenAnswer)
@@ -513,12 +541,15 @@ public class CommentServiceTest {
 
 		Answer givenAnswer = Answer.builder().id(1L).build();
 
+		Question givenQuestion = Question.builder().id(1L).build();
+
 		String givenContent = "testContent";
 
 		ParentType givenParentType = ParentType.ANSWER;
 
 		Comment givenComment = Comment.builder()
 			.id(1L)
+			.rootQuestion(givenQuestion)
 			.content(givenContent)
 			.author(givenMember)
 			.answer(givenAnswer)
@@ -545,6 +576,8 @@ public class CommentServiceTest {
 			.username("testUsername")
 			.build();
 
+		Question givenQuestion = Question.builder().id(1L).build();
+
 		Member givenLoginMember = Member.builder()
 			.id(2L)
 			.email("testEmail2@naver.com")
@@ -559,6 +592,7 @@ public class CommentServiceTest {
 
 		Comment givenComment = Comment.builder()
 			.id(1L)
+			.rootQuestion(givenQuestion)
 			.content(givenContent)
 			.author(givenMember)
 			.answer(givenAnswer)
@@ -595,6 +629,7 @@ public class CommentServiceTest {
 			.forEach((index) -> {
 				commentResponseList.add(CommentResponse.builder()
 					.commentId(index + 1)
+					.rootQuestionId(givenQuestionId)
 					.parentId(givenQuestionId)
 					.parentType(givenParentType)
 					.author("testUsername")
@@ -641,6 +676,8 @@ public class CommentServiceTest {
 
 		ParentType givenParentType = ParentType.ANSWER;
 
+		Long givenQuestionId = 1L;
+
 		SearchCondition givenSearchCondition = SearchCondition.builder()
 			.pageNum(0)
 			.build();
@@ -651,6 +688,7 @@ public class CommentServiceTest {
 			.forEach((index) -> {
 				commentResponseList.add(CommentResponse.builder()
 					.commentId(index + 1)
+					.rootQuestionId(givenQuestionId)
 					.parentId(givenAnswerId)
 					.parentType(givenParentType)
 					.author("testUsername")

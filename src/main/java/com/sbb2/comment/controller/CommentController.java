@@ -57,7 +57,10 @@ public class CommentController {
 		ParentType parentType = ParentType.from(commentCreateForm.parentType());
 
 		CommentResponse savedCommentResponse = commentService.save(
-			commentCreateForm.parentId(), commentCreateForm.content(), parentType, memberUserDetails.getMember()
+			commentCreateForm.rootQuestionId(),
+			commentCreateForm.parentId(),
+			commentCreateForm.content(), parentType,
+			memberUserDetails.getMember()
 		);
 
 		return ResponseEntity.status(HttpStatus.CREATED)

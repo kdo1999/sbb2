@@ -11,6 +11,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
 public record CommentCreateForm(
+	@NotNull(message = "질문 ID는 필수 항목입니다.", groups = NotNullGroup.class)
+	Long rootQuestionId,
 	@NotNull(message = "부모 ID는 필수 항목입니다.", groups = NotNullGroup.class)
 	Long parentId,
 	@ValidStringEnum(enumClass = ParentType.class, groups = ValidEnumGroup.class)
@@ -20,7 +22,8 @@ public record CommentCreateForm(
 	String content) {
 
 	@Builder
-	public CommentCreateForm(Long parentId, String parentType, String content) {
+	public CommentCreateForm(Long rootQuestionId, Long parentId, String parentType, String content) {
+		this.rootQuestionId = rootQuestionId;
 		this.parentId = parentId;
 		this.parentType = parentType;
 		this.content = content;

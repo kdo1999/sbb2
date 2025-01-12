@@ -8,16 +8,17 @@ import com.sbb2.question.domain.Question;
 
 import lombok.Builder;
 
-public record Comment(Long id, String content, Member author, Question question, Answer answer, LocalDateTime createdAt,
+public record Comment(Long id, String content, Member author, Question question, Question rootQuestion, Answer answer, LocalDateTime createdAt,
 					  LocalDateTime modifiedAt) {
 
 	@Builder
-	public Comment(Long id, String content, Member author, Question question, Answer answer, LocalDateTime createdAt,
+	public Comment(Long id, String content, Member author, Question question, Question rootQuestion, Answer answer, LocalDateTime createdAt,
 		LocalDateTime modifiedAt) {
 		this.id = id;
 		this.content = content;
 		this.author = author;
 		this.question = question;
+		this.rootQuestion = rootQuestion;
 		this.answer = answer;
 		this.createdAt = createdAt;
 		this.modifiedAt = modifiedAt;
@@ -30,6 +31,7 @@ public record Comment(Long id, String content, Member author, Question question,
 				.content(updateContent)
 				.author(this.author)
 				.question(this.question)
+				.rootQuestion(this.rootQuestion)
 				.answer(this.answer)
 				.createdAt(this.createdAt)
 				.modifiedAt(this.modifiedAt)

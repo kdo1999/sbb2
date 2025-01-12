@@ -9,7 +9,7 @@ import com.sbb2.member.domain.Member;
 
 public interface CommentService {
 	Page<CommentResponse> findAll(Long parentId, Long memberId, ParentType parentType, SearchCondition searchCondition);
-	CommentResponse save(Long parentId, String content, ParentType parentType, Member author);
+	CommentResponse save(Long rootQuestionId, Long parentId, String content, ParentType parentType, Member author);
 	CommentResponse update(Long commentId, String updateContent, Member author);
 	void deleteById(Long commentId, Member author);
 }
