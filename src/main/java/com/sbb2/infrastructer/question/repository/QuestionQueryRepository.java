@@ -1,5 +1,6 @@
 package com.sbb2.infrastructer.question.repository;
 
+import static com.sbb2.infrastructer.answer.entity.QAnswerEntity.*;
 import static com.sbb2.infrastructer.comment.entity.QCommentEntity.*;
 import static com.sbb2.infrastructer.question.entity.QQuestionEntity.*;
 import static com.sbb2.infrastructer.voter.entity.QVoterEntity.*;
@@ -15,7 +16,6 @@ import org.springframework.util.StringUtils;
 
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
@@ -24,7 +24,6 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sbb2.category.service.response.QCategoryResponse;
 import com.sbb2.common.util.SearchCondition;
-import com.sbb2.infrastructer.answer.entity.QAnswerEntity;
 import com.sbb2.infrastructer.category.entity.CategoryName;
 import com.sbb2.question.service.response.QQuestionDetailResponse;
 import com.sbb2.question.service.response.QQuestionPageResponse;
@@ -49,12 +48,19 @@ public class QuestionQueryRepository {
 				questionEntity.viewCount,
 				questionEntity.createdAt,
 				questionEntity.modifiedAt,
-				queryFactory.select(QAnswerEntity.answerEntity.count())
-					.from(QAnswerEntity.answerEntity)
-					.where(QAnswerEntity.answerEntity.questionEntity.id.eq(questionEntity.id))))
+				answerEntity.id.countDistinct()))
 			.from(questionEntity)
 			.leftJoin(questionEntity.author)
-			.where(subjectAndContentContains(searchCondition), categoryIdEquals(searchCondition))
+			.leftJoin(questionEntity.answerEntityList, answerEntity)
+			.where(subjectAndContentContains(searchCondition), categoryIdEquals(searchCondition),
+				usernameEquals(searchCondition))
+			.groupBy(questionEntity.id,
+				questionEntity.subject,
+				questionEntity.content,
+				questionEntity.author.username,
+				questionEntity.viewCount,
+				questionEntity.createdAt,
+				questionEntity.modifiedAt)
 			.orderBy(getOrderBy(searchCondition))
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
@@ -139,8 +145,14 @@ public class QuestionQueryRepository {
 			null;
 	}
 
-	private Predicate categoryIdEquals(SearchCondition searchCondition) {
+	private BooleanExpression categoryIdEquals(SearchCondition searchCondition) {
 		return searchCondition.categoryId() != null ? questionEntity.category.id.eq(searchCondition.categoryId()) :
 			null;
 	}
+
+	private BooleanExpression usernameEquals(SearchCondition searchCondition) {
+		return StringUtils.hasText(searchCondition.username()) ?
+			questionEntity.author.username.eq(searchCondition.username()) : null;
+	}
+
 }
