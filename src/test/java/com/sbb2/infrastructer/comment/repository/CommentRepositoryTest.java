@@ -73,7 +73,14 @@ public class CommentRepositoryTest {
 			.email(email)
 			.build();
 
+		Member member2 = Member.builder()
+			.username(username + 1)
+			.password(password)
+			.email(email + 1)
+			.build();
+
 		Member savedMember = memberRepository.save(member);
+		Member savedMember2 = memberRepository.save(member2);
 
 		Category category1 = Category.builder()
 			.categoryName(CategoryName.QUESTION_BOARD)
@@ -139,7 +146,7 @@ public class CommentRepositoryTest {
 				.rootQuestion(savedQuestion2)
 				.content("testCommentContent" + i)
 				.answer(savedAnswer1)
-				.author(savedMember)
+				.author(savedMember2)
 				.build();
 
 			commentRepository.save(comment);
@@ -411,6 +418,36 @@ public class CommentRepositoryTest {
 
 		//when
 		Page<CommentResponse> commentResponsePage = commentRepository.findAll(findAnswer.id(), findMember.id(),
+			givenParentType, givenPageable, givenSearchCondition);
+
+		//then
+		assertThat(commentResponsePage.getTotalPages()).isEqualTo(3);
+		assertThat(commentResponsePage.getContent().size()).isEqualTo(10);
+		assertThat(commentResponsePage.getTotalElements()).isEqualTo(26);
+	}
+
+	@DisplayName("회원 이름으로 댓글 전체 조회 테스트")
+	@Test
+	void findAll_username() {
+		//given
+		Member findMember = memberRepository.findById(2L).get();
+		Long givenAnswerId = null;
+
+		int page = 0;
+
+		ParentType givenParentType = null;
+
+		SearchCondition givenSearchCondition = SearchCondition.builder()
+			.pageNum(page)
+			.username(findMember.username())
+			.sort("createdAt")
+			.order("desc")
+			.build();
+
+		Pageable givenPageable = PageRequest.of(givenSearchCondition.pageNum(), 10);
+
+		//when
+		Page<CommentResponse> commentResponsePage = commentRepository.findAll(givenAnswerId, findMember.id(),
 			givenParentType, givenPageable, givenSearchCondition);
 
 		//then

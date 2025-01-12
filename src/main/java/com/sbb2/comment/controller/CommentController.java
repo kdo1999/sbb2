@@ -38,9 +38,9 @@ public class CommentController {
 	private final CommentService commentService;
 
 	@GetMapping
-	public ResponseEntity<GenericResponse<Page<CommentResponse>>> findAll(@RequestParam("parentId") Long parentId,
-		@ValidStringEnum(enumClass = ParentType.class, groups = ValidationGroups.ValidEnumGroup.class)
-		@RequestParam("parentType") String parentType,
+	public ResponseEntity<GenericResponse<Page<CommentResponse>>> findAll(@RequestParam(value = "parentId", required = false) Long parentId,
+		@ValidStringEnum(nullable = true, enumClass = ParentType.class, groups = ValidationGroups.ValidEnumGroup.class)
+		@RequestParam(value = "parentType", required = false) String parentType,
 		SearchCondition searchCondition, @AuthenticationPrincipal MemberUserDetails memberUserDetails) {
 
 		Page<CommentResponse> commentResponsePage = commentService

@@ -41,13 +41,13 @@ public class CommentQueryRepository {
 				commentEntity.content,
 				commentEntity.memberEntity.username,
 				commentEntity.memberEntity.id.eq(memberId),
-				Expressions.asSimple(parentType),
+				getParentType(parentType),
 				commentEntity.createdAt,
 				commentEntity.modifiedAt
 			))
 			.from(commentEntity)
 			.leftJoin(commentEntity.memberEntity)
-			.where(getParentIdCondition(parentId, parentType))
+			.where(parentIdEquals(parentId, parentType), usernameEquals(searchCondition))
 			.orderBy(getOrderBy(searchCondition))
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
@@ -56,7 +56,7 @@ public class CommentQueryRepository {
 		JPAQuery<Long> countQuery = queryFactory
 			.select(commentEntity.count())
 			.from(commentEntity)
-			.where(getParentIdCondition(parentId, parentType));
+			.where(parentIdEquals(parentId, parentType), usernameEquals(searchCondition));
 
 		return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
 	}
@@ -67,10 +67,23 @@ public class CommentQueryRepository {
 			: commentEntity.answerEntity.id;
 	}
 
-	private BooleanExpression getParentIdCondition(Long parentId, ParentType parentType) {
+	private Expression<ParentType> getParentType(ParentType parentType) {
+		return parentType == null ? Expressions.nullExpression(ParentType.class) : Expressions.asSimple(parentType);
+	}
+
+	private BooleanExpression parentIdEquals(Long parentId, ParentType parentType) {
+		if (parentId == null || parentType == null) {
+			return null;
+		}
+
 		return parentType == ParentType.QUESTION
 			? commentEntity.questionEntity.id.eq(parentId)
 			: commentEntity.answerEntity.id.eq(parentId);
+	}
+
+	private BooleanExpression usernameEquals(SearchCondition searchCondition) {
+		return StringUtils.hasText(searchCondition.username()) ?
+			commentEntity.memberEntity.username.eq(searchCondition.username()) : null;
 	}
 
 	private OrderSpecifier<?> getOrderBy(SearchCondition searchCondition) {
