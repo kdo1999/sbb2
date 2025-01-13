@@ -107,9 +107,6 @@ public class AuthServiceTest {
 			.loginType(LoginType.EMAIL)
 			.build();
 
-		given(memberRepository.existsByEmail(email)).willReturn(false);
-		given(memberRepository.existsByUsername(username)).willReturn(false);
-
 		//when & then
 		assertThatThrownBy(() -> authService.signup(email, username, password, loginType))
 			.isInstanceOf(AuthBusinessLogicException.class)

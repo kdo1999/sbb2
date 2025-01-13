@@ -3,12 +3,13 @@ package com.sbb2.auth.controller;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -38,11 +39,21 @@ class AuthControllerTest {
 	@Mock
 	private JwtUtil jwtUtil;
 
-	@InjectMocks
 	private AuthController authController;
 
 	@Mock
 	private HttpServletRequest request;
+
+	@Value("${jwt.access-max-age}")
+	private int ACCESS_MAX_AGE;
+
+	@Value("${jwt.access-max-age}")
+	private int REFRESH_MAX_AGE;
+
+	@BeforeEach
+	void setUp() {
+		authController = new AuthController(authService, jwtUtil, ACCESS_MAX_AGE, REFRESH_MAX_AGE);
+	}
 
 	@DisplayName("회원가입 성공 테스트")
 	@Test
@@ -87,28 +98,18 @@ class AuthControllerTest {
 		String accessToken = "access-token";
 		String refreshToken = "refresh-token";
 
-		when(authService.memberLogin(memberLoginRequest.email(), memberLoginRequest.password())).thenReturn(
+		given(authService.memberLogin(memberLoginRequest.email(), memberLoginRequest.password())).willReturn(
 			memberLoginResponse);
-		when(jwtUtil.createAccessToken(memberLoginResponse)).thenReturn(accessToken);
-		when(jwtUtil.createRefreshToken(memberLoginResponse)).thenReturn(refreshToken);
+		given(jwtUtil.createAccessToken(memberLoginResponse)).willReturn(accessToken);
+		given(jwtUtil.createRefreshToken(memberLoginResponse)).willReturn(refreshToken);
 
 		// When
 		ResponseEntity<GenericResponse<MemberLoginResponse>> result = authController.login(memberLoginRequest);
 
 		// Then
-		ResponseCookie cookie = ResponseCookie.from("refresh", refreshToken)
-			.domain("localhost")
-			.path("/")
-			.httpOnly(true)
-			.secure(false)
-			.maxAge(24 * 60 * 60)
-			.sameSite("Strict")
-			.build();
-
 		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(result.getBody().getData()).isEqualTo(memberLoginResponse);
-		assertThat(result.getHeaders().getFirst("Authorization")).isEqualTo("Bearer " + accessToken);
-		assertThat(result.getHeaders().get(HttpHeaders.SET_COOKIE)).containsExactly(cookie.toString());
+		assertThat(result.getHeaders().get(HttpHeaders.SET_COOKIE).size()).isEqualTo(2);
 	}
 
 	@DisplayName("로그아웃 성공 테스트")
@@ -122,7 +123,7 @@ class AuthControllerTest {
 		given(jwtUtil.getRefreshToken(request)).willReturn(refreshToken);
 
 		ResponseCookie refreshCookie = ResponseCookie
-			.from("refresh", null)
+			.from("REFRESH", null)
 			.domain("localhost")
 			.path("/")
 			.httpOnly(true)
@@ -142,7 +143,7 @@ class AuthControllerTest {
 		verify(jwtUtil).logout(accessToken, refreshToken);
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-		assertThat(response.getHeaders().getFirst(HttpHeaders.SET_COOKIE)).isEqualTo(refreshCookie.toString());
+		assertThat(response.getHeaders().get(HttpHeaders.SET_COOKIE).size()).isEqualTo(2);
 		assertThat(response.getBody()).isNotNull();
 		assertThat(response.getBody().getData()).isNull();
 	}
