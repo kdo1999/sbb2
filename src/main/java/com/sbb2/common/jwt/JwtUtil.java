@@ -10,6 +10,8 @@ import java.util.Map;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
@@ -36,14 +38,14 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Transactional(readOnly = true)
+@Component
 public class JwtUtil {
 	private static final String REDIS_JWT_PREFIX = "jwt_member:";
 	private static final String REDIS_BLACK_VALUE = "black";
 	private final SecretKey secretKey;
 	private final RedisService redisService;
 
-	public JwtUtil(String secretKey,
-		RedisService redisService) {
+	public JwtUtil(@Value("${jwt.secret}") String secretKey, RedisService redisService) {
 		this.secretKey = new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8),
 			Jwts.SIG.HS256.key().build().getAlgorithm());
 		this.redisService = redisService;
@@ -51,9 +53,10 @@ public class JwtUtil {
 
 	/**
 	 * HttpServletRequest를 담아서 보내면 AccessToken 반환
-	 * @throws JwtTokenBusinessLogicException 토큰이 존재하지 않을때 예외 발생
+	 *
 	 * @param request
 	 * @return String
+	 * @throws JwtTokenBusinessLogicException 토큰이 존재하지 않을때 예외 발생
 	 */
 	public String getAccessToken(HttpServletRequest request) {
 		String access = null;
@@ -64,12 +67,13 @@ public class JwtUtil {
 			for (Cookie cookie : cookies) {
 				if (cookie.getName().equals(TokenType.ACCESS.toString())) {
 					access = cookie.getValue();
+					break;
 				}
 			}
 		}
 
 		if (!StringUtils.hasText(access)) {
-			throw new JwtTokenBusinessLogicException(JwtTokenErrorCode.MALFORMED);
+			return null;
 		}
 
 		return access;
@@ -79,8 +83,8 @@ public class JwtUtil {
 	 * HttpServletRequset를 담아서 보내면 RefreshToken 반환
 	 *
 	 * @param request
-	 * @throws JwtTokenBusinessLogicException 쿠키에 refreshToken이 존재하지 않을때 예외 발생
 	 * @return String
+	 * @throws JwtTokenBusinessLogicException 쿠키에 refreshToken이 존재하지 않을때 예외 발생
 	 */
 	public String getRefreshToken(HttpServletRequest request) throws MalformedJwtException {
 		String refresh = null;
@@ -89,8 +93,9 @@ public class JwtUtil {
 		//cookies null이 아니라면
 		if (cookies != null) {
 			for (Cookie cookie : cookies) {
-				if (cookie.getName().equals(TokenType.REFRESH)) {
+				if (cookie.getName().equals(TokenType.REFRESH.toString())) {
 					refresh = cookie.getValue();
+					break;
 				}
 			}
 		}
@@ -148,6 +153,7 @@ public class JwtUtil {
 
 	/**
 	 * 남은 만료시간을 반환해주는 메소드
+	 *
 	 * @param token
 	 * @return long (millsSecond)
 	 */
@@ -196,7 +202,7 @@ public class JwtUtil {
 	}
 
 	public boolean isRefreshToken(String token) {
-		return getCategory(token).equals(TokenType.REFRESH);
+		return getCategory(token).equals(TokenType.REFRESH.toString());
 	}
 
 	/**
@@ -262,10 +268,10 @@ public class JwtUtil {
 	 * @param request
 	 * @return refreshToken
 	 * @throws JwtTokenBusinessLogicException <br>
-	 * RefreshToken의 만료 시간이 지났을 때 Exception <br>
-	 * RefreshToken이 존재하지 않으면 Exception <br>
-	 * RefreshToken category가 refresh가 아닐시 Exception <br>
-	 * Redis에 저장된 토큰 값과 일치하지 않을시 Exception <br>
+	 *                                        RefreshToken의 만료 시간이 지났을 때 Exception <br>
+	 *                                        RefreshToken이 존재하지 않으면 Exception <br>
+	 *                                        RefreshToken category가 refresh가 아닐시 Exception <br>
+	 *                                        Redis에 저장된 토큰 값과 일치하지 않을시 Exception <br>
 	 */
 	public String refreshTokenValid(HttpServletRequest request) {
 		String refreshToken = getRefreshToken(request);
@@ -307,22 +313,24 @@ public class JwtUtil {
 
 	/**
 	 * 로그아웃 로직
-	 * @exception JwtTokenBusinessLogicException <br>
-	 * - AccessToken이 아닐때 예외 발생 <br>
-	 * - RefreshToken이 아닐 때 예외 발생 <br>
-	 * - Redis에 저장된 토큰과 일치하지 않을때 예외 발생
+	 *
 	 * @param accessToken
 	 * @param refreshToken
+	 * @throws JwtTokenBusinessLogicException <br>
+	 *                                        - AccessToken이 아닐때 예외 발생 <br>
+	 *                                        - RefreshToken이 아닐 때 예외 발생 <br>
+	 *                                        - Redis에 저장된 토큰과 일치하지 않을때 예외 발생
 	 */
 	@Transactional
 	public void logout(String accessToken, String refreshToken) {
-		//유효시간이 남아있다면 redis에 유효시간만큼 저장
-		if (isExpired(accessToken)) {
-			//AccessToken이 아니라면 Exception
-			if (!isAccessToken(accessToken)) {
-				throw new JwtTokenBusinessLogicException(JwtTokenErrorCode.INVALID_ACCESS_TOKEN);
+		if (StringUtils.hasText(accessToken)) {
+			if (isExpired(accessToken)) {
+				//AccessToken이 아니라면 Exception
+				if (!isAccessToken(accessToken)) {
+					throw new JwtTokenBusinessLogicException(JwtTokenErrorCode.INVALID_ACCESS_TOKEN);
+				}
+				addTokenBlacklist(accessToken);
 			}
-			addTokenBlacklist(accessToken);
 		}
 
 		//RefreshToken이 아니라면 Exception
@@ -352,8 +360,9 @@ public class JwtUtil {
 
 	/**
 	 * 토큰이 블랙리스트에 존재하는지 체크하는 메소드
-	 * @throws JwtTokenBusinessLogicException 토큰이 블랙리스트에 존재하는경우 예외 발생
+	 *
 	 * @param token
+	 * @throws JwtTokenBusinessLogicException 토큰이 블랙리스트에 존재하는경우 예외 발생
 	 */
 	public void blackListCheck(String token) {
 		if (REDIS_BLACK_VALUE.equals(redisService.getData(token))) {
