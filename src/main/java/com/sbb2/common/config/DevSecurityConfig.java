@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -52,6 +53,10 @@ public class DevSecurityConfig {
 	private final OAuth2SuccessHandler oAuth2SuccessHandler;
 	private final OAuth2UserService oAuth2UserService;
 	private final PasswordEncoder passwordEncoder;
+	@Value("${jwt.access-max-age}")
+	private int accessMaxAge;
+	@Value("${jwt.refresh-max-age}")
+	private int refreshMaxAge;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -135,7 +140,7 @@ public class DevSecurityConfig {
 	}
 
 	public OncePerRequestFilter jwtFilter() {
-		JwtFilter jwtFilter = new JwtFilter(jwtUtil, objectMapper, memberDetailsService, antPathMatcher());
+		JwtFilter jwtFilter = new JwtFilter(accessMaxAge, refreshMaxAge, jwtUtil, objectMapper, memberDetailsService, antPathMatcher());
 
 		jwtFilter
 			.addUriPattern(HttpMethod.GET, "/api/v1/question/*", "/api/v1/answer/*", "/api/v1/answer",
