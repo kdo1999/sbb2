@@ -18,6 +18,8 @@ public enum AuthErrorCode {
 	CERTIFICATION_CODE_NOT_FOUND(HttpStatus.BAD_REQUEST, "인증번호가 존재하지 않습니다."),
 	CERTIFICATION_CODE_NOT_MATCH(HttpStatus.UNAUTHORIZED, "인증번호가 일치하지 않습니다."),
 	VERIFY_TYPE_NOT_MATCH(HttpStatus.UNAUTHORIZED, "인증 타입이 일치하지 않습니다."),
+	LOGIN_TYPE_NOT_EMAIL(HttpStatus.UNAUTHORIZED, "이메일 회원만 사용할 수 있습니다."),
+	LOGIN_TYPE_NOT_SUPPORT(HttpStatus.UNAUTHORIZED, "지원하지 않는 로그인 유형입니다."),
 	TOOMANY_RESEND_ATTEMPTS(HttpStatus.BAD_REQUEST, "5회 이상 시도하셨습니다. 잠시후 다시 시도해주세요.");
 
 	private final HttpStatus httpStatus;

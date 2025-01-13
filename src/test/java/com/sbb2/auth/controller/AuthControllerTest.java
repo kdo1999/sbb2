@@ -23,6 +23,7 @@ import com.sbb2.auth.service.response.MemberLoginResponse;
 import com.sbb2.common.auth.userdetails.MemberUserDetails;
 import com.sbb2.common.jwt.JwtUtil;
 import com.sbb2.common.response.GenericResponse;
+import com.sbb2.member.domain.LoginType;
 import com.sbb2.member.domain.Member;
 import com.sbb2.member.domain.MemberRole;
 
@@ -59,7 +60,7 @@ class AuthControllerTest {
 			memberRole);
 
 		given(authService.signup(memberEmailSignupRequest.email(), memberEmailSignupRequest.username(),
-			memberEmailSignupRequest.password())).willReturn(memberEmailSignupResponse);
+			memberEmailSignupRequest.password(), LoginType.EMAIL)).willReturn(memberEmailSignupResponse);
 
 		// When
 		ResponseEntity<GenericResponse<MemberEmailSignupResponse>> result = authController.signup(

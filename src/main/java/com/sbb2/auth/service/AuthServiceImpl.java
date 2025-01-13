@@ -25,6 +25,7 @@ import com.sbb2.common.mail.service.MailService;
 import com.sbb2.common.mail.util.TemplateName;
 import com.sbb2.common.redis.service.RedisService;
 import com.sbb2.infrastructer.member.repository.MemberRepository;
+import com.sbb2.member.domain.LoginType;
 import com.sbb2.member.domain.Member;
 import com.sbb2.member.domain.MemberRole;
 import com.sbb2.member.exception.MemberBusinessLoginException;
@@ -47,17 +48,22 @@ public class AuthServiceImpl implements AuthService {
 	private final ObjectMapper objectMapper;
 
 	@Override
-	public MemberEmailSignupResponse signup(String email, String username, String password) {
+	public MemberEmailSignupResponse signup(String email, String username, String password, LoginType loginType) {
 		existsMember(email, username);
 
-		Member createMember = Member.builder()
+		Member.MemberBuilder memberBuilder = Member.builder()
 			.email(email)
 			.username(username)
-			.password(passwordEncoder.encode(password))
 			.memberRole(MemberRole.USER)
-			.build();
+			.loginType(loginType);
 
-		Member savedMember = memberRepository.save(createMember);
+		switch (loginType) {
+			case EMAIL -> memberBuilder.password(passwordEncoder.encode(password));
+			case KAKAO, NAVER -> memberBuilder.password(passwordEncoder.encode(createPassword()));
+			default -> throw new AuthBusinessLogicException(AuthErrorCode.LOGIN_TYPE_NOT_SUPPORT);
+		}
+
+		Member savedMember = memberRepository.save(memberBuilder.build());
 
 		return MemberEmailSignupResponse.builder()
 			.email(savedMember.email())
@@ -86,6 +92,10 @@ public class AuthServiceImpl implements AuthService {
 
 	@Override
 	public void passwordChange(String originalPassword, String changePassword, Member loginMember) {
+		if (!LoginType.EMAIL.equals(loginMember.loginType())) {
+			throw new AuthBusinessLogicException(AuthErrorCode.LOGIN_TYPE_NOT_EMAIL);
+		}
+
 		if (!passwordEncoder.matches(originalPassword, loginMember.password())) {
 			throw new AuthBusinessLogicException(AuthErrorCode.PASSWORD_NOT_MATCH);
 		}
@@ -134,8 +144,12 @@ public class AuthServiceImpl implements AuthService {
 
 	@Override
 	public void sendCode(String email, VerifyType verifyType) {
-		Member savedMember = memberRepository.findByEmail(email)
+		Member findMember = memberRepository.findByEmail(email)
 			.orElseThrow(() -> new MemberBusinessLoginException(MemberErrorCode.NOT_FOUND));
+
+		if (!LoginType.EMAIL.equals(findMember.loginType())) {
+			throw new AuthBusinessLogicException(AuthErrorCode.LOGIN_TYPE_NOT_EMAIL);
+		}
 
 		String certificationCode = UUID.randomUUID().toString();
 
@@ -209,6 +223,7 @@ public class AuthServiceImpl implements AuthService {
 	private void existsMember(String email, String username) {
 		Boolean emailExists = memberRepository.existsByEmail(email);
 		Boolean usernameExists = memberRepository.existsByUsername(username);
+
 		if (emailExists) {
 			throw new MemberBusinessLoginException(MemberErrorCode.EXISTS_EMAIL);
 		}

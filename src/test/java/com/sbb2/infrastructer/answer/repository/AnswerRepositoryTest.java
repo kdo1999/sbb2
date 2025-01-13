@@ -354,6 +354,7 @@ public class AnswerRepositoryTest {
 		SearchCondition givenSearchCondition = SearchCondition.builder()
 			.pageNum(0)
 			.kw("1")
+			.sort("modifiedAt")
 			.build();
 		Long questionId = 1L;
 		Long loginMemberId = 1L;

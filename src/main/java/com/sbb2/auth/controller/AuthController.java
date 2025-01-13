@@ -25,6 +25,7 @@ import com.sbb2.common.auth.userdetails.MemberUserDetails;
 import com.sbb2.common.jwt.JwtUtil;
 import com.sbb2.common.response.GenericResponse;
 import com.sbb2.common.validation.ValidationSequence;
+import com.sbb2.member.domain.LoginType;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +42,7 @@ public class AuthController {
 	public ResponseEntity<GenericResponse<MemberEmailSignupResponse>> signup(
 		@Validated(ValidationSequence.class) @RequestBody MemberEmailSignupRequest memberEmailSignupRequest) {
 		MemberEmailSignupResponse signup = authService.signup(memberEmailSignupRequest.email(),
-			memberEmailSignupRequest.username(), memberEmailSignupRequest.password());
+			memberEmailSignupRequest.username(), memberEmailSignupRequest.password(), LoginType.EMAIL);
 
 		return ResponseEntity.created(URI.create("/login")).body(GenericResponse.of(signup));
 	}

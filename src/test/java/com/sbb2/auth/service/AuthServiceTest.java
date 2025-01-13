@@ -31,6 +31,7 @@ import com.sbb2.common.mail.service.MailService;
 import com.sbb2.common.mail.util.TemplateName;
 import com.sbb2.common.redis.service.RedisService;
 import com.sbb2.infrastructer.member.repository.MemberRepository;
+import com.sbb2.member.domain.LoginType;
 import com.sbb2.member.domain.Member;
 import com.sbb2.member.domain.MemberRole;
 import com.sbb2.member.exception.MemberBusinessLoginException;
@@ -65,12 +66,14 @@ public class AuthServiceTest {
 		String email = "testEmail@naver.com";
 		String username = "testUsername";
 		String password = "testPassword";
+		LoginType loginType = LoginType.EMAIL;
 
 		Member givenMember = Member.builder()
 			.email(email)
 			.username(username)
 			.password(password)
 			.memberRole(MemberRole.USER)
+			.loginType(LoginType.EMAIL)
 			.build();
 
 		given(passwordEncoder.encode(password)).willReturn(password);
@@ -79,7 +82,7 @@ public class AuthServiceTest {
 		given(memberRepository.save(givenMember)).willReturn(givenMember);
 
 		//when
-		MemberEmailSignupResponse memberEmailSignupResponse = authService.signup(email, username, password);
+		MemberEmailSignupResponse memberEmailSignupResponse = authService.signup(email, username, password, loginType);
 
 		//then
 		assertThat(memberEmailSignupResponse.email()).isEqualTo(email);
@@ -94,12 +97,14 @@ public class AuthServiceTest {
 		String email = "testEmail@naver.com";
 		String username = "testUsername";
 		String password = "testPassword";
+		LoginType loginType = LoginType.EMAIL;
+
 
 		given(memberRepository.existsByEmail(email)).willReturn(true);
 		given(memberRepository.existsByUsername(username)).willReturn(false);
 
 		//when & then
-		assertThatThrownBy(() -> authService.signup(email, username, password)).isInstanceOf(
+		assertThatThrownBy(() -> authService.signup(email, username, password, loginType)).isInstanceOf(
 			MemberBusinessLoginException.class).hasMessage(MemberErrorCode.EXISTS_EMAIL.getMessage());
 	}
 
@@ -110,12 +115,13 @@ public class AuthServiceTest {
 		String email = "testEmail@naver.com";
 		String username = "testUsername";
 		String password = "testPassword";
+		LoginType loginType = LoginType.EMAIL;
 
 		given(memberRepository.existsByEmail(email)).willReturn(false);
 		given(memberRepository.existsByUsername(username)).willReturn(true);
 
 		//when & then
-		assertThatThrownBy(() -> authService.signup(email, username, password)).isInstanceOf(
+		assertThatThrownBy(() -> authService.signup(email, username, password, loginType)).isInstanceOf(
 			MemberBusinessLoginException.class).hasMessage(MemberErrorCode.EXISTS_USERNAME.getMessage());
 	}
 
@@ -127,7 +133,12 @@ public class AuthServiceTest {
 		String email = "testEmail@naver.com";
 		String password = "!Password1234";
 
-		Member member = Member.builder().email(email).username(username).memberRole(MemberRole.USER).build();
+		Member member = Member.builder()
+			.email(email)
+			.username(username)
+			.memberRole(MemberRole.USER)
+			.loginType(LoginType.EMAIL)
+			.build();
 
 		MemberUserDetails userDetails = new MemberUserDetails(member);
 		Authentication successAuth = new MemberLoginToken(userDetails.getAuthorities(), userDetails, null);
@@ -155,6 +166,7 @@ public class AuthServiceTest {
 			.username("testUsername")
 			.password("!testPassword1234")
 			.memberRole(MemberRole.USER)
+			.loginType(LoginType.EMAIL)
 			.build();
 
 		String originalPassword = "!testPassword1234";
@@ -187,6 +199,7 @@ public class AuthServiceTest {
 			.username("testUsername")
 			.password("!testPassword1234")
 			.memberRole(MemberRole.USER)
+			.loginType(LoginType.EMAIL)
 			.build();
 
 		String originalPassword = "!testPassword12345";
@@ -209,7 +222,11 @@ public class AuthServiceTest {
 		String email = "testEmail@naver.com";
 		VerifyType verifyType = VerifyType.PASSWORD_RESET_VERIFY;
 
-		Member member = Member.builder().email(email).username("testUsername").build();
+		Member member = Member.builder()
+			.email(email)
+			.username("testUsername")
+			.loginType(LoginType.EMAIL)
+			.build();
 
 		given(memberRepository.findByEmail(email))
 			.willReturn(Optional.of(member));
@@ -237,7 +254,12 @@ public class AuthServiceTest {
 		Map<Object, Object> redisData = Map.of("certificationCode", certificationCode, "verifyType",
 			verifyType.toString(), "sendCount", "1");
 
-		Member member = Member.builder().email(email).username("testUsername").password("oldPassword").build();
+		Member member = Member.builder()
+			.email(email)
+			.username("testUsername")
+			.password("oldPassword")
+			.loginType(LoginType.EMAIL)
+			.build();
 
 		given(redisService.getHashDataAll("certification_email:" + email)).willReturn(redisData);
 

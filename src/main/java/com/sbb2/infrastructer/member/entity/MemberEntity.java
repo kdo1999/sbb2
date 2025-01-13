@@ -1,5 +1,9 @@
 package com.sbb2.infrastructer.member.entity;
 
+import java.time.LocalDateTime;
+
+import com.sbb2.common.util.BaseEntity;
+import com.sbb2.member.domain.LoginType;
 import com.sbb2.member.domain.Member;
 import com.sbb2.member.domain.MemberRole;
 
@@ -20,7 +24,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "member")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class MemberEntity {
+public class MemberEntity extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "member_id")
@@ -38,13 +42,20 @@ public class MemberEntity {
 	@Enumerated(EnumType.STRING)
 	private MemberRole memberRole;
 
+	@Enumerated(EnumType.STRING)
+	private LoginType loginType;
+
 	@Builder(access = AccessLevel.PROTECTED)
-	private MemberEntity(Long id, String username, String email, String password, MemberRole memberRole) {
+	private MemberEntity(Long id, String username, String email, String password, MemberRole memberRole,
+		LoginType loginType, LocalDateTime createdAt, LocalDateTime modifiedAt) {
 		this.id = id;
 		this.username = username;
 		this.email = email;
 		this.password = password;
 		this.memberRole = memberRole;
+		this.loginType = loginType;
+		this.createdAt = createdAt;
+		this.modifiedAt = modifiedAt;
 	}
 
 	public static MemberEntity from(Member member) {
@@ -54,6 +65,9 @@ public class MemberEntity {
 			.email(member.email())
 			.password(member.password())
 			.memberRole(member.memberRole())
+			.loginType(member.loginType())
+			.createdAt(member.createdAt())
+			.modifiedAt(member.modifiedAt())
 			.build();
 	}
 
@@ -64,6 +78,9 @@ public class MemberEntity {
 			.email(this.email)
 			.password(this.password)
 			.memberRole(this.memberRole)
+			.loginType(this.loginType)
+			.createdAt(this.createdAt)
+			.modifiedAt(this.modifiedAt)
 			.build();
 	}
 }
