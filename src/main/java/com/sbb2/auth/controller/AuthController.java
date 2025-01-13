@@ -2,6 +2,7 @@ package com.sbb2.auth.controller;
 
 import java.net.URI;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -23,20 +24,28 @@ import com.sbb2.auth.service.response.MemberEmailSignupResponse;
 import com.sbb2.auth.service.response.MemberLoginResponse;
 import com.sbb2.common.auth.userdetails.MemberUserDetails;
 import com.sbb2.common.jwt.JwtUtil;
+import com.sbb2.common.jwt.TokenType;
 import com.sbb2.common.response.GenericResponse;
 import com.sbb2.common.validation.ValidationSequence;
 import com.sbb2.member.domain.LoginType;
 
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/v1/auth")
 public class AuthController {
-	private static final int REFRESH_MAX_AGE = 24 * 60 * 60; //1일
+	private final int ACCESS_MAX_AGE; //20분
+	private final int REFRESH_MAX_AGE; //1일
 	private final AuthService authService;
 	private final JwtUtil jwtUtil;
+
+	public AuthController(AuthService authService, JwtUtil jwtUtil,
+		@Value("${jwt.refresh-max-age}") int refreshMaxAge, @Value("${jwt.access-max-age}") int ACCESS_MAX_AGE) {
+		this.authService = authService;
+		this.jwtUtil = jwtUtil;
+		this.REFRESH_MAX_AGE = refreshMaxAge;
+		this.ACCESS_MAX_AGE = ACCESS_MAX_AGE;
+	}
 
 	@PostMapping("/signup")
 	public ResponseEntity<GenericResponse<MemberEmailSignupResponse>> signup(
@@ -56,10 +65,11 @@ public class AuthController {
 		String accessToken = jwtUtil.createAccessToken(memberLoginResponse);
 		String refreshToken = jwtUtil.createRefreshToken(memberLoginResponse);
 
-		ResponseCookie refreshCookie = createRefreshCookie(refreshToken, REFRESH_MAX_AGE);
+		ResponseCookie accessCookie = createTokenCookie(refreshToken, ACCESS_MAX_AGE, TokenType.ACCESS);
+		ResponseCookie refreshCookie = createTokenCookie(refreshToken, REFRESH_MAX_AGE, TokenType.REFRESH);
 
 		return ResponseEntity.ok()
-			.header("Authorization", "Bearer " + accessToken)
+			.header(HttpHeaders.SET_COOKIE, accessCookie.toString())
 			.header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
 			.body(GenericResponse.of(memberLoginResponse));
 	}
@@ -71,7 +81,8 @@ public class AuthController {
 
 		jwtUtil.logout(accessToken, refreshToken);
 
-		ResponseCookie refreshCookie = createRefreshCookie(null, 0);
+		ResponseCookie refreshCookie = createTokenCookie(null, 0, TokenType.REFRESH);
+		ResponseCookie accessCookie = createTokenCookie(null, 0, TokenType.ACCESS);
 
 		return ResponseEntity.ok()
 			.header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
@@ -108,18 +119,20 @@ public class AuthController {
 	/**
 	 * RefreshToken를 파라미터로 보내면 쿠키를 생성후 반환
 	 *
-	 * @param refreshToken
+	 * @param tokenValue
 	 * @return {@link ResponseCookie}
 	 */
-	private ResponseCookie createRefreshCookie(String refreshToken, int maxAge) {
-		return ResponseCookie
-			.from("refresh", refreshToken)
-			.domain("localhost") //로컬에서 사용할 때 사용
-			.path("/")
-			.httpOnly(true)
-			.secure(false)
-			.maxAge(maxAge) //1일
-			.sameSite("Strict")
-			.build();
+	private ResponseCookie createTokenCookie(String tokenValue, int maxAge, TokenType tokenType) {
+		ResponseCookie responseCookie = ResponseCookie
+					.from(tokenType.toString(), tokenValue)
+					.domain("localhost") //로컬에서 사용할 때 사용
+					.path("/")
+					.httpOnly(true)
+					.secure(false)
+					.maxAge(maxAge) //1일
+					.sameSite("Strict")
+					.build();
+
+		return responseCookie;
 	}
 }
