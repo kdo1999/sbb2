@@ -81,10 +81,11 @@ public class AuthController {
 
 		jwtUtil.logout(accessToken, refreshToken);
 
-		ResponseCookie refreshCookie = createTokenCookie(null, 0, TokenType.REFRESH);
 		ResponseCookie accessCookie = createTokenCookie(null, 0, TokenType.ACCESS);
+		ResponseCookie refreshCookie = createTokenCookie(null, 0, TokenType.REFRESH);
 
 		return ResponseEntity.ok()
+			.header(HttpHeaders.SET_COOKIE, accessCookie.toString())
 			.header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
 			.body(GenericResponse.of());
 	}
