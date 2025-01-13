@@ -29,13 +29,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * JWT 관련 로직을 처리하는 클래스 입니다.
- *
- * @author : Kim Dong O
- * @fileName : JwtUtil
- * @since : 05/14/24
- */
 @Slf4j
 @Transactional(readOnly = true)
 @Component
