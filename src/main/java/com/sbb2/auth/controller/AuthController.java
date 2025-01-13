@@ -65,7 +65,7 @@ public class AuthController {
 		String accessToken = jwtUtil.createAccessToken(memberLoginResponse);
 		String refreshToken = jwtUtil.createRefreshToken(memberLoginResponse);
 
-		ResponseCookie accessCookie = createTokenCookie(refreshToken, ACCESS_MAX_AGE, TokenType.ACCESS);
+		ResponseCookie accessCookie = createTokenCookie(accessToken, ACCESS_MAX_AGE, TokenType.ACCESS);
 		ResponseCookie refreshCookie = createTokenCookie(refreshToken, REFRESH_MAX_AGE, TokenType.REFRESH);
 
 		return ResponseEntity.ok()
