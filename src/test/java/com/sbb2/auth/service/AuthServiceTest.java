@@ -90,6 +90,32 @@ public class AuthServiceTest {
 		assertThat(memberEmailSignupResponse.memberRole()).isEqualTo(MemberRole.USER);
 	}
 
+	@DisplayName("회원가입시 LoginType가 null일때 실패 테스트")
+	@Test
+	void signup_login_type_isNull_fail() {
+		//given
+		String email = "testEmail@naver.com";
+		String username = "testUsername";
+		String password = "testPassword";
+		LoginType loginType = null;
+
+		Member givenMember = Member.builder()
+			.email(email)
+			.username(username)
+			.password(password)
+			.memberRole(MemberRole.USER)
+			.loginType(LoginType.EMAIL)
+			.build();
+
+		given(memberRepository.existsByEmail(email)).willReturn(false);
+		given(memberRepository.existsByUsername(username)).willReturn(false);
+
+		//when & then
+		assertThatThrownBy(() -> authService.signup(email, username, password, loginType))
+			.isInstanceOf(AuthBusinessLogicException.class)
+			.hasMessage(AuthErrorCode.LOGIN_TYPE_NOT_SUPPORT.getMessage());
+	}
+
 	@DisplayName("회원가입시 이메일 중복 실패 테스트")
 	@Test
 	void signup_exists_email_fail() {
