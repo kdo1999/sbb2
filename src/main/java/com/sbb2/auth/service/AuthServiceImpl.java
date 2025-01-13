@@ -49,6 +49,10 @@ public class AuthServiceImpl implements AuthService {
 
 	@Override
 	public MemberEmailSignupResponse signup(String email, String username, String password, LoginType loginType) {
+		if (loginType == null) {
+			throw new AuthBusinessLogicException(AuthErrorCode.LOGIN_TYPE_NOT_SUPPORT);
+		}
+
 		existsMember(email, username);
 
 		Member.MemberBuilder memberBuilder = Member.builder()
@@ -57,10 +61,10 @@ public class AuthServiceImpl implements AuthService {
 			.memberRole(MemberRole.USER)
 			.loginType(loginType);
 
+
 		switch (loginType) {
 			case EMAIL -> memberBuilder.password(passwordEncoder.encode(password));
 			case KAKAO, NAVER -> memberBuilder.password(passwordEncoder.encode(createPassword()));
-			default -> throw new AuthBusinessLogicException(AuthErrorCode.LOGIN_TYPE_NOT_SUPPORT);
 		}
 
 		Member savedMember = memberRepository.save(memberBuilder.build());
