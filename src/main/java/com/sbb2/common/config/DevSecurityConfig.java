@@ -1,11 +1,13 @@
 package com.sbb2.common.config;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -13,10 +15,17 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
+import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorHandler;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -24,6 +33,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sbb2.common.auth.filter.JwtFilter;
+import com.sbb2.common.auth.oauth2.CustomResponseConverter;
+import com.sbb2.common.auth.oauth2.OAuth2SuccessHandler;
 import com.sbb2.common.auth.service.MemberDetailsService;
 import com.sbb2.common.jwt.JwtUtil;
 
@@ -38,11 +49,9 @@ public class DevSecurityConfig {
 	private final ObjectMapper objectMapper;
 	private final JwtUtil jwtUtil;
 	private final MemberDetailsService memberDetailsService;
-
-	@Bean
-	public BCryptPasswordEncoder bCryptPasswordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+	private final OAuth2SuccessHandler oAuth2SuccessHandler;
+	private final OAuth2UserService oAuth2UserService;
+	private final PasswordEncoder passwordEncoder;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -76,6 +85,13 @@ public class DevSecurityConfig {
 			)
 			.formLogin(AbstractHttpConfigurer::disable)
 			.httpBasic(AbstractHttpConfigurer::disable)
+			.oauth2Login(oauth2 -> {
+				oauth2.userInfoEndpoint((userInfoConfig) -> userInfoConfig.userService(oAuth2UserService))
+					.tokenEndpoint(token -> {
+						token.accessTokenResponseClient(accessTokenResponseClient());
+					})
+					.successHandler(oAuth2SuccessHandler);
+			})
 			.sessionManagement(
 				session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 			);
@@ -130,5 +146,26 @@ public class DevSecurityConfig {
 			.addUriPattern(HttpMethod.DELETE, "/api/v1/question/*", "/api/v1/answer/*", "/api/v1/voter/*",
 				"/api/v1/comment/*");
 		return jwtFilter;
+	}
+
+	/**
+	 * 인증 코드 인가 요청을 처리하기 위한 커스텀 OAuth2AccessTokenResponseClient를 구성합니다.
+	 *
+	 * @return 커스텀 설정이 적용된 OAuth2AccessTokenResponseClient
+	 */
+	@Bean
+	public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> accessTokenResponseClient() {
+		DefaultAuthorizationCodeTokenResponseClient accessTokenResponseClient = new DefaultAuthorizationCodeTokenResponseClient();
+
+		OAuth2AccessTokenResponseHttpMessageConverter tokenResponseHttpMessageConverter = new OAuth2AccessTokenResponseHttpMessageConverter();
+
+		// 카카오 응답 값에서 refreshToken을 추출하기 위한 생성 및 커스텀 토큰 응답 컨버터 설정
+		tokenResponseHttpMessageConverter.setAccessTokenResponseConverter(new CustomResponseConverter());
+
+		RestTemplate restTemplate = new RestTemplate(
+			Arrays.asList(new FormHttpMessageConverter(), tokenResponseHttpMessageConverter));
+		restTemplate.setErrorHandler(new OAuth2ErrorResponseErrorHandler());
+		accessTokenResponseClient.setRestOperations(restTemplate);
+		return accessTokenResponseClient;
 	}
 }

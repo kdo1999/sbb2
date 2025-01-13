@@ -53,6 +53,9 @@ dependencies {
     // spring-redis-data 라이브러리
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+    //oAuth2 라이브러리
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.h2database:h2'
     annotationProcessor 'org.projectlombok:lombok'
