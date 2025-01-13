@@ -11,6 +11,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.sbb2.auth.service.response.MemberLoginResponse;
 import com.sbb2.common.jwt.exception.JwtTokenBusinessLogicException;
@@ -36,8 +37,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Transactional(readOnly = true)
 public class JwtUtil {
-	private static final String ACCESS_TOKEN = "ACCESS";
-	private static final String REFRESH_TOKEN = "REFRESH";
 	private static final String REDIS_JWT_PREFIX = "jwt_member:";
 	private static final String REDIS_BLACK_VALUE = "black";
 	private final SecretKey secretKey;
@@ -57,12 +56,23 @@ public class JwtUtil {
 	 * @return String
 	 */
 	public String getAccessToken(HttpServletRequest request) {
-		String authorization = request.getHeader("Authorization");
+		String access = null;
+		Cookie[] cookies = request.getCookies();
 
-		if (authorization == null || !authorization.startsWith("Bearer ")) {
-			throw new JwtTokenBusinessLogicException(JwtTokenErrorCode.BAD_REQUEST);
+		//cookies null이 아니라면
+		if (cookies != null) {
+			for (Cookie cookie : cookies) {
+				if (cookie.getName().equals(TokenType.ACCESS.toString())) {
+					access = cookie.getValue();
+				}
+			}
 		}
-		return authorization.split(" ")[1];
+
+		if (!StringUtils.hasText(access)) {
+			throw new JwtTokenBusinessLogicException(JwtTokenErrorCode.MALFORMED);
+		}
+
+		return access;
 	}
 
 	/**
@@ -79,13 +89,13 @@ public class JwtUtil {
 		//cookies null이 아니라면
 		if (cookies != null) {
 			for (Cookie cookie : cookies) {
-				if (cookie.getName().equals("refresh")) {
+				if (cookie.getName().equals(TokenType.REFRESH)) {
 					refresh = cookie.getValue();
 				}
 			}
 		}
 
-		if (refresh == null) {
+		if (!StringUtils.hasText(refresh)) {
 			throw new JwtTokenBusinessLogicException(JwtTokenErrorCode.MALFORMED);
 		}
 
@@ -158,7 +168,7 @@ public class JwtUtil {
 	}
 
 	public boolean isAccessToken(String token) {
-		return getCategory(token).equals(ACCESS_TOKEN);
+		return getCategory(token).equals(TokenType.ACCESS.toString());
 	}
 
 	/**
@@ -186,7 +196,7 @@ public class JwtUtil {
 	}
 
 	public boolean isRefreshToken(String token) {
-		return getCategory(token).equals(REFRESH_TOKEN);
+		return getCategory(token).equals(TokenType.REFRESH);
 	}
 
 	/**
@@ -198,7 +208,7 @@ public class JwtUtil {
 	public String createAccessToken(MemberLoginResponse memberLoginResponse) {
 		Map<String, String> map = new HashMap<>();
 
-		map.put("category", ACCESS_TOKEN);
+		map.put("category", TokenType.ACCESS.toString());
 		map.put("username", memberLoginResponse.username());
 		map.put("email", memberLoginResponse.email());
 		map.put("memberRole", memberLoginResponse.memberRole().toString());
@@ -224,7 +234,7 @@ public class JwtUtil {
 	public String createRefreshToken(MemberLoginResponse memberLoginSuccessDto) {
 		Map<String, String> map = new HashMap<>();
 
-		map.put("category", REFRESH_TOKEN);
+		map.put("category", TokenType.REFRESH.toString());
 		map.put("email", memberLoginSuccessDto.email().toString());
 
 		LocalDateTime issuedAt = createIssuedAt();
