@@ -79,7 +79,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 	@Override
 	protected void handle(HttpServletRequest request, HttpServletResponse response,
 		Authentication authentication) throws IOException {
-		getRedirectStrategy().sendRedirect(request, response, "http://localhost:3000");
+		getRedirectStrategy().sendRedirect(request, response, "http://localhost:3000/oauth/callback");
 	}
 
 	private ResponseCookie createTokenCookie(String tokenValue, int maxAge, TokenType tokenType) {
