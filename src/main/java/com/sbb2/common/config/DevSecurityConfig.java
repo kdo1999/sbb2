@@ -69,7 +69,7 @@ public class DevSecurityConfig {
 				.requestMatchers(HttpMethod.POST, "/api/v1/auth/code", "/api/v1/auth/password/reset")
 				.permitAll()
 				.requestMatchers(HttpMethod.GET, "/api/v1/question/{id}", "/api/v1/answer/{id}", "/api/v1/answer",
-					"/api/v1/comment")
+					"/api/v1/comment", "/api/v1/member/info")
 				.hasRole("USER")
 				.requestMatchers(HttpMethod.POST, "/api/v1/question", "/api/v1/answer", "/api/v1/voter/{id}",
 					"/api/v1/comment")
@@ -139,7 +139,7 @@ public class DevSecurityConfig {
 
 		jwtFilter
 			.addUriPattern(HttpMethod.GET, "/api/v1/question/*", "/api/v1/answer/*", "/api/v1/answer",
-				"/api/v1/comment")
+				"/api/v1/comment", "/api/v1/member/info")
 			.addUriPattern(HttpMethod.POST, "/api/v1/question", "/api/v1/answer", "/api/v1/voter/*", "/api/v1/comment")
 			.addUriPattern(HttpMethod.PATCH, "/api/v1/question/*", "/api/v1/answer/*", "/api/v1/comment/*",
 				"/api/v1/auth/password/change")
