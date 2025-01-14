@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+  sbb2-backend:
+    container_name: alllink-backend
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+#    environment:
+#      - SPRING_PROFILES_ACTIVE=dev
+    volumes:
+      - ./logs:/application/logs
+    networks:
+      - sbb-net
+
+
+  sbb2-redis:
+    image: redis:latest
+    container_name: redis
+    hostname: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - sbb-net
+
+
+networks:
+  sbb-net:
+    external: true
